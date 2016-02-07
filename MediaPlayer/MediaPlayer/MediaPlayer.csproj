@@ -307,12 +307,11 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2055</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-<<<<<<< HEAD
-          <IISUrl>http://gborderolle:7070/</IISUrl>
-=======
+
+          <!-- --><IISUrl>http://gborderolle:7070/</IISUrl> -->
           <IISUrl>http://localhost:7070/</IISUrl>
           <!--<IISUrl>http://localhost/</IISUrl>-->
->>>>>>> origin/master
+
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
