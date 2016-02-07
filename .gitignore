@@ -49,3 +49,7 @@ Temporary Items
 # Media Player
 *.config
 
+*.pdb
+MediaPlayer/MediaPlayer/obj/Debug/MediaPlayer.pdb
+*.pdb
+MediaPlayer/MediaPlayer/obj/Debug/MediaPlayer.dll
