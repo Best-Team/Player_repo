@@ -194,7 +194,7 @@
         else if (rangeMinutes < 600) {
             ticksRange = "15minute"
         }
-        else if (rangeMinutes < 1440) {
+        else if (rangeMinutes <= 1440) {
             ticksRange = "1hour"
         }
         else {

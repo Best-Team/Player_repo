@@ -521,7 +521,6 @@
            // ******** Globalplay ********
 
            // Set current timer
-
            var date_str1 = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
 
            var date1 = new Date(date);
@@ -538,9 +537,10 @@
            $('#lblGlobalplay_timer_current').timer({
                seconds: Seconds_Between_Dates
            });
+           $('#lblGlobalplay_timer_current').timer('pause');
 
            console.log("Seconds_Between_Dates: " + Seconds_Between_Dates);
-           startGlobalplay();
+           //startGlobalplay();
        }
 
        // Event Drag & Drop: Dragging
@@ -567,7 +567,6 @@
            // ******** Globalplay ********
 
            // Stop timer 
-
            abortGlobalplay();
        }
 
