@@ -307,7 +307,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2055</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://gborderolle:7070/</IISUrl>
+          <IISUrl>http://localhost:7070/</IISUrl>
           <!--<IISUrl>http://localhost/</IISUrl>-->
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
