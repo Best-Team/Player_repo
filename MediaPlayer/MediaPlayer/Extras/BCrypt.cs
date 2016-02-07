@@ -21,7 +21,7 @@ namespace MediaPlayer.Extras
     // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
     // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-    [assembly: System.Reflection.AssemblyVersion("0.1")]
+    //[assembly: System.Reflection.AssemblyVersion("0.1")]
 
     /// <summary>BCrypt implements OpenBSD-style Blowfish password hashing
     /// using the scheme described in "A Future-Adaptable Password Scheme"
