@@ -143,11 +143,7 @@ namespace MediaPlayer
 
                 if (!string.IsNullOrWhiteSpace(fileName))
                 {
-                    string[] extensionArray = fileName.Split('.');
-                    if (extensionArray.Length > 0)
-                    {
-                        file_extension = extensionArray[1];
-                    }
+                    file_extension = fileName.Substring(fileName.LastIndexOf('.'));
                 }
 
                 /* ******** Global variables ******** */
@@ -235,7 +231,7 @@ namespace MediaPlayer
                         repoFilename = guid + ".bin";
 
                         // File name auxiliar with real extension
-                        repoFilenameAUX = guid + "." + file_extension;
+                        repoFilenameAUX = guid + file_extension;
 
                         // Repository relative path
                         relativeLocalPath = datetime_final.Year.ToString("D4") + "\\" + datetime_final.Month.ToString("D2") + "\\" + datetime_final.Day.ToString("D2") + "\\" + datetime_final.Hour.ToString("D2") + "\\";
@@ -360,8 +356,10 @@ namespace MediaPlayer
 
         private string GetFileMediaType(string file_extension)
         {
+            var extension = file_extension.TrimStart('.');
+
             string mediaType = "D";
-            switch (file_extension.ToLowerInvariant())
+            switch (extension.ToLowerInvariant())
             {
                 case "fbs":
                     {
