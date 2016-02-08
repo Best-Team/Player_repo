@@ -327,8 +327,7 @@
                                                    $('tr:visible td input:checked').parent().parent().hide();
 
                                                    // Disable element in memory elements 
-                                                   var
-                                                       _hdnIsUpdateNeeded = $("input[id*='_hdnIsUpdateNeeded']");
+                                                   var _hdnIsUpdateNeeded = $("input[id*='_hdnIsUpdateNeeded']");
                                                    if (
                                                        _hdnIsUpdateNeeded != null) {
                                                        _hdnIsUpdateNeeded.val("true");
@@ -506,8 +505,6 @@
 
        }); // END On Ready
 
-       
-
        // Event Drag & Drop: Stop Dragging
        function handleDragStop(event, ui) {
            var posX = ui.offset.left - $("#svg_timeframe").offset().left;
@@ -518,7 +515,6 @@
                $("#commentDate").val(date_str.format('DD-MM-YYYY HH:mm:ss'));
                $("input[id*='uploadDate']").val(date_str.format('DD-MM-YYYY HH:mm:ss'));
            }
-
 
            // ******** Globalplay ********
 
