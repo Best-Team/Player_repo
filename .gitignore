@@ -51,6 +51,6 @@ Temporary Items
 *.csproj
 *.sln
 *.suo
-MediaPlayer/MediaPlayer.sln
-MediaPlayer/MediaPlayer.v12.suo
-*.csproj
+*.pdb
+MediaPlayer/MediaPlayer/obj/Debug/MediaPlayer.dll
+MediaPlayer/MediaPlayer/obj/Debug/MediaPlayer.csproj.FileListAbsolute.txt
