@@ -183,6 +183,7 @@
                stopFBSPlayer();
                var table = $(e.target).closest('table');
 
+               /* Warning: --- This is a Workaround to avoid click event changing the property --- */
                // Disable click events
                $('tr:visible td input:checkbox', table).attr('disabled', 'true');
 
@@ -191,6 +192,7 @@
 
                // Enable click events
                $('tr:visible td input:checkbox', table).removeAttr('disabled');
+               /* --- Workaround --- */
 
                var timeline_data = _TL_DATA; // Copy original timeline elements as reference
                var new_timeline_data = jQuery.extend(true, {},_TL_DATA); // Clone the object, do not reference it
@@ -533,14 +535,17 @@
 
            GLOBALPLAY_seconds_current = Seconds_Between_Dates;
 
+           // Clear global timer
            $('#lblGlobalplay_timer_current').timer('remove');
+
+           // Set global timer current progress
            $('#lblGlobalplay_timer_current').timer({
+               format: '%H:%M:%S',
                seconds: Seconds_Between_Dates
            });
-           $('#lblGlobalplay_timer_current').timer('pause');
 
-           console.log("Seconds_Between_Dates: " + Seconds_Between_Dates);
-           //startGlobalplay();
+           // Pause global timer 
+           $('#lblGlobalplay_timer_current').timer('pause');
        }
 
        // Event Drag & Drop: Dragging
@@ -1934,11 +1939,13 @@
                }
                lnkElementDownload.attr("href", filePath_str);
            }
+
            // Clear previous onclick or click events
            btnRemoveElement.attr('onclick', '');
            btnRemoveElement.off("click");
            btnConfirmRemoveElement.attr('onclick', '');
            btnConfirmRemoveElement.off("click");
+
            // Load on click event remove button
            var btnRemoveElement = $("#btnRemoveElement");
            btnRemoveElement.bind("click", function () {
@@ -1959,8 +1966,8 @@
            // Load on click event remove button
            btnConfirmRemoveElement.bind("click", function () {
 
-        var userID = '<%= Session["UserID"] %>';
-         var password_input = $("#txbConfirmRemoveElement");
+             var userID = '<%= Session["UserID"] %>';
+             var password_input = $("#txbConfirmRemoveElement");
 
          if (userID != null && userID != "" && password_input != null && password_input.val() != "") {
              $.ajax({
@@ -1985,9 +1992,8 @@
                          /************************ Reload timeline BEGIN ************************/
 
                          $("#timeframe").empty(); // Clean div content
-                         var new_timeline_data =
-                             jQuery.extend(true, {},
-                                 _TL_DATA); // It clones the object, do not references it
+                         var new_timeline_data = jQuery.extend(true, {}, _TL_DATA); // It clones the object, do not references it
+
                          if (new_timeline_data.spans != null && new_timeline_data.spans.length > 0) {
                              new_timeline_data.spans =
                                  $.grep(_TL_DATA.spans,
@@ -2103,13 +2109,16 @@
 
      // Empty title
          $("#lblSoundTitle1_AUDIO, #lblSoundTitle2_AUDIO").text("");
+
      // Set pause icon to players
          divControlsMask_AUDIO.addClass("paused");
          divControlsMask_AUDIO.removeClass("playing");
          divControlsMask_VIDEO.addClass("paused");
          divControlsMask_VIDEO.removeClass("playing");
+
      // Hide comments
          $("div[name='divComment']").hide();
+
      // Empty screen recording applet or avi video plugin
          if (divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
              divPlayer_VIDEO.empty();
@@ -2205,7 +2214,9 @@
                  // Click over progress bar 
                  // Video player
                  $("#sm2-progress-track_VIDEO").on("click", { _duration: duration, _d: $(this) }, setVideoCurrent);
+
                  // Bottom progress track
+
                  $("#sm2-progress-track").on("click", { _duration: duration }, setVideoCurrent);
                  // Click over play/pause button 
                  divControlsMask_AUDIO.on("click", { _tapeID: tapeID }, playAudioElement);
@@ -2311,6 +2322,7 @@
                  if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length) {
                      divControlsMask_AUDIO.show("blind", 200);
                  }
+
                  // Set title
                  $("#lblSoundTitle1_AUDIO, #lblSoundTitle2_AUDIO").text(fileName);
 
@@ -2320,9 +2332,8 @@
                      p = filePath_EXTRA;
                  }
 
-                 lnkSound_AUDIO.attr("href", p); // Set file path
-
-                 //SetAudioPlaylistURL(0, filePath_str);
+                 // Prepare audio player
+                 lnkSound_AUDIO.attr("href", p); 
                  SetAudioPlaylistURL(0, p);
 
                  // IMPORTANT: GET SCREEN RECORDINGS ELEMENTS IN RANGE -- Currently Disabled
@@ -2330,8 +2341,8 @@
                  /*
 
                  // Add seconds to startDate
-                 var myDateEnd1 = moment(timestamp, "dd-MM-yyyy HH:mm:ss");
-                 var myDateEnd2 = moment(timestamp, "dd-MM-yyyy HH:mm:ss");
+                 var myDateEnd1 = moment(timestamp, "DD-MM-YYYY HH:mm:ss");
+                 var myDateEnd2 = moment(timestamp, "DD-MM-YYYY HH:mm:ss");
 
                  myDateEnd2.add(duration, "seconds");
                  var myDateStart2 = myDateEnd1.toDate();
@@ -2451,8 +2462,7 @@
                  loadPlayerBoxImage("url(assets/images/audio.png)");
              }
 
-
-             // PCM WAVE - Case
+             /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
              var ext = getFileExtension(fileName);
              if ((ext != null && ext.length > 0 && ext[0] === "wav" || ext[0] === "crypt") && getIsIE()) {
 
@@ -2462,6 +2472,7 @@
 
                  // Source: http://joliclic.free.fr/html/object-tag/en/
 
+                 // ActiveX object
                  var wav_object = "<object data='" + p + "' type='audio/x-wav' width='" + w + "' height='" + h + "'>";
                  wav_object += " <param name='src' value='" + p + "'>";
                  wav_object += " <param name='autoplay' value='false'>";
@@ -2473,6 +2484,8 @@
                  $("#audioContainer").append(wav_object);
                  divControlsMask_AUDIO.hide();
              }
+             /* Important: ----------- PCM WAVE - Case ----------- */
+
              //#endregion
 
          } else if (tapeType === "C") {
@@ -2480,7 +2493,7 @@
              //#region COMMENT ELEMENT ------------
 
              //****************************************************************************************
-             //************************************* COMMENT  *****************************************
+             //************************************* 3. COMMENT  **************************************
              //****************************************************************************************
 
              removeDivPlayerContentExcept();
@@ -2505,7 +2518,7 @@
              //#region IMAGE ELEMENT (I)  ------------
 
              //****************************************************************************************
-             //*************************************** IMAGE  *****************************************
+             //*************************************** 4. IMAGE  **************************************
              //****************************************************************************************
 
          else if (tapeType === "I") {
@@ -2546,7 +2559,7 @@
              //#region DOCUMENT ELEMENT (D)  ------------
 
              //****************************************************************************************
-             //************************************ DOCUMENT  *****************************************
+             //************************************ 5. DOCUMENT  **************************************
              //****************************************************************************************
 
              loadPlayerBoxImage("url(assets/images/document.png)");
@@ -2566,7 +2579,7 @@
              //#region VIDEO ELEMENT (V)  ------------
 
              //****************************************************************************************
-             //************************************** VIDEO  ******************************************
+             //************************************** 6. VIDEO ****************************************
              //****************************************************************************************
 
              // SET Element file path
@@ -2738,10 +2751,13 @@
        }
 
        function SetAudioPlaylistURL(number, vURL){
-           var player = window.sm2BarPlayers[number];
-            if (player != null && player.playlistController && player.playlistController.getSoundObject()) {
-                if (player.playlistController.getSoundObject()._iO != null && player.playlistController.getSoundObject()._iO && player.playlistController.getSoundObject()._iO.url != null)
-                {
+           var player = window.sm2BarPlayers[number]; // Collection priority
+           if (player != null && player.playlistController && player.playlistController.getSoundObject()) {
+
+               // ToDo: Research this.
+               /* Workaround: sometimes SoundManager.js uses ._iO object to reproduce the audio, and other times uses the object returned by getSoundObject() directly */
+                if (player.playlistController.getSoundObject()._iO != null && player.playlistController.getSoundObject()._iO &&
+                    player.playlistController.getSoundObject()._iO.url != null){
                     player.playlistController.getSoundObject()._iO.url = vURL;
                 }
                 if (player.playlistController.getSoundObject().url != null && player.playlistController.getSoundObject().url) {
@@ -3176,7 +3192,8 @@
      function compare(key, value) {
          if (key == "start" || key == "end") {
              var date_str = value.toString();
-             var value_date = moment(date_str, "dd-MM-yyyy HH:mm:ss:");
+             var value_date = moment(date_str, "DD-MM-YYYY HH:mm:ss");
+
              if (key == "start" && value_date < min) {
                  _TL_STARTDATE = value;
                  min = value_date;
@@ -3631,8 +3648,8 @@
          if (elementsInMemory != null && elementsInMemory.length > 0) {
              var array = elementsInMemory.filter(function (el) {
                  return (el.tapeType === 'S' || el.tapeType === 'A') && el.tapeID != originalID && el.isPlaying === "false" &&
-                     moment(el.timestamp, "dd-MM-yyyy HH:mm:ss").toDate() >= timeStart &&
-                     moment(el.timestamp, "dd-MM-yyyy HH:mm:ss").toDate() <= timeCurrent;
+                     moment(el.timestamp, "DD-MM-YYYY HH:mm:ss").toDate() >= timeStart &&
+                     moment(el.timestamp, "DD-MM-YYYY HH:mm:ss").toDate() <= timeCurrent;
              });
              return array;
          }
@@ -3646,8 +3663,8 @@
              if(element_caller != null){
                  var array = elementsInMemory.filter(function (el) {
                      return (el.tapeType === 'S' || el.tapeType === 'A' || el.tapeType === 'V') && el.tapeType != element_caller.tapeType && el.tapeID != originalID && el.isPlaying === "false" &&
-                         moment(el.timestamp, "dd-MM-yyyy HH:mm:ss").toDate() >= timeStart &&
-                         moment(el.timestamp, "dd-MM-yyyy HH:mm:ss").toDate() <= timeCurrent &&
+                         moment(el.timestamp, "DD-MM-YYYY HH:mm:ss").toDate() >= timeStart &&
+                         moment(el.timestamp, "DD-MM-YYYY HH:mm:ss").toDate() <= timeCurrent &&
                          $("#tlTape_" + el.tapeID).length > 0;
                  });
              }
@@ -3658,10 +3675,10 @@
      function getElementInMemoryByTimeRangeAux(current_date) {
          if (elementsInMemory != null && elementsInMemory.length > 0) {
              var array = elementsInMemory.filter(function (el) {
-                 var end1 = moment(el.timestamp, "dd-MM-yyyy HH:mm:ss");
+                 var end1 = moment(el.timestamp, "DD-MM-YYYY HH:mm:ss");
                  end1.add(el.duration, "seconds");
                  return (el.tapeType === 'S' || el.tapeType === 'A') &&
-                     current_date >= moment(el.timestamp, "dd-MM-yyyy HH:mm:ss").toDate() &&
+                     current_date >= moment(el.timestamp, "DD-MM-YYYY HH:mm:ss").toDate() &&
                      end1.toDate() >= current_date;
              });
              return array;
@@ -3842,7 +3859,7 @@
      }
  }
 
-       /******** START: Media Player 2.0: Nuevo Requerimiento: Play global ********/
+       /******** START: Media Player 2.0: Nuevo Requerimiento: Global Play ********/
 
        // stack_elements [object, taken: bool]
 
@@ -3883,13 +3900,16 @@
            //console.log("initGlobalplay");
 
            var w = $("#divTimelineProgress").css("width");
-           $("#sm2-progress-track").css("width", w);           
+           $("#sm2-progress-track").css("width", w);
 
            // Timer Source: http://jquerytimer.com/
 
            // Init event while playing
            timer_globalplay = setInterval(whilePlayingGlobalplay, 1000);
-           }
+
+           // Enable right side Player box
+           $("#divPanel_PlayerControl").removeClass("disabled");
+       }
 
        var timer = 0;
        function whilePlayingGlobalplay() {
@@ -3905,46 +3925,122 @@
            //console.log("GLOBALPLAY_seconds_current: " + GLOBALPLAY_seconds_current);
            //console.log("progress_percentage: " + progress_percentage);
 
-           $("#sm2-progress-ball_TIMELINE").css("left", left_final_percentage);
+           if (progress_percentage <= 100) { // If it is still in range 
+               $("#sm2-progress-ball_TIMELINE").css("left", left_final_percentage);
 
-           // Search elements in current playtime
-           var elementsCandidate = getElementInMemoryByCurrentPlayingTime();
-           if (elementsCandidate != null && elementsCandidate.length > 0) {
+               /* Important: ----- Elements finding section ----- */
 
-               $("#lblGlobalplay_element_count").text(elementsCandidate.length);
+               // Search elements in current playtime
+               var elementsCandidate = getElementInMemoryByCurrentPlayingTime();
+               if (elementsCandidate != null && elementsCandidate.length > 0) {
 
-               console.log(" getElementInMemoryByCurrentPlayingTime() ");
+                   // Set label elements on play
+                   $("#lblGlobalplay_element_count").text(elementsCandidate.length);
 
-               var ids = "";
+                   // Prepare URL elements to reproduce
+                   var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download;
+                   var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
 
-               for (var i = 0; i < elementsCandidate.length; i++) {
-                   var el = elementsCandidate[i];
-                   if (el != null) {
-                       //el[1] = true;
-                       
-                       ids = ids + el[0].tapeID + "(" + el[0].tapeType + "), ";
+                   var ids = "";
+                   for (var i = 0; i < elementsCandidate.length; i++) {
+                       var el = elementsCandidate[i];
+                       if (el != null) {
 
-                        var current_duration = GLOBALPLAY_seconds_current;
-                        var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
-                        timeCurrent.add(current_duration, "seconds");
+                           ids = ids + el[0].tapeID + "(" + el[0].tapeType + "), ";
 
-                        var element_end = moment(el[0].timestamp, "dd-MM-yyyy HH:mm:ss");
-                        element_end.add(el[0].duration, "seconds");
+                           var current_duration = GLOBALPLAY_seconds_current;
+                           var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
+                           timeCurrent.add(current_duration, "seconds");
 
-                        console.log(" --------- " + el[0].tapeID);
-                        console.log("el start - " + el[0].timestamp);
-                        console.log("CURRENT - " + timeCurrent.toDate());
-                        console.log("el end - " + element_end.toDate());
+                           var element_end = moment(el[0].timestamp, "DD-MM-YYYY HH:mm:ss");
+                           element_end.add(el[0].duration, "seconds");
 
-                   }
-               } // for
+                           // Si el elemento no fue procesado, hacerlo
+                           if (el[1] == false) {
+                               el[1] = true;
 
-               $("#lblGlobalplay_element_ids").text(ids);
+                               var type = el[0].tapeType;
+                               /*
+                               A: Audio
+                               V: Video
+                               S: Screen recording
+                               I: Image
+                               D: Document
+                               C: Comment
+                               */
+
+                               // IsExtra = If filePath is NOT empty, then is extra from incextras table
+                               var isExtra = el[0].filePath.length == 0 ? false : true;
+
+                               // Prepare URL elements
+                               filePath_EXTRA += "?id=" + el[0].segmentID + "&isExtra=1";
+                               filePath_OREKA += "?segid=" + el[0].segmentID;
+
+                               // SET Element file path
+                               var p = isExtra ? filePath_EXTRA : filePath_OREKA;
+
+                               switch (type) {
+                                   case "A": {
+
+                                       // Prepare audio player
+                                       $("#lnkSound_AUDIO").attr("href", p);
+                                       SetAudioPlaylistURL(0, p);
+
+                                       // Set title
+                                       $("#lblSoundTitle1_AUDIO, #lblSoundTitle2_AUDIO").text(el[0].fileName);
+
+                                       // Clear audio player timers
+                                       $("#sm2-inline-time_AUDIO").text("0:00");
+                                       $("#sm2-inline-duration_AUDIO").text("0:00");
+
+                                       // Play audio
+                                       if (window.sm2BarPlayers != null && window.sm2BarPlayers.length > 0 &&
+                                           window.sm2BarPlayers[0].actions != null) {
+                                           window.sm2BarPlayers[0].actions.play();
+                                       }
+                                       break;
+                                   }
+
+                                   case "V": {
+                                       break;
+                                   }
+
+                                   case "S": {
+                                       break;
+                                   }
+
+                                   case "I": {
+                                       break;
+                                   }
+
+                                   case "D": {
+                                       break;
+                                   }
+
+                                   case "C": {
+                                       break;
+                                   }
+                               }
 
 
+
+                           }
+
+                       }
+                   } // for
+
+                   // Set ids label
+                   $("#lblGlobalplay_element_ids").text(ids);
+
+               }
+
+               /* Important: ----- Elements finding section END ----- */
+
+           } else {
+               // Pointer arrived to the end
+               abortGlobalplay();
            }
-
-        }
+       }
 
        function abortGlobalplay() {
            clearInterval(timer_globalplay);
@@ -3976,7 +4072,7 @@
                        element_end.add(el[0].duration, "seconds");
                    }
 
-                   return element_start != null && element_end != null /* && el[1] === false */ &&
+                   return element_start != null && element_end != null && el[1] === false && /* && el[1] === false !!!! */ 
                        element_start.toDate() <= timeCurrent.toDate() &&
                        timeCurrent.toDate() <= element_end.toDate();
                });
@@ -3985,7 +4081,7 @@
        }
 
 
-       /******** END: Media Player 2.0: Nuevo Requerimiento: Play global ********/
+       /******** END: Media Player 2.0: Nuevo Requerimiento: Global Play ********/
 
 
 
@@ -4622,7 +4718,7 @@ div.disabled,button.disabled,a.disabled {
                                   <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                                   <span class="sr-only">Info:</span> Está a punto de borrar el elemento, confirme su contraseña para continuar
                                 </div>
-                     <input type="password" class="form-control" id="txbConfirmRemoveElement" placeholder="Contraseña" name="login-username" required="required"/>
+                            <input type="password" class="form-control" id="txbConfirmRemoveElement" placeholder="Contraseña" name="login-username" required="required"/>
                                <!--  -->
                            </div>
                            <div id="popbox_footer3" class="row row-short pull-right" style="margin-right: 15px; margin-top: 4px;">
