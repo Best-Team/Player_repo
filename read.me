@@ -1,14 +1,21 @@
 problemas resueltos:
-* PLOMAD (acceso a ficheros locales)
+* PROMAD (acceso a ficheros locales)
 * obtención del file-ext (Pendiente)
 
 -- detalles: --
 timeline largo (período de tiempo)
-* al deseleccionar un elemento del folio se pierden las marcas de las fechas intermedias
+* al deseleccionar un elemento del folio se pierden las marcas de las fechas intermedias - 
+Resp: FIXED. Esto depende de la escala que exista entre el 1er el. y el último. Igual para el caso de un día exacto, lo mejoré un poco.
 * fecha inicio y fin intercambiadas
+Resp: FIXED. En determinadas situaciones se estaban convirtiendo mal las fechas, de string a date (moment.js). 
+Ejemplo: 
+  var timeCurrent = moment(_TL_STARTDATE, "dd-mm-yyyy HH:mm:ss"); MAL
+  var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss"); BIEN
+
+
 
 timeline ie:
-* pierde elementos al deseleccionar alguno del filio (unidad: día)
+* pierde elementos al deseleccionar alguno del folio (unidad: día)
 
 el método de obtención del file-extension nos es correcto
 
