@@ -39,6 +39,7 @@ Ejemplo:
 # Media Player
 *.config
 *.csproj
+*.sln
 *.suo
 
 -> Para remover archivo que es ignorado pero ya fue uploaded al repo:
