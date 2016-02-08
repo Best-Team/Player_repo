@@ -48,4 +48,5 @@ Temporary Items
 
 # Media Player
 *.config
-
+*.csproj
+*.suo

@@ -24,7 +24,6 @@ Image:
 .bmp - html5
 
 
-
 2] Alert messages located in ExternalResources/Alert_Messages.js
 
 3] Grid results refreshes every 5 minutes
@@ -32,4 +31,16 @@ Image:
 4] NOTE: IN VISUAL STUDIO USE 'VisualStudio JavaScript & CSS Outlining' EXTENSION (Compatible with all VS versions) TO IMPROVE JS CODE DISTRIBUTION IN REGIONS
 SOURCE: http://jsoutlining.codeplex.com/
 
+5] GITHUB
+-> Para ignorar archivos al hacer commit:
+[dir_repositorio]\.gitignore
+
+Ejemplo:
+# Media Player
+*.config
+*.csproj
+*.suo
+
+-> Para remover archivo que es ignorado pero ya fue uploaded al repo:
+git rm --cached web.config
 
