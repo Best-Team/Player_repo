@@ -124,8 +124,31 @@ namespace MediaPlayer
 
         #region Private Methods
 
-        //Todo: redo local change...
-        
+        /// <summary>
+        /// Convierte el texto (si tiene) del input en formato de fecha.
+        /// Si no es posible retorna la fecha actual.
+        /// </summary>
+        private DateTime GetDateTime(HtmlInputText input, string className, string methodName)
+        {
+            DateTime datetime = DateTime.Now;
+            
+            if (input != null && !string.IsNullOrWhiteSpace(input.Value))
+            {
+                Logger.LogDebug("(%s) (%s) -- Get datetime1: Intentando convertir a datetime. Formato: dd-MM-yyyy HH:mm:ss. Dato: " + input.Value, className, methodName);
+
+                if (!DateTime.TryParseExact(input.Value, "dd-MM-yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out datetime))
+                {
+                    datetime = DateTime.Now;
+
+                    // #2- Logger exception
+                    Logger.LogError("(%s) (%s) -- Excepcion. Convirtiendo a datetime.", className, methodName);
+                    Logger.LogError("(%s) (%s) -- Dato: " + input.Value, className, methodName);
+                }
+            }
+
+            return datetime;
+        }
+
         private void UploadFile()
         {
             if (HttpContext.Current.Session["UserID"] != null && ViewState["FolioID"] != null)
@@ -155,58 +178,13 @@ namespace MediaPlayer
                 // File ID
                 string guid = Guid.NewGuid().ToString();
 
-                // Get datetime 1
-                DateTime datetime_final = DateTime.Now;
-                string datetimeStr = DateTime.Now.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
-                if (uploadDate != null && !string.IsNullOrWhiteSpace(uploadDate.Value))
-                {
-                    datetimeStr = uploadDate.Value;
-                    Logger.LogDebug("(%s) (%s) -- Get datetime1: Intentando convertir a datetime. Formato: dd-MM-yyyy HH:mm:ss. Dato: " + uploadDate.Value.ToString(), className, methodName);
-                    if (!DateTime.TryParseExact(uploadDate.Value, "dd-MM-yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out datetime_final))
-                    //if (!DateTime.TryParse(uploadDate.Value.ToString(), out datetime_final))
-                    {
-                        datetime_final = DateTime.Now;
+                // Get DateTimes 1-2-3...
+                DateTime datetime_final = GetDateTime(uploadDate, className, methodName);
+                
+                DateTime datetime2_a = GetDateTime(camarasDate1, className, methodName);
 
-                        // #2- Logger exception
-                        Logger.LogError("(%s) (%s) -- Excepcion. Convirtiendo a datetime.", className, methodName);
-                        Logger.LogError("(%s) (%s) -- Dato: " + uploadDate.Value, className, methodName);
-                    }
-                }
+                DateTime datetime2_b = GetDateTime(camarasDate2, className, methodName);
 
-                // Get datetime 2
-                DateTime datetime2_a = DateTime.Now;
-                string datetimeStr_a = DateTime.Now.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
-                if (camarasDate1 != null && !string.IsNullOrWhiteSpace(camarasDate1.Value))
-                {
-                    datetimeStr_a = camarasDate1.Value;
-                    Logger.LogDebug("(%s) (%s) -- Get datetime2_a: Intentando convertir a datetime. Formato: dd-MM-yyyy HH:mm. Dato: " + camarasDate1.Value.ToString(), className, methodName);
-                    if (!DateTime.TryParseExact(camarasDate1.Value, "dd-MM-yyyy HH:mm", null, System.Globalization.DateTimeStyles.None, out datetime2_a))
-                    //if (!DateTime.TryParse(camarasDate1.Value.ToString(), out datetime2_a))
-                    {
-                        datetime2_a = DateTime.Now;
-
-                        // #2- Logger exception
-                        Logger.LogError("(%s) (%s) -- Excepcion. Convirtiendo a datetime.", className, methodName);
-                        Logger.LogError("(%s) (%s) -- Dato: " + camarasDate1.Value, className, methodName);
-                    }
-                }
-
-                DateTime datetime2_b = DateTime.Now;
-                string datetimeStr_b = DateTime.Now.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
-                if (camarasDate2 != null && !string.IsNullOrWhiteSpace(camarasDate2.Value))
-                {
-                    datetimeStr_b = camarasDate2.Value;
-                    Logger.LogDebug("(%s) (%s) -- Get datetime2_b: Intentando convertir a datetime. Formato: dd-MM-yyyy HH:mm. Dato: " + camarasDate2.Value.ToString(), className, methodName);
-                    if (!DateTime.TryParseExact(camarasDate2.Value, "dd-MM-yyyy HH:mm", null, System.Globalization.DateTimeStyles.None, out datetime2_b))
-                    //if (!DateTime.TryParse(camarasDate2.Value.ToString(), out datetime2_b))
-                    {
-                        datetime2_b = DateTime.Now;
-
-                        // #2- Logger exception
-                        Logger.LogError("(%s) (%s) -- Excepcion. Convirtiendo a datetime.", className, methodName);
-                        Logger.LogError("(%s) (%s) -- Dato: " + camarasDate2.Value, className, methodName);
-                    }
-                }
 
                 if (string.IsNullOrWhiteSpace(txbInputCameraNumber.Value))
                 {
