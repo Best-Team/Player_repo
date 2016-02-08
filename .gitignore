@@ -47,12 +47,16 @@ Temporary Items
 .apdisk
 
 # Media Player
+MediaPlayer/MediaPlayer/obj/Debug/MediaPlayer.dll
 *.config
 *.csproj
 *.sln
 *.suo
 *.pdb
-MediaPlayer/MediaPlayer/obj/Debug/MediaPlayer.dll
+*.suo
+*.dll
+
+# =======
 MediaPlayer/MediaPlayer/obj/Debug/MediaPlayer.csproj.FileListAbsolute.txt
 MediaPlayer/MediaPlayer/MediaPlayer.csproj
 MediaPlayer/MediaPlayer.v12.suo
