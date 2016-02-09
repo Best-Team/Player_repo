@@ -684,7 +684,7 @@ namespace MediaPlayer
                     string hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus = string.Empty;
                     string hdnElementsIDChecked = string.Empty;
 
-                    //
+                    // Json object
                     RootObject json_elementList = new RootObject();
                     json_elementList.name = "Elements";
                     json_elementList.color = "#000000";
@@ -697,6 +697,8 @@ namespace MediaPlayer
                     if (list != null && list.Count > 0)
                     {
                         ViewState["FolioID"] = list[0].folio_textID;
+                        _hdnFolioID.Value = list[0].folio_textID;
+
                         foreach (Folio folio in list)
                         {
                             index++;
@@ -841,6 +843,8 @@ namespace MediaPlayer
                 {
                     // Folio does not exist
                     ViewState["FolioID"] = 0;
+                    _hdnJSonEnd.Value = "0";
+
                     _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus.Value = string.Empty;
                     ScriptManager.RegisterStartupScript(this, typeof(Page), "clear_timeline", "clear_timeline();", true);
                 }

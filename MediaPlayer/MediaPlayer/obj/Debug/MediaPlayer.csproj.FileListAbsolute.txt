@@ -36,4 +36,17 @@ C:\Projects\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.xml
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.dll
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.pdb
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\bin\MediaPlayer.dll.config
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\bin\MediaPlayer.dll.config
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\bin\MediaPlayer.dll
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\bin\MediaPlayer.pdb
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\bin\Microsoft.WindowsAPICodePack.dll
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\bin\Microsoft.WindowsAPICodePack.Shell.dll
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\bin\MySql.Data.dll
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.dll
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.WindowsMediaFormat.dll
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\bin\Newtonsoft.Json.dll
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.xml
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.dll
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.pdb
+D:\_github_\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.csprojResolveAssemblyReference.cache
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.csprojResolveAssemblyReference.cache

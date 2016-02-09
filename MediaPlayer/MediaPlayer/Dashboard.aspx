@@ -31,6 +31,9 @@
     <script src="assets/js/jquery.inputmask.bundle.js"></script>
     <script src="assets/js/jquery.maskedinput.js"></script>
 
+    <script src="assets/js/jquery.fancybox.js"></script>
+    <script src="assets/js/jquery.flex.js"></script>
+
     <!-- Styles -->
     <link href="assets/css/datetimepicker.css" type="text/css" rel="stylesheet"/>
     <link href="assets/css/jquery.photobox.css" type="text/css" rel="stylesheet"/> 
@@ -42,6 +45,9 @@
     <link href="assets/css/highlight.css" rel="stylesheet" />
     <link href="assets/css/jslider.css" rel="stylesheet" />
     <link href="assets/css/globalplay.css" type="text/css" rel="stylesheet"/> 
+
+
+    <link href="assets/css/jquery.fancybox.css" type="text/css" rel="stylesheet"/> 
 
    <script type="text/javascript">
       
@@ -71,6 +77,9 @@
        var selectedElementID = 0;
        var currrentVideoDuration = 0;
        var currentPointerPositionDate;
+
+       // Timeline Global Pointer
+       var timeline_pointer = $("#sm2-progress-ball_TIMELINE");
 
        // Get screen resolution
        var MONITOR_WIDTH = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -172,110 +181,153 @@
                hourFormat: "24"
            });
 
-
            /**** Event: OnClick check all elements at left grid ****/
-           $('#chbSelectAll').click(function (e) {
-               
-               // Clear div player
-               removeDivPlayerContentExcept();
-
-               // Stop fbs player if is active
-               stopFBSPlayer();
-               var table = $(e.target).closest('table');
-
-               /* Warning: --- This is a Workaround to avoid click event changing the property --- */
-               // Disable click events
-               $('tr:visible td input:checkbox', table).attr('disabled', 'true');
-
-               // Get only visible checkboxes
-               $('tr:visible td input:checkbox', table).prop('checked', this.checked);
-
-               // Enable click events
-               $('tr:visible td input:checkbox', table).removeAttr('disabled');
-               /* --- Workaround --- */
-
-               var timeline_data = _TL_DATA; // Copy original timeline elements as reference
-               var new_timeline_data = jQuery.extend(true, {},_TL_DATA); // Clone the object, do not reference it
-               var new_object = {};
-               new_object.name = "Elements";
-               new_object.color = "#000000";
-               if (!this.checked) {
-                   if (new_timeline_data.spans != null &&
-                       new_timeline_data.spans.length > 0) {
-                       new_timeline_data.spans = $.grep(_TL_DATA.spans,
-                           function (item, index) {
-                               return item.id == "";
-                           });
-                   }
-               } else {
-                   var objects = [];
-                   $("#tblLeftGridElements input:checked:visible").each(
-                       function () {
-                           var ids = $(this).attr("value");
-                           if (ids != null) {
-                               var id_array = ids.split("#");
-                               if (id_array.length > 1) {
-                                   objects.push(id_array[0]);
-                               }
-                           }
-                       })
-                   var element_checks = [];
-
-                   // Loop into types
-                   for (obj in objects) {
-                       if (elementsInMemory != null) {
-                           if (elementsInMemory.length > 0) {
-                               for (var i = 0; i < elementsInMemory
-                                   .length; i++) {
-                                   var element = elementsInMemory[i];
-                                   if (element != null) {
-                                       var tapeID = element.tapeID;
-                                       if (objects[obj] == tapeID) {
-                                           var groupName = element.groupName;
-                                           var tapeType = element.tapeType;
-                                           var duration = element.duration;
-                                           var timestamp = element.timestamp;
-                                           var segmentID = element.segmentID;
-                                           var count = element.count;
-                                           var fileName = element.fileName;
-                                           var endDate = element.endDate;
-                                           var filePath = element.filePath;
-                                           var duration_formatStr = element.duration_formatStr;
-                                           var fileStatus = element.fileStatus;
-
-                                           var tapeType_str = tapeType;
-                                           if (tapeType == "S") {
-                                               tapeType_str = "P";
-                                           }
-                                           // Create object
-                                           var object_group = {};
-                                           object_group.name = tapeType_str; //
-                                           object_group.start = timestamp;
-                                           object_group.end = endDate;
-                                           object_group.id = tapeID;
-                                           object_group.role = groupName;
-                                           object_group.type = tapeType;
-                                           element_checks.push(object_group);
-                                       }
-                                   }
-                               } //for
-                           }
-                       }
-                   } //for
-
-                   // Append role elements to original elements
-                   var allTags = [];
-                   allTags.push.apply(allTags, _TL_DATA.spans);
-                   allTags.push.apply(allTags, element_checks);
-                   new_object.spans = allTags;
-                   new_timeline_data = new_object;
-               }
-               _TL_DATA = new_timeline_data;
-               prepareTimelineReload(new_timeline_data);
-           });
+           loadGridCheckboxAll_event();
 
            /**** Event: OnClick Load on click event remove button ****/
+           loadClickRemoveElementSelected_event();
+
+           /**** Event: OnClick Load on click event fullscreen button for Screen recording elements ****/
+           loadClickFullscreen_event();         
+
+           /**** Slider control: comment duration ****/
+           $("#sliderSingle1").slider({
+               from: 1,
+               to: 3600,
+               step: 1,
+               round: 1,
+               format: {
+                   format: '##',
+                   locale: 'de'
+               },
+               dimension: '&nbsp;seg',
+               skin: "round"
+           });
+
+           /**** Progress Pointer settings ****/
+           currentPointerPositionDate = _TL_STARTDATE;
+
+           // If the folio selected is not valid, then hides the Pointer from timeline
+           timeline_pointer.hide();
+
+           // If there are elements loaded, show timeline pointer
+           var first_tapeID = 0;
+           if (elementsInMemory != null && elementsInMemory.length > 0) {
+               first_tapeID = elementsInMemory[0].tapeID;
+
+               if (first_tapeID > 0) {
+                   timeline_pointer.show();
+                   setImgPointerLocation(first_tapeID);
+               }
+           }
+
+           timeline_pointer.css("top", "5px");
+           $('.popbox4').popbox4();
+
+           // Event Drag & Drop ********
+
+           // Source: http://www.elated.com/articles/drag-and-drop-with-jquery-your-essential-guide/
+           if (timeline_pointer != null) {
+               timeline_pointer.draggable({
+                   containment: '#divTimelineProgress',
+                   axis: "x", 
+                   scroll: false,
+                   cursor: 'move',
+                   stop: handleDragStop,
+                   drag: handleDragging
+               });
+           }
+
+           // If timeline is already drawn, set to divTimelineProgress the main line real width 
+           divTimelineProgress_SetWidth();
+
+           /**** Load Globalplay settings ****/
+           loadGlobalplay_settings();
+
+
+           // Remove padding, set opening and closing animations, close if clicked and disable overlay
+           $("#btnForm").fancybox({
+               padding: 0,
+               closeClick: true,
+
+               openEffect: 'elastic',
+               openSpeed: 150,
+
+               closeEffect: 'elastic',
+               closeSpeed: 150,
+
+               helpers: {
+                   overlay: null
+               }
+           });
+
+           $(".flex").flex();
+
+           // Fancybox Source 1: http://fancybox.net/
+           // Fancybox Source 2: http://devtroce.com/2011/07/19/como-manejar-un-iframe-con-fancybox-y-jquery-en-modo-popup/
+
+           // Flex Source: http://www.jsonenglish.com/projects/flex/
+
+       }); // END On Ready
+
+
+       function loadGlobalplay_settings() {
+
+           // ************* Globalplay Timer settings *************
+
+           var date_str1 = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
+           var date_str2 = moment(_TL_ENDDATE, "DD-MM-YYYY HH:mm:ss");
+
+           var date1 = new Date(date_str1);
+           var date2 = new Date(date_str2);
+
+           var dif = date2.getTime() - date1.getTime();
+
+           var Seconds_from_T1_to_T2 = dif / 1000;
+           var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
+
+           GLOBALPLAY_seconds_total = Seconds_Between_Dates;
+
+           // Get duration format: HH:mm:ss
+           var total_sec_format = getFormatDuration(Seconds_Between_Dates);
+
+           // Set timeline total duration
+           $("#lblGlobalplay_timer_total").text(total_sec_format);
+       }
+
+       /**** Event: OnClick Load on click event fullscreen button for Screen recording elements ****/
+       function loadClickFullscreen_event() {
+           $("#aBtnFullscreen").click(function (event) {
+               event.preventDefault();
+               var $this = $(this);
+
+               var timer = 0;
+               if (document.fbsviewer != null) {
+                   try{
+                       timer = (document.fbsviewer.getCurrTimeOffsetInMSec() / 1000).toString();
+                       document.fbsviewer.pause();
+                   }catch(err)
+                   {
+                       console.log(err);
+                   }
+               }
+
+               $(this).attr("data-popup", "width=" + FBS_POPUP_Width + ",height= " + FBS_POPUP_Height + ",scrollbars=yes");
+               var url = "Fullscreen.aspx?segId=" + screenRecording_segmentID + "&width=" + FBS_FULLSCREEN_Width + "&height=" + FBS_FULLSCREEN_Height + "&currentSecs=" + timer;
+               //var url = "http://localhost:7070/Fullscreen.aspx?segId=" + screenRecording_segmentID + "&width=" + FBS_FULLSCREEN_Width + "&height=" + FBS_FULLSCREEN_Height + "&currentSecs=" + timer;
+
+               var windowName = "popUp";
+               var windowSize = $this.data("popup");
+
+               window.open(url, windowName, windowSize);
+           });
+       }
+
+       /**** Event: OnClick Load on click event remove button ****/
+       function loadClickRemoveElementSelected_event() {
+
            $("#btnRemoveElementSelected").bind("click", function () {
+
                // Get only visible and checked checkboxes to remove
                var list_elements = [];
                $('tr:visible td input:checked').each(function () {
@@ -395,115 +447,125 @@
                    });
                }
            });
+       }
 
-           /**** Event: OnClick Load on click event fullscreen button for Screen recording elements ****/
-           $("#aBtnFullscreen").click(function (event) {
-               event.preventDefault();
-               var $this = $(this);
+       /**** Event: OnClick check all elements at left grid ****/
+       function loadGridCheckboxAll_event() {
+           $('#chbSelectAll').click(function (e) {
 
-               var timer = 0;
-               if (document.fbsviewer != null) {
-                   try{
-                       timer = (document.fbsviewer.getCurrTimeOffsetInMSec() / 1000).toString();
-                       document.fbsviewer.pause();
-                   }catch(err)
-                   {
-                       console.log(err);
+               // Clear div player
+               removeDivPlayerContentExcept();
+
+               // Stop fbs player if is active
+               stopFBSPlayer();
+               var table = $(e.target).closest('table');
+
+               /* Warning: --- This is a Workaround to avoid click event changing the property --- */
+               // Disable click events
+               $('tr:visible td input:checkbox', table).attr('disabled', 'true');
+
+               // Get only visible checkboxes
+               $('tr:visible td input:checkbox', table).prop('checked', this.checked);
+
+               // Enable click events
+               $('tr:visible td input:checkbox', table).removeAttr('disabled');
+               /* --- Workaround --- */
+
+               var timeline_data = _TL_DATA; // Copy original timeline elements as reference
+               var new_timeline_data = jQuery.extend(true, {}, _TL_DATA); // Clone the object, do not reference it
+               var new_object = {};
+               new_object.name = "Elements";
+               new_object.color = "#000000";
+               if (!this.checked) {
+                   if (new_timeline_data.spans != null &&
+                       new_timeline_data.spans.length > 0) {
+                       new_timeline_data.spans = $.grep(_TL_DATA.spans,
+                           function (item, index) {
+                               return item.id == "";
+                           });
                    }
+               } else {
+                   var objects = [];
+                   $("#tblLeftGridElements input:checked:visible").each(
+                       function () {
+                           var ids = $(this).attr("value");
+                           if (ids != null) {
+                               var id_array = ids.split("#");
+                               if (id_array.length > 1) {
+                                   objects.push(id_array[0]);
+                               }
+                           }
+                       })
+                   var element_checks = [];
+
+                   // Loop into types
+                   for (obj in objects) {
+                       if (elementsInMemory != null) {
+                           if (elementsInMemory.length > 0) {
+                               for (var i = 0; i < elementsInMemory
+                                   .length; i++) {
+                                   var element = elementsInMemory[i];
+                                   if (element != null) {
+                                       var tapeID = element.tapeID;
+                                       if (objects[obj] == tapeID) {
+                                           var groupName = element.groupName;
+                                           var tapeType = element.tapeType;
+                                           var duration = element.duration;
+                                           var timestamp = element.timestamp;
+                                           var segmentID = element.segmentID;
+                                           var count = element.count;
+                                           var fileName = element.fileName;
+                                           var endDate = element.endDate;
+                                           var filePath = element.filePath;
+                                           var duration_formatStr = element.duration_formatStr;
+                                           var fileStatus = element.fileStatus;
+
+                                           var tapeType_str = tapeType;
+                                           if (tapeType == "S") {
+                                               tapeType_str = "P";
+                                           }
+                                           // Create object
+                                           var object_group = {};
+                                           object_group.name = tapeType_str; //
+                                           object_group.start = timestamp;
+                                           object_group.end = endDate;
+                                           object_group.id = tapeID;
+                                           object_group.role = groupName;
+                                           object_group.type = tapeType;
+                                           element_checks.push(object_group);
+                                       }
+                                   }
+                               } //for
+                           }
+                       }
+                   } //for
+
+                   // Append role elements to original elements
+                   var allTags = [];
+                   allTags.push.apply(allTags, _TL_DATA.spans);
+                   allTags.push.apply(allTags, element_checks);
+                   new_object.spans = allTags;
+                   new_timeline_data = new_object;
                }
-
-               $(this).attr("data-popup", "width=" + FBS_POPUP_Width + ",height= " + FBS_POPUP_Height + ",scrollbars=yes");
-               var url = "Fullscreen.aspx?segId=" + screenRecording_segmentID + "&width=" + FBS_FULLSCREEN_Width + "&height=" + FBS_FULLSCREEN_Height + "&currentSecs=" + timer;
-               //var url = "http://localhost:7070/Fullscreen.aspx?segId=" + screenRecording_segmentID + "&width=" + FBS_FULLSCREEN_Width + "&height=" + FBS_FULLSCREEN_Height + "&currentSecs=" + timer;
-
-               var windowName = "popUp";
-               var windowSize = $this.data("popup");
-
-               window.open(url, windowName, windowSize);
+               _TL_DATA = new_timeline_data;
+               prepareTimelineReload(new_timeline_data);
            });
+       }
 
-           /**** Slider control: comment duration ****/
-           $("#sliderSingle1").slider({
-               from: 1,
-               to: 3600,
-               step: 1,
-               round: 1,
-               format: {
-                   format: '##',
-                   locale: 'de'
-               },
-               dimension: '&nbsp;seg',
-               skin: "round"
-           });
 
-           /**** Progress Pointer settings ****/
-           currentPointerPositionDate = _TL_STARTDATE;
-           var pointer_timeline = $("#sm2-progress-ball_TIMELINE");
-
-           // Si hay elementos cargados, muestra el puntero
-           var first_tapeID = 0; 
-           if (elementsInMemory != null && elementsInMemory.length > 0) {
-               first_tapeID = elementsInMemory[0].tapeID;
-           }
-
-           // If the folio selected is not valid, then hides the Pointer from timeline
-           pointer_timeline.hide();
-
-           if (first_tapeID > 0) {
-               pointer_timeline.show();
-               setImgPointerLocation(first_tapeID);
-           }
-
-           pointer_timeline.css("top", "5px");
-           $('.popbox4').popbox4();
-
-           // Event Drag & Drop ********
-
-           // Source: http://www.elated.com/articles/drag-and-drop-with-jquery-your-essential-guide/
-           if (pointer_timeline != null) {
-               pointer_timeline.draggable({
-                   containment: '#divTimelineProgress',
-                   axis: "x", 
-                   scroll: false,
-                   cursor: 'move',
-                   stop: handleDragStop,
-                   drag: handleDragging
-               });
-           }
-
-           // Set main line real width 
+       // If timeline is already drawn, set to divTimelineProgress the main line real width 
+       function divTimelineProgress_SetWidth() {
            var MAIN_LINE = $("#timeframe > svg > g:first > line:first");
            if (MAIN_LINE != null && MAIN_LINE.length) {
                var x1 = parseInt(MAIN_LINE.attr("x1"), 10);
                var x2 = parseInt(MAIN_LINE.attr("x2"), 10);
+
                $('#divTimelineProgress').css("width", (x2 - x1 + 4) + "px");
                $("#divTimelineProgress").offset({
                    left: $("#timeframe > svg").offset().left + 42 //Fix Left Offset 
-                })
+               })
            }
-
-
-           // ************* Globalplay Timer settings *************
-
-           var date_str1 = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
-           var date_str2 = moment(_TL_ENDDATE, "DD-MM-YYYY HH:mm:ss");
-
-           var date1 = new Date(date_str1);
-           var date2 = new Date(date_str2);
-
-           var dif = date2.getTime() - date1.getTime();
-
-           var Seconds_from_T1_to_T2 = dif / 1000;
-           var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
-
-           GLOBALPLAY_seconds_total = Seconds_Between_Dates;
-
-           // Get duration format: HH:mm:ss
-           var total_sec_format = getFormatDuration(Seconds_Between_Dates); 
-
-           $("#lblGlobalplay_timer_total").text(total_sec_format);
-
-       }); // END On Ready
+       }
 
        // Event Drag & Drop: Stop Dragging
        function handleDragStop(event, ui) {
@@ -585,7 +647,7 @@
            hashMessages["MaximoElementosDescarga2"] = "elementos en simultáneo para descargar.";
            hashMessages["SeleccioneArchivo"] = "Por favor, seleccione un archivo.";
            hashMessages["IngreseNumeroCamara"] = "Por favor, ingrese el número de cámara.";
-           hashMessages["ElementoGuardado"] = "Comentario correctamente guardado.";
+           hashMessages["ComentarioGuardado"] = "Comentario correctamente guardado.";
            hashMessages["InstallWebchimera"] = "Por favor, descargue WebChimera plugin desde: ";
            hashMessages["ConfirmarDesgargaElementos"] = "¿Desea descargar TODOS los elementos seleccionados?";
            hashMessages["ConfirmarBorrarElementos1"] = "¿Desea borrar TODOS los elementos seleccionados?";
@@ -595,6 +657,8 @@
        }
 
        function initVariables() {
+
+           timeline_pointer = $("#sm2-progress-ball_TIMELINE");
 
            // Set Username and Date info
            currentDateToday = new Date();
@@ -927,25 +991,34 @@
                // -------------------------------------------------------------
 
                var manual_offset = 52;
-               $("#divPlayer_VIDEO").css("height", (parseInt(playerBox.css("height"), 10) - manual_offset - 2) + "px");
+               var extra = 2;
+               var playerBox_h = parseInt(playerBox.css("height"), 10);
+               var height_final = playerBox_h - manual_offset - extra;
 
-               $("#divPlayer_VIDEO").offset({ top: $("div[id*='playerBox").offset().top + manual_offset });
+               // divPlayer_VIDEO size
+               divPlayer_VIDEO.css("height", height_final + "px");
+               divPlayer_VIDEO.offset({ top: playerBox.offset().top + manual_offset });
                
-               var w = parseInt($("#divPlayer_VIDEO").css("width"), 10);
-               var h = parseInt($("#divPlayer_VIDEO").css("height"), 10);
+               // Webchimera player size
+               var divPlayer_VIDEO_w = parseInt(divPlayer_VIDEO.css("width"), 10);
+               var divPlayer_VIDEO_h = parseInt(divPlayer_VIDEO.css("height"), 10);
 
-               document.getElementById("webchimera").width = w;
-               document.getElementById("webchimera").height = h;
-
+               document.getElementById("webchimera").width = divPlayer_VIDEO_w;
+               document.getElementById("webchimera").height = divPlayer_VIDEO_h;
            }
        }
 
        function addCommentClick() {
 
            // Check if folio is selected
-           var folioID = '<%= ViewState["FolioID"] %>';
+           var folioID = 0;
+           var _hdnFolioID = $("input[id*='_hdnFolioID']");
+           if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
+               folioID = _hdnFolioID.val();
+           }
            var folioID_int = parseInt(folioID, 10);
-           if (folioID_int != null && folioID_int > 0) {
+
+           if (folioID_int != null && !isNaN(folioID_int) && folioID_int > 0) {
 
                if (!$('#btnAddComment').hasClass("opened")) {
                    var posXoff = $("#btnAddComment").offset().left;
@@ -1203,9 +1276,8 @@
 
        function events_line_click(event) {
            var MAIN_LINE = $("#timeframe > svg > g:first > line:first");
-           var pointer_timeline = $("#sm2-progress-ball_TIMELINE");
-           if (MAIN_LINE != null && MAIN_LINE.length && pointer_timeline != null && pointer_timeline.length) {
-               pointer_timeline.show();
+           if (MAIN_LINE != null && MAIN_LINE.length && timeline_pointer != null && timeline_pointer.length) {
+               timeline_pointer.show();
 
                // Set Y axis
                var first_tapeID = 0; // Get first element
@@ -1221,7 +1293,7 @@
                var parentPosition = getPosition2(event.currentTarget);
                var xPosition = event.clientX - parentPosition.x;
                var yPosition = event.clientY - parentPosition.y;
-               pointer_timeline.offset({ left: xPosition - parseInt(pointer_timeline.css("width"), 10) / 2 });
+               timeline_pointer.offset({ left: xPosition - parseInt(timeline_pointer.css("width"), 10) / 2 });
            }
        }
 
@@ -1260,7 +1332,7 @@
            $("#timeframe").empty();
            $("#timeframe").hide();
 
-           $("#sm2-progress-ball_TIMELINE").hide();
+           timeline_pointer.hide();
        }
 
        function pre_timeframe_prepare() { 
@@ -1271,15 +1343,47 @@
            if (hdnJSonList != null && hdnJSonList.length && hdnJSonStart != null && hdnJSonStart.length && hdnJSonEnd != null && hdnJSonEnd.length) {
                timeframe_prepare(JSON.parse(hdnJSonList), hdnJSonStart, hdnJSonEnd);
            }
-           $("#sm2-progress-ball_TIMELINE").show();
+           timeline_pointer.show();
+
+           // Re Load all grid button events, because Ajax call removes them
+
+           /**** Event: OnClick check all elements at left grid ****/
+           loadGridCheckboxAll_event();
+
+           /**** Event: OnClick Load on click event remove button ****/
+           loadClickRemoveElementSelected_event();
+
+           /**** Event: OnClick Load on click event fullscreen button for Screen recording elements ****/
+           loadClickFullscreen_event();
+
+           /**** Load Globalplay settings ****/
+           loadGlobalplay_settings();
        }
 
        function timeframe_prepare(timeline_data, start, end) {
            getElementsInMemory();
+
            _TL_DATA = timeline_data;
            _TL_STARTDATE = start;
            _TL_ENDDATE = end;
+
+           // **** DRAW TIMELINE ****
            timeframe_draw(timeline_data, start, end);
+
+           // If there are elements loaded, show timeline pointer
+           var first_tapeID = 0;
+           if (elementsInMemory != null && elementsInMemory.length > 0) {
+               first_tapeID = elementsInMemory[0].tapeID;
+               var first_tapeID_int = parseInt(first_tapeID, 10);
+
+               if (first_tapeID_int > 0) {
+                   timeline_pointer.show();
+                   setImgPointerLocation(first_tapeID_int);
+               }
+           }
+
+           // If timeline is already drawn, set to divTimelineProgress the main line real width 
+           divTimelineProgress_SetWidth();
        }
        /* ************* Method: draw Timeline - CSS Custom Styles ************* */
 
@@ -1634,9 +1738,11 @@
            var border_start = $("line[name='timeframe_start']");
            var x_extra = parseInt(border_start.attr('x1'), 10) - 12;
            var initial_top = 31; //42
+
            // Loop into types
            for (obj in objects) {
                var y_extra = initial_top + 20;
+
                // Left vertical element type letter
                if (border_start != null && border_start.length && border_start !=
                    null && border_start.length) {
@@ -1653,12 +1759,9 @@
                    }, letter);
                    document.getElementById('svg_timeframe').appendChild(text);
                }
-               $("#timeframe g[type_name='" + objects[obj] + "'] > rect").attr(
-                   "y", initial_top);
-               $("#timeframe g[type_name='" + objects[obj] + "'] > rect").attr(
-                   "height", basic_height);
-               $("#timeframe g[type_name='" + objects[obj] + "'] > text").attr(
-                   "y", initial_top - 7);
+               $("#timeframe g[type_name='" + objects[obj] + "'] > rect").attr("y", initial_top);
+               $("#timeframe g[type_name='" + objects[obj] + "'] > rect").attr("height", basic_height);
+               $("#timeframe g[type_name='" + objects[obj] + "'] > text").attr("y", initial_top - 7);
                initial_top += extra_top;
            }
        }
@@ -1805,19 +1908,22 @@
 
        function setImgPointerLocation(tapeID) {
            var timeline = $(".background");
-           var pointer_timeline = $("#sm2-progress-ball_TIMELINE");
            var sm2_inline_element = $("#sm2-inline-element");
            var sm2_progress_bd = $("#sm2-progress-bd");
            var sm2_progress = $("#sm2-progress");
            var sm2_progress_track = $("#sm2-progress-track");
-           if (pointer_timeline != null && pointer_timeline.length && sm2_inline_element != null && sm2_inline_element.length &&
+           if (timeline_pointer != null && sm2_inline_element != null && sm2_inline_element.length &&
                sm2_progress_bd != null && sm2_progress_bd.length && sm2_progress != null && sm2_progress.length &&
-               sm2_progress_track != null && sm2_progress_track.length && timeline != null && timeline.length) {
+               sm2_progress_track != null && sm2_progress_track.length && timeline != null) {
 
-               pointer_timeline.show();
+               timeline_pointer.show();
+
+               // Check if if exists at least one element
                if (tapeID > 0) {
                    var vElement = $("#timeframe #tlTape_" + tapeID);
                    var vElementRect = $("#timeframe #tlTape_" + tapeID + " > rect");
+
+                   // Check if timeline is already drawn
                    if (vElement != null && vElement.length && vElementRect != null && vElementRect.length) {
 
                        // Set progress bar width
@@ -1831,21 +1937,28 @@
                        sm2_inline_element.offset({ left: vElementRect.offset().left });
                        sm2_progress_bd.css('width', _width);
 
-                       //
                        sm2_progress_bd.css('left', _width);
 
                        sm2_progress_track.css('height', 15);
 
                        // Pointer left and top position
-                       pointer_timeline.offset({ left: vElement.offset().left });
+                       timeline_pointer.offset({ left: vElement.offset().left });
 
                        sm2_inline_element.offset({ top: $("#divTimelineProgress").offset().top })
-                   }
+
                } else {
+                   // Timeline is not drawn yet
+
+
+               }
+               } else {
+                   // It does not exists elements
+
                    // Set progress bar width
                    var _width_int = parseInt(timeline.attr('width'), 10);
                    var _width_percentage = (5 / 100) * _width_int;
                    var _width = _width_int + _width_percentage + "px";
+
                    sm2_progress.css('height', 15);
                    sm2_inline_element.css('width', _width);
                    sm2_inline_element.css('left', timeline.offset().left + 3);
@@ -1853,7 +1966,7 @@
                    sm2_progress_track.css('height', 15);
 
                    // Pointer left position
-                   pointer_timeline.offset({ left: timeline.offset().left });
+                   timeline_pointer.offset({ left: timeline.offset().left });
                    sm2_inline_element.offset({ top: timeline.offset().top + 15 }); // + 25
                }
            }
@@ -2003,6 +2116,8 @@
                          max = new Date(-100000000 * 86400000);
                          min = new Date(100000000 * 86400000);
                          traverse(_TL_DATA.spans, compare);
+
+                         // **** DRAW TIMELINE ****
                          timeframe_draw(_TL_DATA, _TL_STARTDATE, _TL_ENDDATE);
 
                          /******** Reload timeline END ********/
@@ -2054,7 +2169,7 @@
      /************************ General styles START ************************/
 
     // Set video player visible
-    $("#divPlayer_VIDEO").css("visibility", "visible");
+    divPlayer_VIDEO.css("visibility", "visible");
     $("#divControlsMask_VIDEO").removeClass("disabled");
 
     // Show fullscreen button
@@ -2249,16 +2364,16 @@
                  // Enable video player
                  if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
 
-             //        divControlsMask_VIDEO.show("blind", 200); **********
+                // divControlsMask_VIDEO.show("blind", 200); **********
                      divControlsMask_VIDEO.removeClass("disabled");
 
                      // Set playing
                      divControlsMask_VIDEO.addClass("playing");
                      divControlsMask_VIDEO.removeClass("paused");
                      TimeRefreshLoop(duration);
-
+                     
                      // Coloca los controles en top = 0, por si antes fue usado el Video player (webchimera player)
-                     $("#divPlayer_VIDEO").offset({ top: $("div[id*='playerBox").offset().top });
+                     divPlayer_VIDEO.offset({ top: playerBox.offset().top });
 
                  }
 
@@ -2268,9 +2383,9 @@
                  $("#aBtnFullscreen").removeClass("disabled");
                  $("#aBtnFullscreen").show();
                  $("#btnFullscreen").hide();
-
+                 
                  // Hide masked controls - Quitar? 
-                 $("#divPlayer_VIDEO").css("visibility", "visible");
+                 divPlayer_VIDEO.css("visibility", "visible");
                  $("#divControlsMask_VIDEO").hide(); // +++
                  //$("#divControlsMask_VIDEO").show(); // +++
 
@@ -2528,12 +2643,13 @@
              removeDivPlayerContentExcept();
              elementType_active = "I";
 
-             // SET Element file path
+             // Set Element file path
              var p = filePath_OREKA;
              if (isExtra.toLowerCase() === "true") {
                  p = filePath_EXTRA;
              }
              $("#imgPlayer").attr("src", p);
+
              // Style settings
              $("#imgPlayer").show("blind", 200);
 
@@ -2591,16 +2707,16 @@
                  /************************ Styles START ************************/
 
                  var manual_offset = 52;
-                 $("#divPlayer_VIDEO").show();
-                 $("#divPlayer_VIDEO").css("height", (parseInt(playerBox.css("height"), 10) - manual_offset - 2) + "px");
+                 divPlayer_VIDEO.show();
+                 divPlayer_VIDEO.css("height", (parseInt(playerBox.css("height"), 10) - manual_offset - 2) + "px");
 
                  divControlsMask_VIDEO.show();
 
-                 $("#divPlayer_VIDEO").offset({ top: $("div[id*='playerBox").offset().top + manual_offset });
+                 divPlayer_VIDEO.offset({ top: playerBox.offset().top + manual_offset });
 
                  // Create avi player
-                 var w = parseInt($("#divPlayer_VIDEO").css("width"), 10);
-                 var h = parseInt($("#divPlayer_VIDEO").css("height"), 10);
+                 var w = parseInt(divPlayer_VIDEO.css("width"), 10);
+                 var h = parseInt(divPlayer_VIDEO.css("height"), 10);
 
                  var applet = "<object id='webchimera' type='application/x-chimera-plugin' width='" + w + "' height='" + h + "'>";
                  applet += "<param name='windowless' value='true' />";
@@ -2684,7 +2800,6 @@
                          var timer_VIDEO = $('#sm2-inline-time_VIDEO');
                          var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
                          var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
-                         var pointer = $("#sm2-progress-ball_TIMELINE");
                          var currentSecs = wjs("#webchimera").time() / 1000;
 
                          if (currentSecs < duration && /* currentSecs >= previousSecs && */ currentSecs != 0) {
@@ -2695,8 +2810,8 @@
 
                              // Pointers progress
                              pointer_VIDEO.css("left", left);
-                             pointer.show();
-                             pointer.css("left", left);
+                             timeline_pointer.show();
+                             timeline_pointer.css("left", left);
                          }
                      });
                  }, 1000);
@@ -2878,6 +2993,7 @@
      function ActionVideoPlay(tapeID, duration, isAudioPlaying) {
          var aPlayPause_VIDEO = $("#aPlayPause_VIDEO");
          var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
+         var divPlayer_VIDEO = $("#divPlayer_VIDEO");
 
          // Set duration
          setVideoLength(duration);
@@ -2904,7 +3020,7 @@
                                  if (document.fbsviewer != null) {
                                      document.fbsviewer.play();
                                      // Set div visible
-                                     $("#divPlayer_VIDEO").css("visibility", "visible");
+                                     divPlayer_VIDEO.css("visibility", "visible");
 
                                      // Set fbs player init
                                      document.fbsviewer.seekViewerSeconds(0);
@@ -2950,7 +3066,7 @@
                              playVideo_ok = true;
 
                              // Set div visible
-                             $("#divPlayer_VIDEO").css("visibility", "visible");
+                             divPlayer_VIDEO.css("visibility", "visible"); 
 
                              TimeRefreshLoop(duration);
                          }
@@ -3017,11 +3133,14 @@
          //var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + FBS_DEFAULT_Width + "' height='" + FBS_DEFAULT_Height + "' name='fbsviewer' id='fbsviewer' title='undefined'>";         
 
          // Toma resolución del div contenedor (playerBox)
+
+         playerBox_w = parseInt(playerBox.css("width"), 10);
+         playerBox_h = parseInt(playerBox.css("height"), 10);
+
          var left_offset = 25;
          var top_offset = 6;
-         var divWidth = parseInt($("div[id*='playerBox").css("width"), 10) - left_offset;
-         var divHeight = parseInt($("div[id*='playerBox").css("height"), 10) - top_offset;
-
+         var divWidth = playerBox_w - left_offset;
+         var divHeight = playerBox_h - top_offset;
 
          var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
 
@@ -3131,11 +3250,15 @@
      }
 
      function prepareTimelineReload(timel) {
+
          // Refresh max and min dates, timeline limits
          max = new Date(-100000000 * 86400000);
          min = new Date(100000000 * 86400000);
          traverse(timel.spans, compare);
+
+         // **** DRAW TIMELINE ****
          timeframe_draw(timel, _TL_STARTDATE, _TL_ENDDATE);
+
          // Source: http://stackoverflow.com/questions/7718770/finding-max-min-date-in-multidimensional-javascript-object
      }
 
@@ -3217,7 +3340,6 @@
              var timer_VIDEO = $('#sm2-inline-time_VIDEO');
              var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
              var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
-             var pointer = $("#sm2-progress-ball_TIMELINE");
 
              if (document.fbsviewer != null) {
 
@@ -3237,15 +3359,16 @@
 
                      // Pointers progress
                      pointer_VIDEO.css("left", left);
-                     pointer.show();
-                     pointer.css("left", left);
+                     timeline_pointer.show();
+                     timeline_pointer.css("left", left);
 
                      //divControlsMask_VIDEO.addClass("playing");
                      playVideo_ok = true;
                      setTimeout(function () {
                          TimeRefreshLoop(totalDurationSecs)
                      }, 1000); //1000
-                     // Check doTimeout source: http://benalman.com/code/projects/jquery-dotimeout/examples/delay-poll/
+
+                     // doTimeout Source: http://benalman.com/code/projects/jquery-dotimeout/examples/delay-poll/
                  }
              } else {
                  // Si terminó
@@ -3263,10 +3386,9 @@
          var divSoundPlayer = $("#divControlsMask_AUDIO");
          if (divSoundPlayer != null && divSoundPlayer.length > 0) {
              if (divSoundPlayer.hasClass("playing")) {
-                 var pointer = $("#sm2-progress-ball_TIMELINE");
-                 if (pointer != null) {
-                     pointer.show();
-                     setInterval(tickAction(pointer), 1000);
+                 if (timeline_pointer != null) {
+                     timeline_pointer.show();
+
                      // Set element Playing
                      setElementInMemoryIsPlaying(event.data._tapeID);
                  }
@@ -3276,18 +3398,17 @@
          }
      }
 
-     function tickAction(pointer) {
-         if (pointer != null) {
-             //alert(pointer.offset().left);
-         }
-     }
-
      function addFileClick() {
 
          // Check if folio is selected
-         var folioID = '<%= ViewState["FolioID"] %>';
+         var folioID = 0;
+         var _hdnFolioID = $("input[id*='_hdnFolioID']");
+         if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
+             folioID = _hdnFolioID.val();
+         }
          var folioID_int = parseInt(folioID, 10);
-         if (folioID_int != null && folioID_int > 0) {
+        
+         if (folioID_int != null && !isNaN(folioID_int) && folioID_int > 0) {
 
              if (!$('#btnUploadElement').hasClass("opened")) {
                  var posXoff = $("#btnUploadElement").offset().left;
@@ -3396,9 +3517,14 @@
      function downloadAll() {
 
          // Check if folio is selected
-         var folioID = '<%= ViewState["FolioID"] %>';
+         var folioID = 0;
+         var _hdnFolioID = $("input[id*='_hdnFolioID']");
+         if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
+             folioID = _hdnFolioID.val();
+         }
          var folioID_int = parseInt(folioID, 10);
-         if (folioID_int != null && folioID_int > 0) {
+
+         if (folioID_int != null && !isNaN(folioID_int) && folioID_int > 0) {
 
              // Get only visible and checked checkboxes to remove
              var list_elements = [];
@@ -3731,7 +3857,15 @@
 
      function confirmAddComment() {
          var userID = '<%= Session["UserID"] %>';
-         var folioID = '<%= ViewState["FolioID"] %>';
+         
+         // Check if folio is selected
+         var folioID = 0;
+         var _hdnFolioID = $("input[id*='_hdnFolioID']");
+         if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
+             folioID = _hdnFolioID.val();
+         }
+         var folioID_int = parseInt(folioID, 10);
+
          var comment = $("#txbComment").val();
          var date = $("#commentDate").val();
          var duration = $("#sliderSingle1").val();
@@ -3833,10 +3967,9 @@
              }
          });
 
-         alert("Comentario guardado");
+         //alert("Comentario guardado");
 
-         /*
-         $("#dialog p").text(hashMessages["ElementoGuardado"]);
+         $("#dialog p").text(hashMessages["ComentarioGuardado"]);
          $("#dialog").dialog({
              buttons: {
                  "Confirmar": function () {
@@ -3844,7 +3977,6 @@
                  }
              }
          });
-         */
      }
  }
  /******** Event: Enter Key listener ********/
@@ -3878,7 +4010,11 @@
 
                startGlobalplay();
 
+               // Open container fiv
+               $("#btnForm").click();
+
            } else {
+
                $("#button_globalplay").removeClass("pauseAudio");
                $("#button_globalplay").addClass("play");
 
@@ -3900,8 +4036,10 @@
 
            // Timer Source: http://jquerytimer.com/
 
-           // Init event while playing
-           timer_globalplay = setInterval(whilePlayingGlobalplay, 1000);
+           // Init event while playing if GLOBALPLAY_seconds_total is already loaded
+           if (GLOBALPLAY_seconds_total > 0) {
+               timer_globalplay = setInterval(whilePlayingGlobalplay, 1000); 
+           }
 
            // Enable right side Player box
            $("#divPanel_PlayerControl").removeClass("disabled");
@@ -3909,7 +4047,6 @@
 
        var timer = 0;
        function whilePlayingGlobalplay() {
-           var progressMaxLeft = 100;
 
            // REAL TIMER MODE
 
@@ -3922,7 +4059,7 @@
            //console.log("progress_percentage: " + progress_percentage);
 
            if (progress_percentage <= 100) { // If it is still in range 
-               $("#sm2-progress-ball_TIMELINE").css("left", left_final_percentage);
+               timeline_pointer.css("left", left_final_percentage);
 
                /* Important: ----- Elements finding section ----- */
 
@@ -3936,6 +4073,9 @@
                    // Prepare URL elements to reproduce
                    var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download;
                    var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
+
+                   // globalplay box container
+                   var flex_div = $("#divForm .flex");
 
                    var ids = "";
                    for (var i = 0; i < elementsCandidate.length; i++) {
@@ -4006,6 +4146,12 @@
                                    }
 
                                    case "I": {
+
+                                       var global_elementID = "global_img_" + el[0].segmentID;
+
+                                       $('<a id="' + global_elementID + '" style="left:0px;top:0px;width:980px;height:630px; background-image:url(' + p + ')" width="350" height="350">' + el[0].fileName + '</a>').appendTo(flex_div);
+                                       setTimeout(function () { globalplay_removeElement(global_elementID) }, 2500);
+
                                        break;
                                    }
 
@@ -4014,6 +4160,14 @@
                                    }
 
                                    case "C": {
+
+                                       var global_elementID = "global_com_" + el[0].segmentID;
+                                       var duration = el[0].duration <= 1 ? 3000 : el[0].duration * 1000;
+
+
+                                       $(".flex #globalplay_divComments label").text(el[0].fileName);
+                                       setTimeout(function () { globalplay_clearComment() }, duration);
+                                       //setTimeout(function () { globalplay_clearComment() }, 2500);
                                        break;
                                    }
                                }
@@ -4043,13 +4197,13 @@
            $('#lblGlobalplay_timer_current').timer('pause');
        }
 
-
-       function globalplay_searchElements() {
-
-
-
+       function globalplay_removeElement(global_elementID) {
+           $("#" + global_elementID).remove();
        }
 
+       function globalplay_clearComment() {
+           $(".flex #globalplay_divComments label").text("");
+       }
 
        function getElementInMemoryByCurrentPlayingTime() {
            if (stack_elements != null && stack_elements.length > 0) {
@@ -4127,6 +4281,26 @@
 div#playerBox {
     background: #333;
     margin: 0 auto;
+}
+
+.playerBox {
+    min-height:440px; 
+    margin-left: 20px; 
+    border: solid 0.17em; 
+    background: linear-gradient(to bottom, #9EA7B1, #9EA7B1); 
+    position:relative;
+}
+
+.globalplayBox {
+    min-width:1000px; 
+    min-height:650px; 
+    border: solid 0.17em; 
+    background: linear-gradient(to bottom, #9EA7B1, #9EA7B1); 
+    top: 10px;
+}
+
+.fancybox-wrap {
+    top: 15px !important;
 }
 
 div#videoBar {
@@ -4345,6 +4519,24 @@ div.disabled,button.disabled,a.disabled {
 
 }
 
+/* Flex js  */
+
+.flex {position:relative;width:50%;min-height:650px;margin:0 auto;border:0px solid red;margin-top:10px;}
+		.flex a {background-color:white;display:block;width:100px;height:100px;border-radius:8px;position:absolute;background-repeat:no-repeat;background-position:center;border:3px solid white;cursor:pointer;text-align:left;text-shadow:1px 1px 20px #000;color:white;font-size:18px;font-weight:bold;text-indent:10px;line-height:30px;text-decoration:none;}
+
+        /*
+		[bg=a] {background-image:url(http://farm8.staticflickr.com/7013/6448917381_0b754e86fb_z.jpg);}
+		[bg=b] {background-image:url(http://farm9.staticflickr.com/8156/7362866426_bf285ebd45.jpg);background-size:300px auto;}
+		[bg=c] {background-image:url(http://farm6.staticflickr.com/5117/7410370290_0935419fc3.jpg);}
+		[bg=d] {background-image:url(http://farm8.staticflickr.com/7262/7419245080_bb752ed1d6.jpg);}
+		[bg=e] {background-image:url(http://farm8.staticflickr.com/7003/6468321069_3375be3073_z.jpg);background-size:auto 280px;}
+		[bg=f] {background-image:url(http://farm8.staticflickr.com/7220/7342556872_46cddaf9b0.jpg);background-size:auto 280px;}
+		[bg=g] {background-image:url(http://farm9.staticflickr.com/8021/7322604950_348c535903.jpg);background-size:auto 200px;}
+		[bg=h] {background-image:url(http://farm8.staticflickr.com/7076/7286717012_6e6b450243.jpg);}
+		[bg=i] {background-image:url(http://farm8.staticflickr.com/7129/7452167788_a3f6aa3104.jpg);background-size:auto 200px;}
+		[bg=j] {background-image:url(http://farm8.staticflickr.com/7153/6480022425_a8d419e663_z.jpg);background-size:auto 280px;}
+		[bg=k] {background-image:url(http://farm8.staticflickr.com/7225/7269592732_c4b7918626.jpg);background-size:auto 280px;}
+            */
    </style>
 </asp:content>
 <asp:content id="Content3" ContentPlaceHolderID="ContentLoginStatus" runat="server">
@@ -4395,7 +4587,8 @@ div.disabled,button.disabled,a.disabled {
                             <asp:HiddenField ID="_hdnJSonList" runat="server" />
                             <asp:HiddenField ID="_hdnJSonStart" runat="server" />
                             <asp:HiddenField ID="_hdnJSonEnd" runat="server" />
-   
+                            <asp:HiddenField ID="_hdnFolioID" runat="server" />
+
                            <span>
                            <button class="btn btn-default pull-left" type="button" runat="server" id="btnSearch1" onserverclick="btnSearch_ServerClick" >
                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
@@ -4511,11 +4704,27 @@ div.disabled,button.disabled,a.disabled {
                 <div class="col-md-9" style="width: 79%;">    
                     <div class="row">
 
-                        <div id="playerBox" class="img-rounded playerBox" style="min-height:440px; margin-left: 20px; border: solid 0.17em; background: linear-gradient(to bottom, #9EA7B1, #9EA7B1); position:relative;" runat="server">
+                        <div id="playerBox" class="img-rounded playerBox" runat="server">
 
-                                <div id="divPlayer_VIDEO" style="display:none;" class='photobox'> <!-- Contiene el Applet -->
+<div id="divForm" class="globalplayBox img-rounded" style="display:none">
 
-                             </div>
+    <div class="flex" style="min-width: 1000px;">
+        <!--
+		<a bg="a" style="left:0px;top:0px;width:250px;height:250px;" width="350" height="350">A</a>
+		<a bg="b" style="left:290px;top:0px;width:250px;height:250px;" width="350" height="350">B</a>
+		<a bg="g" style="left:0px;top:280px;width:250px;height:250px;" width="350" height="350">G</a>
+		<a bg="h" style="left:290px;top:280px;width:250px;height:250px;" width="350" height="350">H</a>
+        -->
+
+        <div id="globalplay_divComments" style="position: absolute; width: 50%; margin: 0 auto; bottom: 0;">
+            <label style="z-index:1001;"></label>
+        </div>
+
+	</div>
+
+</div>
+
+                                <div id="divPlayer_VIDEO" style="display:none;" class='photobox'> <!-- Contiene el Applet --> </div>
                                 <img id="imgPlayer" class='photobox' style='max-height:390px; max-width:100%; margin: auto; display:none;' alt=''/> <!-- javascript:$("#imgPlayer").photobox(); -->
 
                                 <!-- PLAYER - VIDEO - Controls Mask -->
@@ -4854,7 +5063,6 @@ div.disabled,button.disabled,a.disabled {
                    <span class="special-title label label-primary" style="font-weight: normal;">Timeline</span>
 
                     Cantidad: <label id="lblGlobalplay_element_count" class="label" style="font-size:100%; color:black;">0</label>: IDs: <label id="lblGlobalplay_element_ids" class="label" style="font-size:100%; color:black;">0</label>
-
                </h1>
 
                 <div class="row" style="display:inline">
@@ -4867,6 +5075,7 @@ div.disabled,button.disabled,a.disabled {
 				                </li>
 				                <li>
 					                <a href="#" id="button_globalplay" class="play" data-attr="playPauseAudio" onclick="return initGlobalplay()"></a> <!-- pauseAudio -->
+                                   <a href="#divForm" id="btnForm" style="display:none;"></a>
 				                </li>
 				                <li>
 					                <a href="#" class="right" data-attr="nextAudio"></a>
