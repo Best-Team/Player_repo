@@ -30,7 +30,6 @@
     <script src="assets/js/inputmask.extensions.js"></script>
     <script src="assets/js/jquery.inputmask.bundle.js"></script>
     <script src="assets/js/jquery.maskedinput.js"></script>
-
     <script src="assets/js/jquery.fancybox.js"></script>
     <script src="assets/js/jquery.flex.js"></script>
 
@@ -45,8 +44,6 @@
     <link href="assets/css/highlight.css" rel="stylesheet" />
     <link href="assets/css/jslider.css" rel="stylesheet" />
     <link href="assets/css/globalplay.css" type="text/css" rel="stylesheet"/> 
-
-
     <link href="assets/css/jquery.fancybox.css" type="text/css" rel="stylesheet"/> 
 
    <script type="text/javascript">
@@ -193,15 +190,15 @@
            /**** Slider control: comment duration ****/
            $("#sliderSingle1").slider({
                from: 1,
-               to: 3600,
+               to: GLOBALPLAY_seconds_total, // 3600 seg
                step: 1,
                round: 1,
                format: {
                    format: '##',
                    locale: 'de'
                },
-               dimension: '&nbsp;seg',
-               skin: "round"
+               dimension: '&nbsp;' // seg
+               //skin: "round"
            });
 
            /**** Progress Pointer settings ****/
@@ -214,10 +211,11 @@
            var first_tapeID = 0;
            if (elementsInMemory != null && elementsInMemory.length > 0) {
                first_tapeID = elementsInMemory[0].tapeID;
+               var first_tapeID_int = parseInt(first_tapeID, 10);
 
-               if (first_tapeID > 0) {
+               if (first_tapeID_int > 0) {
                    timeline_pointer.show();
-                   setImgPointerLocation(first_tapeID);
+                   timeline_pointer_setLocation(first_tapeID_int);
                }
            }
 
@@ -604,6 +602,10 @@
 
            // Pause global timer 
            $('#lblGlobalplay_timer_current').timer('pause');
+
+           // Set player mask pause
+           $("#button_globalplay").removeClass("pauseAudio");
+           $("#button_globalplay").addClass("play");
        }
 
        // Event Drag & Drop: Dragging
@@ -642,7 +644,8 @@
            hashMessages["ElementosBorrados"] = "Los elementos se borraron correctamente.";
            hashMessages["SeleccioneElemento"] = "Por favor, seleccione un elemento del folio.";
            hashMessages["ElementoBorrado"] = "Elemento correctamente borrado.";
-           hashMessages["UtilizarNavegador"] = "Por favor, utilice Firefox o IE para continuar con esta función.";
+           hashMessages["UtilizarNavegador1"] = "Por favor, utilice Firefox o IE para continuar con esta función.";
+           hashMessages["UtilizarNavegador2"] = "Por favor, utilice Firefox o IE para reproducir este elemento.";
            hashMessages["MaximoElementosDescarga1"] = "Se permite un máximo de";
            hashMessages["MaximoElementosDescarga2"] = "elementos en simultáneo para descargar.";
            hashMessages["SeleccioneArchivo"] = "Por favor, seleccione un archivo.";
@@ -1277,23 +1280,23 @@
        function events_line_click(event) {
            var MAIN_LINE = $("#timeframe > svg > g:first > line:first");
            if (MAIN_LINE != null && MAIN_LINE.length && timeline_pointer != null && timeline_pointer.length) {
-               timeline_pointer.show();
 
-               // Set Y axis
-               var first_tapeID = 0; // Get first element
-               if (elementsInMemory != null && elementsInMemory.length > 0) {
-                   first_tapeID = elementsInMemory[0].tapeID;
-               }
-               setImgPointerLocation(first_tapeID);
+               // Show timeline pointer
+               timeline_pointer.show();
 
                // Set current pointer date, to the add-comment & upload-file functions
                setCurrentPointerPositionDate(event);
+               
+               // TODO: Check in Chrome 
 
                // Locate pointer in new position
-               var parentPosition = getPosition2(event.currentTarget);
+               var parentPosition = getPosition2(event.currentTarget); //2
                var xPosition = event.clientX - parentPosition.x;
                var yPosition = event.clientY - parentPosition.y;
-               timeline_pointer.offset({ left: xPosition - parseInt(timeline_pointer.css("width"), 10) / 2 });
+
+               var pointer_width = parseInt(timeline_pointer.css("width"), 10);
+
+               timeline_pointer.offset({ left: xPosition - (pointer_width / 2) });
            }
        }
 
@@ -1343,6 +1346,8 @@
            if (hdnJSonList != null && hdnJSonList.length && hdnJSonStart != null && hdnJSonStart.length && hdnJSonEnd != null && hdnJSonEnd.length) {
                timeframe_prepare(JSON.parse(hdnJSonList), hdnJSonStart, hdnJSonEnd);
            }
+
+           // Show timeline pointer
            timeline_pointer.show();
 
            // Re Load all grid button events, because Ajax call removes them
@@ -1358,6 +1363,20 @@
 
            /**** Load Globalplay settings ****/
            loadGlobalplay_settings();
+
+           /**** Slider control: comment duration ****/
+           $("#sliderSingle1").slider({
+               from: 1,
+               to: GLOBALPLAY_seconds_total, // 3600 seg
+               step: 1,
+               round: 1,
+               format: {
+                   format: '##',
+                   locale: 'de'
+               },
+               dimension: '&nbsp;',
+               skin: "round"
+           });
        }
 
        function timeframe_prepare(timeline_data, start, end) {
@@ -1378,7 +1397,7 @@
 
                if (first_tapeID_int > 0) {
                    timeline_pointer.show();
-                   setImgPointerLocation(first_tapeID_int);
+                   timeline_pointer_setLocation(first_tapeID_int);
                }
            }
 
@@ -1434,6 +1453,7 @@
                    MAIN_LINE.attr("y2", MAIN_LINE_top);
                    MAIN_LINE.attr("stroke-width", MAIN_LINE_height);
                }
+
                /* **** EVENTS LINE **** */
                var EVENTS_LINE = $("#timeframe > svg > g:first > line:nth(1)");
                if (EVENTS_LINE != null && EVENTS_LINE.length) {
@@ -1493,8 +1513,7 @@
                                        toolTip_title = "Elemento #" + count + " (Grabación de pantalla)";
 
                                        // Border rounded
-                                       if (ELEMENT_rect != null && ELEMENT_rect
-                                           .length) {
+                                       if (ELEMENT_rect != null && ELEMENT_rect.length) {
                                            ELEMENT_rect.attr("rx", 4);
                                            ELEMENT_rect.attr("ry", 4);
                                        }
@@ -1559,6 +1578,7 @@
                                    }
                            }
                            if (ELEMENT != null && ELEMENT.length) {
+
                                // Set special tooltip
                                ELEMENT.qtip({
                                    position: {
@@ -1597,8 +1617,9 @@
 
                                    // Set cursor
                                    ELEMENT_rect.css('cursor', 'pointer');
+                                   ELEMENT_rect.css('z-index', 10);                                   
+
                                    ELEMENT.css('z-index', 10);
-                                   ELEMENT_rect.css('z-index', 10);
 
                                    // Element click bottom
                                    // Carga los parámetros con el valor actual de sus parámetros para que se envíen dinámicamente con el evento click
@@ -1616,9 +1637,15 @@
                                        _tapeType: tapeType,
                                        _fileStatus: fileStatus
                                    }, fire_event);
+
                                } else {
+
+                                   // Is Comment type Element
                                    ELEMENT.css('z-index', -10); //50
                                    ELEMENT_rect.css('z-index', -10); //50
+
+                                   // new
+                                   line_opacity = 0.6;
                                }
                                // Get Tape text, set bold
                                if (ELEMENT_text != null && ELEMENT_text.length) {
@@ -1633,7 +1660,7 @@
 
                            if (ELEMENT_rect != null && ELEMENT_rect.length) {
                                ELEMENT_rect.attr("fill", color_str);
-                               ELEMENT_rect.attr("fill-opacity", line_opacity);
+                                ELEMENT_rect.attr("fill-opacity", line_opacity);
 
                                // Sacar?
                                // Si el elemento es demasiado corto (pintado), fija un largo mínimo en px
@@ -1655,16 +1682,6 @@
                        }
                    } // for
                }
-               // Get first element
-               var first_tapeID = 0;
-               if (elementsInMemory != null && elementsInMemory.length > 0) {
-                   first_tapeID = elementsInMemory[0].tapeID;
-               }
-               var ELEMENT_first_rect = $("#timeframe #tlTape_" + first_tapeID +
-                   " > rect");
-               if (ELEMENT_first_rect != null && ELEMENT_first_rect.length) {
-                   ELEMENT_first_rect.attr("fill-opacity", 0.8);
-               }
 
                // Visual effect
                $("#timeframe").show("blind", 50);
@@ -1684,6 +1701,7 @@
            // Source: http://jsfiddle.net/fLo4uatw/
        }
 
+       // Locates all elements in timeline
        function locateEveryElementByType() {
            var objects = [];
            $("#divTypes input:checked").each(function () {
@@ -1734,6 +1752,8 @@
                    }
            }
 
+
+
            // Type letter location
            var border_start = $("line[name='timeframe_start']");
            var x_extra = parseInt(border_start.attr('x1'), 10) - 12;
@@ -1759,8 +1779,12 @@
                    }, letter);
                    document.getElementById('svg_timeframe').appendChild(text);
                }
+
+               // rect
                $("#timeframe g[type_name='" + objects[obj] + "'] > rect").attr("y", initial_top);
                $("#timeframe g[type_name='" + objects[obj] + "'] > rect").attr("height", basic_height);
+
+               // text
                $("#timeframe g[type_name='" + objects[obj] + "'] > text").attr("y", initial_top - 7);
                initial_top += extra_top;
            }
@@ -1858,8 +1882,10 @@
            }
 
            // Set Selected element
+           /*
            selectedElementID = tapeID;
-           setImgPointerLocation(tapeID);
+           timeline_pointer_setLocation(tapeID);
+           */
 
            // Set current pointer date, to the add-comment & upload-file functions
            currentPointerPositionDate = timestamp; 
@@ -1906,7 +1932,7 @@
 
        /******** Set location of Pointer over the timeline element initial position ********/
 
-       function setImgPointerLocation(tapeID) {
+       function timeline_pointer_setLocation(tapeID) {
            var timeline = $(".background");
            var sm2_inline_element = $("#sm2-inline-element");
            var sm2_progress_bd = $("#sm2-progress-bd");
@@ -2049,121 +2075,28 @@
                lnkElementDownload.attr("href", filePath_str);
            }
 
+           // ------- Remove element click
+
            // Clear previous onclick or click events
            btnRemoveElement.attr('onclick', '');
            btnRemoveElement.off("click");
-           btnConfirmRemoveElement.attr('onclick', '');
-           btnConfirmRemoveElement.off("click");
 
-           // Load on click event remove button
-           var btnRemoveElement = $("#btnRemoveElement");
-           btnRemoveElement.bind("click", function () {
-               if (!$('#btnRemoveElement').hasClass("opened")) {
-                   $('.popbox3').popbox3();
-                   $(".box3.popbox3").show("highlight", 700);
-                   $('#txbConfirmRemoveElement').focus();
-                   $('#btnRemoveElement').addClass("opened");
-               } else {
-                   $(".box3.popbox3").hide(200);
-                   $('#btnRemoveElement').removeClass("opened");
-               }
-           });
+           /**** Event: OnClick Load on click event remove button (btnRemoveElement) ****/
+           loadClickRemoveButton_event();
+           
            divRemoveElementMessage.text("Está a punto de borrar el elemento, confirme su contraseña para continuar");
            divRemoveElementMessage.removeClass("alert-danger");
            divRemoveElementMessage.addClass("alert-warning");
 
-           // Load on click event remove button
-           btnConfirmRemoveElement.bind("click", function () {
+           // ------- Confirm Remove element click
 
-             var userID = '<%= Session["UserID"] %>';
-             var password_input = $("#txbConfirmRemoveElement");
+           // Clear previous onclick or click events
+           btnConfirmRemoveElement.attr('onclick', '');
+           btnConfirmRemoveElement.off("click");
 
-         if (userID != null && userID != "" && password_input != null && password_input.val() != "") {
-             $.ajax({
-                 type: "POST",
-                 url: "Dashboard.aspx/ConfirmRemoveElement",
-                 data: '{userID: "' + userID + '",password_input: "' + password_input.val() + '",tapeID: "' + tapeID + '",isExtra: "' + isExtra + '"}',
-                 contentType: "application/json; charset=utf-8",
-                 dataType: "json",
-                 success: function (response) {
-                     if (response.d == 1) {
-                         // Hide element from search panel
-                         $("#tape_" + tapeID).hide();
+           /**** Event: OnClick Load on click event confirm remove button (btnConfirmRemoveElement) ****/
+           loadClickConfirmRemoveButton_event(tapeID, isExtra);
 
-                         // Disable element in memory elements 
-                         var _hdnIsUpdateNeeded = $("input[id*='_hdnIsUpdateNeeded']");
-                         if (_hdnIsUpdateNeeded != null) {
-                             _hdnIsUpdateNeeded.val("true");
-                         }
-                         // Clear div player
-                         removeDivPlayerContentExcept();
-
-                         /************************ Reload timeline BEGIN ************************/
-
-                         $("#timeframe").empty(); // Clean div content
-                         var new_timeline_data = jQuery.extend(true, {}, _TL_DATA); // It clones the object, do not references it
-
-                         if (new_timeline_data.spans != null && new_timeline_data.spans.length > 0) {
-                             new_timeline_data.spans =
-                                 $.grep(_TL_DATA.spans,
-                                     function (item, index) {
-                                         return item.id != tapeID;
-                                     });
-                         }
-                         _TL_DATA = new_timeline_data;
-
-                         // Refresh max and min dates, timeline limits
-                         max = new Date(-100000000 * 86400000);
-                         min = new Date(100000000 * 86400000);
-                         traverse(_TL_DATA.spans, compare);
-
-                         // **** DRAW TIMELINE ****
-                         timeframe_draw(_TL_DATA, _TL_STARTDATE, _TL_ENDDATE);
-
-                         /******** Reload timeline END ********/
-
-                         // Disable div player again
-                         divPanel_PlayerControl.addClass("disabled");
-
-                         // Remove previous info
-                         removeDivPlayer();
-
-                         // force to close popup
-                         $(".box3.popbox3").hide();
-
-                         // Clear password field
-                         $("#txbConfirmRemoveElement").val("");
-
-                         $("#dialog p").text(hashMessages["ElementoBorrado"]);
-                         $("#dialog").dialog({
-                             buttons: {
-                                 "Confirmar": function () {
-                                     $(this).dialog("close");
-                                 }
-                             }
-                         });
-
-                         // Clear player image
-                         $("#imgPlayer").attr("src", "");
-
-                     } else if (response.d == 0) {
-                         divRemoveElementMessage.text("La contraseña no es válida ");
-                         divRemoveElementMessage.removeClass("alert-danger");
-                         divRemoveElementMessage.removeClass("alert-warning");
-                         divRemoveElementMessage.addClass("alert-danger");
-                     } else if (response.d == 2) {
-                         divRemoveElementMessage.text(" Ocurrió un error en la opreación");
-                         divRemoveElementMessage.removeClass("alert-danger");
-                         divRemoveElementMessage.removeClass("alert-warning");
-                         divRemoveElementMessage.addClass("alert-danger");
-                     }
-                 }, // end success
-                 failure: function (response) {
-                     alert(response.d);
-                 }
-             });
-         }
-     });
            /************************ General events END ************************/
 
      /************************ General styles START ************************/
@@ -2296,7 +2229,7 @@
              //#region SCREEN RECORDING ELEMENT (S / P) ------------
 
              //****************************************************************************************
-             //********************************* 1. SCREEN RECORDING  ************************************
+             //********************************* 1. SCREEN RECORDING  *********************************
              //****************************************************************************************
 
              if (getIsFirefoxOrIE()) {
@@ -2329,6 +2262,7 @@
                  // Bottom progress track
 
                  $("#sm2-progress-track").on("click", { _duration: duration }, setVideoCurrent);
+
                  // Click over play/pause button 
                  divControlsMask_AUDIO.on("click", { _tapeID: tapeID }, playAudioElement);
 
@@ -2364,7 +2298,6 @@
                  // Enable video player
                  if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
 
-                // divControlsMask_VIDEO.show("blind", 200); **********
                      divControlsMask_VIDEO.removeClass("disabled");
 
                      // Set playing
@@ -2386,12 +2319,11 @@
                  
                  // Hide masked controls - Quitar? 
                  divPlayer_VIDEO.css("visibility", "visible");
-                 $("#divControlsMask_VIDEO").hide(); // +++
-                 //$("#divControlsMask_VIDEO").show(); // +++
+                 $("#divControlsMask_VIDEO").hide(); 
 
              } else { // It is not Firefox
 
-                 $("#dialog p").text(hashMessages["UtilizarNavegador"]);
+                 $("#dialog p").text(hashMessages["UtilizarNavegador1"]);
                  $("#dialog").dialog({
                      buttons: {
                          "Confirmar": function () {
@@ -2810,13 +2742,18 @@
 
                              // Pointers progress
                              pointer_VIDEO.css("left", left);
+
+
+                             /*
                              timeline_pointer.show();
                              timeline_pointer.css("left", left);
+                             */
+
                          }
                      });
                  }, 1000);
              } else {
-                 $("#dialog p").text(hashMessages["UtilizarNavegador"]);
+                 $("#dialog p").text(hashMessages["UtilizarNavegador1"]);
                  $("#dialog").dialog({
                      buttons: {
                          "Confirmar": function () {
@@ -2859,6 +2796,122 @@
 
            /************************ Load element on Player END ************************/
 
+       }
+
+       /**** Event: OnClick Load on click event remove button (btnRemoveElement) ****/
+       function loadClickRemoveButton_event(){
+           var btnRemoveElement = $("#btnRemoveElement");
+           btnRemoveElement.bind("click", function () {
+               if (!$('#btnRemoveElement').hasClass("opened")) {
+                   $('.popbox3').popbox3();
+                   $(".box3.popbox3").show("highlight", 700);
+                   $('#txbConfirmRemoveElement').focus();
+                   $('#btnRemoveElement').addClass("opened");
+               } else {
+                   $(".box3.popbox3").hide(200);
+                   $('#btnRemoveElement').removeClass("opened");
+               }
+           });
+       }
+
+       /**** Event: OnClick Load on click event confirm remove button (btnConfirmRemoveElement) ****/
+       function loadClickConfirmRemoveButton_event(tapeID, isExtra) {
+
+           var btnConfirmRemoveElement = $("button[id*='btnConfirmRemoveElement");
+           var divPanel_PlayerControl = $("#divPanel_PlayerControl");
+           var divRemoveElementMessage = $("div[id*='divRemoveElementMessage");
+
+           btnConfirmRemoveElement.bind("click", function () {
+
+               var userID = '<%= Session["UserID"] %>';
+               var password_input = $("#txbConfirmRemoveElement");
+
+               if (userID != null && userID != "" && password_input != null && password_input.val() != "") {
+                   $.ajax({
+                       type: "POST",
+                       url: "Dashboard.aspx/ConfirmRemoveElement",
+                       data: '{userID: "' + userID + '",password_input: "' + password_input.val() + '",tapeID: "' + tapeID + '",isExtra: "' + isExtra + '"}',
+                       contentType: "application/json; charset=utf-8",
+                       dataType: "json",
+                       success: function (response) {
+                           if (response.d == 1) {
+                               // Hide element from search panel
+                               $("#tape_" + tapeID).hide();
+
+                               // Disable element in memory elements 
+                               var _hdnIsUpdateNeeded = $("input[id*='_hdnIsUpdateNeeded']");
+                               if (_hdnIsUpdateNeeded != null) {
+                                   _hdnIsUpdateNeeded.val("true");
+                               }
+                               // Clear div player
+                               removeDivPlayerContentExcept();
+
+                               /************************ Reload timeline BEGIN ************************/
+
+                               $("#timeframe").empty(); // Clean div content
+                               var new_timeline_data = jQuery.extend(true, {}, _TL_DATA); // It clones the object, do not references it
+
+                               if (new_timeline_data.spans != null && new_timeline_data.spans.length > 0) {
+                                   new_timeline_data.spans =
+                                       $.grep(_TL_DATA.spans,
+                                           function (item, index) {
+                                               return item.id != tapeID;
+                                           });
+                               }
+                               _TL_DATA = new_timeline_data;
+
+                               // Refresh max and min dates, timeline limits
+                               max = new Date(-100000000 * 86400000);
+                               min = new Date(100000000 * 86400000);
+                               traverse(_TL_DATA.spans, compare);
+
+                               // **** DRAW TIMELINE ****
+                               timeframe_draw(_TL_DATA, _TL_STARTDATE, _TL_ENDDATE);
+
+                               /******** Reload timeline END ********/
+
+                               // Disable div player again
+                               divPanel_PlayerControl.addClass("disabled");
+
+                               // Remove previous info
+                               removeDivPlayer();
+
+                               // force to close popup
+                               $(".box3.popbox3").hide();
+
+                               // Clear password field
+                               $("#txbConfirmRemoveElement").val("");
+
+                               $("#dialog p").text(hashMessages["ElementoBorrado"]);
+                               $("#dialog").dialog({
+                                   buttons: {
+                                       "Confirmar": function () {
+                                           $(this).dialog("close");
+                                       }
+                                   }
+                               });
+
+                               // Clear player image
+                               $("#imgPlayer").attr("src", "");
+
+                           } else if (response.d == 0) {
+                               divRemoveElementMessage.text("La contraseña no es válida ");
+                               divRemoveElementMessage.removeClass("alert-danger");
+                               divRemoveElementMessage.removeClass("alert-warning");
+                               divRemoveElementMessage.addClass("alert-danger");
+                           } else if (response.d == 2) {
+                               divRemoveElementMessage.text(" Ocurrió un error en la opreación");
+                               divRemoveElementMessage.removeClass("alert-danger");
+                               divRemoveElementMessage.removeClass("alert-warning");
+                               divRemoveElementMessage.addClass("alert-danger");
+                           }
+                       }, // end success
+                       failure: function (response) {
+                           alert(response.d);
+                       }
+                   });
+               }
+           });
        }
 
        function SetAudioPlaylistURL(number, vURL){
@@ -2942,7 +2995,6 @@
              // NOTE: Chrome way
              //xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
              //yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
-             //element = element.offsetParent;
 
              // NOTE: Firefox / Chrome way 1
              xPosition += (XY(element).x - element.scrollLeft + element.clientLeft);
@@ -2988,8 +3040,8 @@
              duration_VIDEO.text(length.toString());
          }
      }
-     // Button play/pause actions
 
+     // Button play/pause actions
      function ActionVideoPlay(tapeID, duration, isAudioPlaying) {
          var aPlayPause_VIDEO = $("#aPlayPause_VIDEO");
          var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
@@ -3173,9 +3225,10 @@
                  document.fbsviewer.pause();
              }
          } catch (err) {
-             console.log("Fbs Catch");
+             console.log("Oreka Player (.fbs) error try catch");
              console.log(err);
          }
+
          // FBS Player init
          previousSecs = 0;
          playVideo_ok = true;
@@ -3244,7 +3297,7 @@
                  document.fbsviewer.pause();
              }
          } catch (err) {
-             console.log("Fbs Catch");
+             console.log("Oreka Player (.fbs) error try catch");
              console.log(err);
          }
      }
@@ -3359,8 +3412,11 @@
 
                      // Pointers progress
                      pointer_VIDEO.css("left", left);
+
+                     /*
                      timeline_pointer.show();
                      timeline_pointer.css("left", left);
+                     */
 
                      //divControlsMask_VIDEO.addClass("playing");
                      playVideo_ok = true;
@@ -3386,12 +3442,12 @@
          var divSoundPlayer = $("#divControlsMask_AUDIO");
          if (divSoundPlayer != null && divSoundPlayer.length > 0) {
              if (divSoundPlayer.hasClass("playing")) {
-                 if (timeline_pointer != null) {
-                     timeline_pointer.show();
 
-                     // Set element Playing
-                     setElementInMemoryIsPlaying(event.data._tapeID);
-                 }
+                 //timeline_pointer.show();
+
+                // Set element Playing
+                 setElementInMemoryIsPlaying(event.data._tapeID);
+
              } else {
                  clearInterval(myTimer);
              }
@@ -4010,8 +4066,11 @@
 
                startGlobalplay();
 
-               // Open container fiv
-               $("#btnForm").click();
+               // If Fancybox is closed, open it
+               var fancybox = $(".fancybox-wrap")[0];
+               if (fancybox == null) {
+                   $("#btnForm").click();
+               }
 
            } else {
 
@@ -4067,6 +4126,53 @@
                var elementsCandidate = getElementInMemoryByCurrentPlayingTime();
                if (elementsCandidate != null && elementsCandidate.length > 0) {
 
+                   // visual_queue: video, screen_recording and images
+                   var visual_queue = $.grep(elementsCandidate, function (el, i) {
+                       return el[0].tapeType == "V" || el[0].tapeType == "S" || el[0].tapeType == "I";
+                   });
+
+
+                   var flex_width_int = parseInt($(".flex").css("width"), 10);
+                   var flex_height_int = parseInt($(".flex").css("height"), 10);
+                   
+                   var visual_size = flex_width_int;
+
+                   // Element distinct types 
+                   switch (visual_queue.length) {
+                       case 1:
+                           {
+                               visual_size = flex_width_int; // 1000
+                               break;
+                           }
+                       case 2:
+                           {
+                               visual_size = flex_width_int / 2 - 20; // 480
+                               break;
+                           }
+                       case 3:
+                           {
+                               visual_size = 300;
+                               break;
+                           }
+                       case 4:
+                           {
+                               visual_size = 250;
+                               break;
+                           }
+                       case 5:
+                           {
+                               visual_size = 250;
+                               break;
+                           }
+                       case 6:
+                           {
+                               visual_size = 250;
+                               break;
+                           }
+                   }
+
+
+
                    // Set label elements on play
                    $("#lblGlobalplay_element_count").text(elementsCandidate.length);
 
@@ -4077,10 +4183,29 @@
                    // globalplay box container
                    var flex_div = $("#divForm .flex");
 
+                   // Location variables
+                   var visual_left = 0;
+                   var visual_delta_left = 250;
+                   var visual_top = 0;
+                   var visual_delta_top = 250;
+                   var visual_corrector = 0;
+                   var visual_count = 0;
+
+                   //
+                   var left_final = 50;
+                   var top_final = 0;
+                   var booleanX = 0;
+                   var booleanY = 0;
+
+
                    var ids = "";
                    for (var i = 0; i < elementsCandidate.length; i++) {
                        var el = elementsCandidate[i];
                        if (el != null) {
+
+                           //var isPar = visual_count % 2 == 0;
+                           //visual_corrector = isPar ? 0 : 1;
+
 
                            ids = ids + el[0].tapeID + "(" + el[0].tapeType + "), ";
 
@@ -4096,6 +4221,7 @@
                                el[1] = true;
 
                                var type = el[0].tapeType;
+                               var isVisual = (type == "V" || type == "S" || type == "I") ? true : false;
                                /*
                                A: Audio
                                V: Video
@@ -4105,43 +4231,203 @@
                                C: Comment
                                */
 
+                               //                              
+                               if (isVisual) {
+
+                                   visual_left += visual_delta_left * visual_corrector;
+                                   visual_top += visual_delta_top * visual_corrector;
+
+                                   visual_count++;
+                                   var isPar = visual_count % 2 == 0;
+                                   if (isPar) {
+                                       booleanX = 1;
+                                       booleanY = 0;
+                                   }
+                                   else {
+                                       booleanX = 0;
+                                       booleanY = 1;
+                                   }
+
+                                   var visual_correctorX = 0;
+                                   var visual_correctorY = 0;
+
+
+
+                                   left_final += 350 * booleanX;
+                                   top_final += 0;
+
+                                   visual_correctorX = 1;
+                                   visual_correctorY = 0;
+
+
+                                   
+                                   /*
+                                   // Posiciona los elementos de acuerdo a la cantidad que haya en ese momento
+                                   switch (visual_count) {
+                                       case 1: {
+
+                                           left_final = flex_width_int / 2 - visual_size / 2; // Centrar
+                                           top_final = 0;
+
+                                           visual_correctorX = 0;
+                                           visual_correctorY = 0;
+                                           break;
+                                       }
+                                       case 2: {
+
+                                           left_final += 300 * booleanX;
+                                           top_final += 0;
+
+                                           visual_correctorX = 1;
+                                           visual_correctorY = 0;
+                                           break;
+                                       }
+                                       case 3: {
+
+                                           left_final = 0;
+                                           top_final += 300 * booleanY;
+
+                                           visual_correctorX = 0;
+                                           visual_correctorY = 1;
+                                           break;
+                                       }
+                                       case 4: {
+
+                                           left_final += 300 * booleanX;
+                                           top_final += 300 * booleanY;
+
+                                           visual_correctorX = 1;
+                                           visual_correctorY = 1;
+                                           break;
+                                       }
+                                       case 5: {
+
+                                           left_final = 580;
+                                           top_final = 0;
+
+                                           visual_correctorX = 2;
+                                           visual_correctorY = 0;
+                                           break;
+                                       }
+                                       case 6: {
+
+                                           left_final = 580;
+                                           top_final = 280;
+
+                                           visual_correctorX = 0;
+                                           visual_correctorY = 2;
+                                           break;
+                                       }
+                                      
+                                   }
+                                   */
+
+                               }
+
+                               var default_duration_image = 5000; // 5 seg
+
                                // IsExtra = If filePath is NOT empty, then is extra from incextras table
                                var isExtra = el[0].filePath.length == 0 ? false : true;
 
                                // Prepare URL elements
-                               filePath_EXTRA += "?id=" + el[0].segmentID + "&isExtra=1";
-                               filePath_OREKA += "?segid=" + el[0].segmentID;
+                               var path_extra = filePath_EXTRA + "?id=" + el[0].segmentID + "&isExtra=1";
+                               var path_oreka = filePath_OREKA + "?segid=" + el[0].segmentID;
 
                                // SET Element file path
-                               var p = isExtra ? filePath_EXTRA : filePath_OREKA;
+                               var p = isExtra ? path_extra : path_oreka;
 
                                switch (type) {
                                    case "A": {
 
-                                       // Prepare audio player
-                                       $("#lnkSound_AUDIO").attr("href", p);
-                                       SetAudioPlaylistURL(0, p);
+                                       var audio = new Audio(p);
+                                       audio.play();
+                                       
 
-                                       // Set title
-                                       $("#lblSoundTitle1_AUDIO, #lblSoundTitle2_AUDIO").text(el[0].fileName);
-
-                                       // Clear audio player timers
-                                       $("#sm2-inline-time_AUDIO").text("0:00");
-                                       $("#sm2-inline-duration_AUDIO").text("0:00");
-
-                                       // Play audio
-                                       if (window.sm2BarPlayers != null && window.sm2BarPlayers.length > 0 &&
-                                           window.sm2BarPlayers[0].actions != null) {
-                                           window.sm2BarPlayers[0].actions.play();
-                                       }
                                        break;
                                    }
 
                                    case "V": {
+
+                                       if (getIsFirefoxOrIE()) {
+
+                                           var applet = "<object id='webchimera' type='application/x-chimera-plugin' width='" + visual_size + "' height='" + visual_size + "'>";
+                                           applet += "<param name='windowless' value='true' />";
+                                           applet += "</object>";
+                                           applet += "<div id='interface'></div>";
+
+                                           flex_div.append(applet);
+
+                                           // Play webchimera
+                                           try {
+                                               wjs("#webchimera").clearPlaylist();
+                                               wjs("#webchimera").addPlaylist(p);
+                                           } catch (err) {
+                                               console.log("Error loading webchimera");
+                                               console.log(err);
+
+                                               $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
+                                               $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
+                                               $("#dialog_WebChimera a").text("aquí.")
+                                               $("#dialog_WebChimera").dialog({
+                                                   buttons: {
+                                                       "OK": function () {
+                                                           $(this).dialog("close");
+                                                       }
+                                                   }
+                                               });
+                                           }
+                                       }
+                                       else {
+                                           var label = $(".flex #globalplay_divSpecialMessages h2");
+                                           label.text(hashMessages["UtilizarNavegador2"]);
+                                           setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration);
+                                       }
+
                                        break;
                                    }
 
                                    case "S": {
+
+                                       if (getIsFirefoxOrIE()) {
+                                           if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
+
+                                               var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size + "px' height='" + visual_size + "px' name='fbsviewer' id='fbsviewer' title='undefined'>";
+
+                                               applet += "<param name='HOST' value=''>";
+                                               applet += "<param name='PORT' value='5901'>";
+                                               applet += "<param name='FBSURL' value='" + filePath_OREKA + "'>";
+                                               applet += "<param name='AUDIOURL' value=''>";
+                                               applet += "<param name='SHOWPLAYERCONTROLS' value='NO'>"; // YES
+                                               applet += "<param name='SHOWPLAYERTAGCONTROLS' value='YES'>";
+                                               applet += "<param name='TIMECOUNTDOWN' value='NO'>";
+                                               applet += "<param name='CACHE' value='NO'>";
+                                               applet += "<param name='RESIZABLE' value='NO'>";
+                                               applet += "<param name='TAGS' value=''>";
+                                               applet += "<param name='QUICK_REWIND_SECS' value='-5'>";
+                                               applet += "<param name='QUICK_ADVANCE_SECS' value='5'>";
+                                               applet += "<param name='NOREC_TAGTYPE_NAME' value='Pause'>";
+                                               applet += "</applet>";
+
+                                               flex_div.append(applet);
+
+                                               // Stop FBS player if it is playing
+                                               //stopFBSPlayer();
+                                               try {
+                                                   if (document.fbsviewer != null) {
+                                                       document.fbsviewer.pause();
+                                                   }
+                                               } catch (err) {
+                                                   console.log("Oreka Player (.fbs) error try catch");
+                                                   console.log(err);
+                                               }
+
+                                           }
+                                       } else {
+                                           var label = $(".flex #globalplay_divSpecialMessages h2");
+                                           label.text(hashMessages["UtilizarNavegador2"]);
+                                           setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration);
+                                       }
+
                                        break;
                                    }
 
@@ -4149,25 +4435,31 @@
 
                                        var global_elementID = "global_img_" + el[0].segmentID;
 
-                                       $('<a id="' + global_elementID + '" style="left:0px;top:0px;width:980px;height:630px; background-image:url(' + p + ')" width="350" height="350">' + el[0].fileName + '</a>').appendTo(flex_div);
-                                       setTimeout(function () { globalplay_removeElement(global_elementID) }, 2500);
+                                       $('<a id="' + global_elementID + '" style="left:' + left_final + 'px; top:' + top_final + 'px; width:' + visual_size + 'px; height:' + visual_size + 'px; background-image:url(' + p + ')" width="' + (visual_size + 80) + '" height="' + (visual_size + 80) + '">' + el[0].fileName + '</a>').appendTo(flex_div);
+                                       setTimeout(function () { globalplay_removeElement(global_elementID) }, default_duration_image);
 
                                        break;
                                    }
 
                                    case "D": {
+
+                                       var duration = el[0].duration <= 1 ? 5000 : el[0].duration * 1000;
+
+                                       var label = $(".flex #globalplay_divDocumentsName h2");
+                                       label.text(el[0].fileName);
+                                       setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration);
+
                                        break;
+
                                    }
 
                                    case "C": {
 
-                                       var global_elementID = "global_com_" + el[0].segmentID;
-                                       var duration = el[0].duration <= 1 ? 3000 : el[0].duration * 1000;
+                                       var duration = el[0].duration <= 1 ? 5000 : el[0].duration * 1000;
 
-
-                                       $(".flex #globalplay_divComments label").text(el[0].fileName);
-                                       setTimeout(function () { globalplay_clearComment() }, duration);
-                                       //setTimeout(function () { globalplay_clearComment() }, 2500);
+                                       var label = $(".flex #globalplay_divComments h2");
+                                       label.text(el[0].fileName);
+                                       setTimeout(function () { globalplay_clearLabel(label) }, duration);
                                        break;
                                    }
                                }
@@ -4201,8 +4493,8 @@
            $("#" + global_elementID).remove();
        }
 
-       function globalplay_clearComment() {
-           $(".flex #globalplay_divComments label").text("");
+       function globalplay_clearLabel(label) {
+           label.text("");
        }
 
        function getElementInMemoryByCurrentPlayingTime() {
@@ -4706,23 +4998,23 @@ div.disabled,button.disabled,a.disabled {
 
                         <div id="playerBox" class="img-rounded playerBox" runat="server">
 
-<div id="divForm" class="globalplayBox img-rounded" style="display:none">
+                        <!-- GLOBALPLAY SCREEN -->
+                        <div id="divForm" class="globalplayBox img-rounded" style="display:none">
+                            <div class="flex" style="min-width: 1000px;">
 
-    <div class="flex" style="min-width: 1000px;">
-        <!--
-		<a bg="a" style="left:0px;top:0px;width:250px;height:250px;" width="350" height="350">A</a>
-		<a bg="b" style="left:290px;top:0px;width:250px;height:250px;" width="350" height="350">B</a>
-		<a bg="g" style="left:0px;top:280px;width:250px;height:250px;" width="350" height="350">G</a>
-		<a bg="h" style="left:290px;top:280px;width:250px;height:250px;" width="350" height="350">H</a>
-        -->
+                                <div id="globalplay_divSpecialMessages" style="position: absolute; width: 100%;">
+                                    <h2 class="label label-danger" style="z-index:1001; text-transform: none; font-size:20px; width: 50%; margin: 0 auto;"></h2>
+                                </div>
 
-        <div id="globalplay_divComments" style="position: absolute; width: 50%; margin: 0 auto; bottom: 0;">
-            <label style="z-index:1001;"></label>
-        </div>
+                                <div id="globalplay_divDocumentsName" style="position: absolute; width: 100%;">
+                                    <h2 class="label label-success" style="z-index:1001; text-transform: none; font-size:20px; width: 50%; margin: 0 auto;"></h2>
+                                </div>
 
-	</div>
-
-</div>
+                                <div id="globalplay_divComments" style="position: absolute; bottom: 30px; width: 100%;">
+                                    <h2 class="label label-warning" style="z-index:1001; background-color: orange; text-transform: none; font-size:20px; width: 50%; margin: 0 auto;"></h2>
+                                </div>
+	                        </div>
+                        </div>
 
                                 <div id="divPlayer_VIDEO" style="display:none;" class='photobox'> <!-- Contiene el Applet --> </div>
                                 <img id="imgPlayer" class='photobox' style='max-height:390px; max-width:100%; margin: auto; display:none;' alt=''/> <!-- javascript:$("#imgPlayer").photobox(); -->
@@ -4975,8 +5267,8 @@ div.disabled,button.disabled,a.disabled {
                   </div>
                </div>
                <div class="form-group">
-                  <div class="col-md-12" style="margin-top: 10px;">
-                     <label class="control-label" style="margin-bottom: 20px;">Duración</label>
+                  <div class="col-md-12" style="margin-top: 12px;">
+                     <label class="control-label" style="margin-bottom: 20px;">Duración (seg)</label>
                      <div class="layout-slider">
                         <input id="sliderSingle1" type="slider" name="duracion" value="1" style="display: none;"/>
                      </div>
@@ -5069,16 +5361,18 @@ div.disabled,button.disabled,a.disabled {
 
                     <div id="playerContainer" class="col-md-2 img-rounded" style="height: 140px; width:55px; margin-top:10px; background-color: #446e9b; background-image: linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 45%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.1) 51%, rgba(0,0,0,0.1) 95%);">
 		                <div id="controlContainer">
-			                <ul class="controls">
+			                <ul class="controls"> <!-- Controls mask Source: http://www.jqueryrain.com/?vXjX8BEk -->
 				                <li>
-					                <a href="#" class="left" data-attr="prevAudio"></a>
+					                <a href="#" class="mute" data-attr="mute"></a>
 				                </li>
 				                <li>
 					                <a href="#" id="button_globalplay" class="play" data-attr="playPauseAudio" onclick="return initGlobalplay()"></a> <!-- pauseAudio -->
                                    <a href="#divForm" id="btnForm" style="display:none;"></a>
 				                </li>
 				                <li>
-					                <a href="#" class="right" data-attr="nextAudio"></a>
+					                <a href="#" class="" data-attr="nextAudio">
+                                        <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+					                </a>
 				                </li>
 			                </ul>
 		                </div>

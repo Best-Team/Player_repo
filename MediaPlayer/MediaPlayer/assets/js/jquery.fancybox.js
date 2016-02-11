@@ -418,7 +418,17 @@
 
 				F.wrap.stop(true, true).removeClass('fancybox-opened');
 
-				F.transitions[ F.current.closeMethod ]();
+				F.transitions[F.current.closeMethod]();
+
+			    //
+				abortGlobalplay();
+
+				$("#button_globalplay").removeClass("pauseAudio");
+				$("#button_globalplay").addClass("play");
+
+			    // Stop timer
+				$('#lblGlobalplay_timer_current').timer('pause');
+                //
 			}
 		},
 

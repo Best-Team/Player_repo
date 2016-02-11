@@ -5,9 +5,18 @@
       <link rel="Shortcut Icon" type="image/ico" href="assets/images/logo.ico"/>
 
         <!-- Scripts -->
-        <script src="assets/js/jquery-1.12.0.js"></script>
-        <script src="assets/js/bootstrap.min.js"></script>
+
+       
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        <script>if (typeof jQuery === 'undefined') {
+    document.write(unescape('%3Cscript%20src%3D%22/assets/js/jquery-1.12.0.js%22%3E%3C/script%3E'));
+    // Source: http://encosia.com/3-reasons-why-you-should-let-google-host-jquery-for-you/?ref=sidebar_most_popular
+        }
+        </script>
+
         <script src="assets/js/jquery-ui.js"></script>
+       
+        <script src="assets/js/bootstrap.min.js"></script>
 
         <!-- Styles -->
         <link href="assets/css/bootstrap.min.css" rel="stylesheet" id="bootstrap"/>

@@ -203,10 +203,12 @@
                   dom.progress.style.left = left;
                   dom.progressBar.style.width = width;
 
+                  /*
                   if (selectedElementID != null && selectedElementID > 0 && $("#tlTape_" + selectedElementID).length > 0) {
-                      dom.progress2.style.left = left; // bottom pointer
+                      dom.progress2.style.left = left; // bottom pointer (timeline_pointer)
                       dom.progressBar2.style.width = width; // bottom progress bar
                   }
+                  */
 
                   // TODO: only write changes
                   dom.time.innerHTML = getTime(this.position, true);
@@ -503,9 +505,11 @@
 
           dom.progress.style.left = '0%';
 
-          if (selectedElementID != null && selectedElementID > 0 && $("#tlTape_" + selectedElementID).length > 0) {
-              dom.progress2.style.left = '0%'; // bottom pointer
+            /*
+            if (selectedElementID != null && selectedElementID > 0 && $("#tlTape_" + selectedElementID).length > 0) {
+              dom.progress2.style.left = '0%'; // bottom pointer (timeline_pointer)
           }
+          */
 
           lastIndex = playlistController.data.selectedIndex;
 
@@ -579,11 +583,13 @@
         dom.progress.style.left = '0px';
         dom.progressBar.style.width = '0px';
 
+        /*
         // If element is on Timeline bar
         if (selectedElementID != null && selectedElementID > 0 && $("#tlTape_" + selectedElementID).length > 0) {
-            dom.progress2.style.left = '0px'; // bottom pointer
+            dom.progress2.style.left = '0px'; // bottom pointer (timeline_pointer)
             dom.progressBar2.style.width = '0px'; // bottom progress bar
         }
+        */
         
         stopOtherSounds();
 
@@ -1122,9 +1128,11 @@
       dom.progressTrack = utils.dom.get(dom.o, '.sm2-progress-track'); 
       dom.progressBar = utils.dom.get(dom.o, '.sm2-progress-bar');
 
-      dom.progress2 = $('#sm2-progress-ball_TIMELINE')[0]; // bottom pointer
+      /*
+      dom.progress2 = $('#sm2-progress-ball_TIMELINE')[0]; // bottom pointer (timeline_pointer)
       dom.progressTrack2 = $('#sm2-progress-track')[0]; // bottom progress track
       dom.progressBar2 = $('#sm2-progress-bar')[0]; // bottom progress bar
+      */
 
       dom.volume = utils.dom.get(dom.o, 'a.sm2-volume-control');
 

@@ -45,3 +45,6 @@ Ejemplo:
 -> Para remover archivo que es ignorado pero ya fue uploaded al repo:
 git rm --cached web.config
 
+--
+
+Desligar timeline_pointer del player_box ? OK
