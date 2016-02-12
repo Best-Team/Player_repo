@@ -47,6 +47,6 @@ C:\Projects\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.dll
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.WindowsMediaFormat.dll
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\bin\Newtonsoft.Json.dll
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.xml
-C:\Projects\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.csprojResolveAssemblyReference.cache
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.dll
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.pdb
+C:\Projects\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.csprojResolveAssemblyReference.cache

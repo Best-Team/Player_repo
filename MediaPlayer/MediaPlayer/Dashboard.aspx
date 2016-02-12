@@ -76,7 +76,9 @@
        var currentPointerPositionDate;
 
        // Timeline Global Pointer
-       var timeline_pointer = $("#sm2-progress-ball_TIMELINE");
+       var TIMELINE_POINTER = $("#sm2-progress-ball_TIMELINE");
+       var PLAYER_BOX = $("div[id*='playerBox");
+
 
        // Get screen resolution
        var MONITOR_WIDTH = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -205,7 +207,7 @@
            currentPointerPositionDate = _TL_STARTDATE;
 
            // If the folio selected is not valid, then hides the Pointer from timeline
-           timeline_pointer.hide();
+           TIMELINE_POINTER.hide();
 
            // If there are elements loaded, show timeline pointer
            var first_tapeID = 0;
@@ -214,19 +216,19 @@
                var first_tapeID_int = parseInt(first_tapeID, 10);
 
                if (first_tapeID_int > 0) {
-                   timeline_pointer.show();
+                   TIMELINE_POINTER.show();
                    timeline_pointer_setLocation(first_tapeID_int);
                }
            }
 
-           timeline_pointer.css("top", "5px");
+           TIMELINE_POINTER.css("top", "5px");
            $('.popbox4').popbox4();
 
            // Event Drag & Drop ********
 
            // Source: http://www.elated.com/articles/drag-and-drop-with-jquery-your-essential-guide/
-           if (timeline_pointer != null) {
-               timeline_pointer.draggable({
+           if (TIMELINE_POINTER != null) {
+               TIMELINE_POINTER.draggable({
                    containment: '#divTimelineProgress',
                    axis: "x", 
                    scroll: false,
@@ -265,6 +267,10 @@
            // Fancybox Source 2: http://devtroce.com/2011/07/19/como-manejar-un-iframe-con-fancybox-y-jquery-en-modo-popup/
 
            // Flex Source: http://www.jsonenglish.com/projects/flex/
+
+           // Image player styles
+           var playerBox_h = parseInt(PLAYER_BOX.css("height"), 10);
+           $("#imgPlayer").css("max-height", playerBox_h);
 
        }); // END On Ready
 
@@ -568,44 +574,46 @@
        // Event Drag & Drop: Stop Dragging
        function handleDragStop(event, ui) {
            var posX = ui.offset.left - $("#svg_timeframe").offset().left;
-           var date = window.timeframe_live.getTickDate(posX); // Datetime position - Formato: AÑO DIA MES
-           if (date != null) {
-               var date_str = moment(date, "YYYY-MM-DD HH:mm:ss");
-               currentPointerPositionDate = date_str.format('DD-MM-YYYY HH:mm:ss');
-               $("#commentDate").val(date_str.format('DD-MM-YYYY HH:mm:ss'));
-               $("input[id*='uploadDate']").val(date_str.format('DD-MM-YYYY HH:mm:ss'));
+           var position_date = window.timeframe_live.getTickDate(posX); // Datetime position - Formato: AÑO DIA MES
+           if (position_date != null) {
+               var position_date_str = moment(position_date, "YYYY-MM-DD HH:mm:ss");
+               currentPointerPositionDate = position_date_str.format('DD-MM-YYYY HH:mm:ss');
+
+               // Update popup dates: FileUpload and CommentUpload
+               $("#commentDate").val(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
+               $("input[id*='uploadDate']").val(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
+
+               // ******** Globalplay ********
+
+               // Set current timer
+               var start_date_str = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
+
+               var position_date_final = new Date(position_date_str);
+               var start_date_final = new Date(start_date_str);
+
+               var dif = start_date_final.getTime() - position_date_final.getTime();
+
+               var Seconds_from_T1_to_T2 = dif / 1000;
+               var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
+
+               GLOBALPLAY_seconds_current = Seconds_Between_Dates;
+
+               // Clear global timer
+               $('#lblGlobalplay_timer_current').timer('remove');
+
+               // Set global timer current progress
+               $('#lblGlobalplay_timer_current').timer({
+                   format: '%H:%M:%S',
+                   seconds: Seconds_Between_Dates
+               });
+
+               // Pause global timer 
+               $('#lblGlobalplay_timer_current').timer('pause');
+
+               // Set player mask pause
+               $("#globalplay_play").removeClass("pauseAudio");
+               $("#globalplay_play").addClass("play");
            }
-
-           // ******** Globalplay ********
-
-           // Set current timer
-           var date_str1 = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
-
-           var date1 = new Date(date);
-           var date2 = new Date(date_str1);
-
-           var dif = date2.getTime() - date1.getTime();
-
-           var Seconds_from_T1_to_T2 = dif / 1000;
-           var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
-
-           GLOBALPLAY_seconds_current = Seconds_Between_Dates;
-
-           // Clear global timer
-           $('#lblGlobalplay_timer_current').timer('remove');
-
-           // Set global timer current progress
-           $('#lblGlobalplay_timer_current').timer({
-               format: '%H:%M:%S',
-               seconds: Seconds_Between_Dates
-           });
-
-           // Pause global timer 
-           $('#lblGlobalplay_timer_current').timer('pause');
-
-           // Set player mask pause
-           $("#button_globalplay").removeClass("pauseAudio");
-           $("#button_globalplay").addClass("play");
        }
 
        // Event Drag & Drop: Dragging
@@ -661,7 +669,8 @@
 
        function initVariables() {
 
-           timeline_pointer = $("#sm2-progress-ball_TIMELINE");
+           TIMELINE_POINTER = $("#sm2-progress-ball_TIMELINE");
+           PLAYER_BOX = $("div[id*='playerBox");
 
            // Set Username and Date info
            currentDateToday = new Date();
@@ -938,7 +947,6 @@
        }
 
        function closeFullscreen() {
-           var playerBox = $("div[id*='playerBox");
            var light = $("#light");
            var fade = $("#fade");
            var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
@@ -946,11 +954,11 @@
 
            if (elementType_active === "A" || elementType_active === "I") {
 
-               if (light != null && light.length && fade != null && fade.length && playerBox != null && playerBox.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
+               if (light != null && light.length && fade != null && fade.length && PLAYER_BOX != null && PLAYER_BOX.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
 
                    // Move player and banner to div container
-                   divControlsMask_VIDEO.appendTo(playerBox);
-                   divPlayer_VIDEO.appendTo(playerBox);
+                   divControlsMask_VIDEO.appendTo(PLAYER_BOX);
+                   divPlayer_VIDEO.appendTo(PLAYER_BOX);
 
                    // styles
                    light.css('display', 'none');
@@ -960,7 +968,7 @@
            }
            else if (elementType_active === "S") {
 
-               if (light != null && light.length && fade != null && fade.length && playerBox != null && playerBox.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
+               if (light != null && light.length && fade != null && fade.length && PLAYER_BOX != null && PLAYER_BOX.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
 
                    // -------------------------------------------------------------
                    $("#fbsviewer").attr('width', FBS_DEFAULT_Width);
@@ -969,8 +977,8 @@
                    // -------------------------------------------------------------
 
                    // Move player and banner to div container
-                   divControlsMask_VIDEO.appendTo(playerBox);
-                   divPlayer_VIDEO.appendTo(playerBox);
+                   divControlsMask_VIDEO.appendTo(PLAYER_BOX);
+                   divPlayer_VIDEO.appendTo(PLAYER_BOX);
 
                    // styles
                    light.css('display', 'none');
@@ -982,8 +990,8 @@
            else if (elementType_active === "V") {
 
                // Move player and banner to div container
-               divControlsMask_VIDEO.appendTo(playerBox);
-               divPlayer_VIDEO.appendTo(playerBox);
+               divControlsMask_VIDEO.appendTo(PLAYER_BOX);
+               divPlayer_VIDEO.appendTo(PLAYER_BOX);
 
                // styles
                light.css('display', 'none');
@@ -995,12 +1003,12 @@
 
                var manual_offset = 52;
                var extra = 2;
-               var playerBox_h = parseInt(playerBox.css("height"), 10);
+               var playerBox_h = parseInt(PLAYER_BOX.css("height"), 10);
                var height_final = playerBox_h - manual_offset - extra;
 
                // divPlayer_VIDEO size
                divPlayer_VIDEO.css("height", height_final + "px");
-               divPlayer_VIDEO.offset({ top: playerBox.offset().top + manual_offset });
+               divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top + manual_offset });
                
                // Webchimera player size
                var divPlayer_VIDEO_w = parseInt(divPlayer_VIDEO.css("width"), 10);
@@ -1279,10 +1287,10 @@
 
        function events_line_click(event) {
            var MAIN_LINE = $("#timeframe > svg > g:first > line:first");
-           if (MAIN_LINE != null && MAIN_LINE.length && timeline_pointer != null && timeline_pointer.length) {
+           if (MAIN_LINE != null && MAIN_LINE.length && TIMELINE_POINTER != null && TIMELINE_POINTER.length) {
 
                // Show timeline pointer
-               timeline_pointer.show();
+               TIMELINE_POINTER.show();
 
                // Set current pointer date, to the add-comment & upload-file functions
                setCurrentPointerPositionDate(event);
@@ -1294,9 +1302,9 @@
                var xPosition = event.clientX - parentPosition.x;
                var yPosition = event.clientY - parentPosition.y;
 
-               var pointer_width = parseInt(timeline_pointer.css("width"), 10);
+               var pointer_width = parseInt(TIMELINE_POINTER.css("width"), 10);
 
-               timeline_pointer.offset({ left: xPosition - (pointer_width / 2) });
+               TIMELINE_POINTER.offset({ left: xPosition - (pointer_width / 2) });
            }
        }
 
@@ -1335,7 +1343,7 @@
            $("#timeframe").empty();
            $("#timeframe").hide();
 
-           timeline_pointer.hide();
+           TIMELINE_POINTER.hide();
        }
 
        function pre_timeframe_prepare() { 
@@ -1348,7 +1356,7 @@
            }
 
            // Show timeline pointer
-           timeline_pointer.show();
+           TIMELINE_POINTER.show();
 
            // Re Load all grid button events, because Ajax call removes them
 
@@ -1396,7 +1404,7 @@
                var first_tapeID_int = parseInt(first_tapeID, 10);
 
                if (first_tapeID_int > 0) {
-                   timeline_pointer.show();
+                   TIMELINE_POINTER.show();
                    timeline_pointer_setLocation(first_tapeID_int);
                }
            }
@@ -1938,11 +1946,11 @@
            var sm2_progress_bd = $("#sm2-progress-bd");
            var sm2_progress = $("#sm2-progress");
            var sm2_progress_track = $("#sm2-progress-track");
-           if (timeline_pointer != null && sm2_inline_element != null && sm2_inline_element.length &&
+           if (TIMELINE_POINTER != null && sm2_inline_element != null && sm2_inline_element.length &&
                sm2_progress_bd != null && sm2_progress_bd.length && sm2_progress != null && sm2_progress.length &&
                sm2_progress_track != null && sm2_progress_track.length && timeline != null) {
 
-               timeline_pointer.show();
+               TIMELINE_POINTER.show();
 
                // Check if if exists at least one element
                if (tapeID > 0) {
@@ -1968,7 +1976,7 @@
                        sm2_progress_track.css('height', 15);
 
                        // Pointer left and top position
-                       timeline_pointer.offset({ left: vElement.offset().left });
+                       TIMELINE_POINTER.offset({ left: vElement.offset().left });
 
                        sm2_inline_element.offset({ top: $("#divTimelineProgress").offset().top })
 
@@ -1992,7 +2000,7 @@
                    sm2_progress_track.css('height', 15);
 
                    // Pointer left position
-                   timeline_pointer.offset({ left: timeline.offset().left });
+                   TIMELINE_POINTER.offset({ left: timeline.offset().left });
                    sm2_inline_element.offset({ top: timeline.offset().top + 15 }); // + 25
                }
            }
@@ -2025,7 +2033,6 @@
 
            /************************ General variables START ************************/
 
-           var playerBox = $("div[id*='playerBox");
            var divPlayer_VIDEO = $("#divPlayer_VIDEO");
            var divControlsMask_AUDIO = $("#divControlsMask_AUDIO");
            var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
@@ -2306,7 +2313,7 @@
                      TimeRefreshLoop(duration);
                      
                      // Coloca los controles en top = 0, por si antes fue usado el Video player (webchimera player)
-                     divPlayer_VIDEO.offset({ top: playerBox.offset().top });
+                     divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top });
 
                  }
 
@@ -2404,7 +2411,6 @@
                                  // If it is screen recording 
                                  if (element.tapeType === "S") {
                                      var divPlayer_VIDEO = $("#divPlayer_VIDEO");
-                                     var playerBox = $("div[id*='playerBox");
 
                                      // Display:none, no lo carga
                                      $("#divPlayer_VIDEO").css("visibility", "hidden");
@@ -2437,11 +2443,11 @@
 
                                      var manual_offset = 52;
                                      $("#divPlayer_VIDEO").show();
-                                     $("#divPlayer_VIDEO").css("height", (parseInt(playerBox.css("height"), 10) - manual_offset - 2) + "px");
+                                     $("#divPlayer_VIDEO").css("height", (parseInt(PLAYER_BOX.css("height"), 10) - manual_offset - 2) + "px");
 
                                      divControlsMask_VIDEO.show();
 
-                                     $("#divPlayer_VIDEO").offset({ top: $("div[id*='playerBox").offset().top + manual_offset });
+                                     $("#divPlayer_VIDEO").offset({ top: PLAYER_BOX.offset().top + manual_offset });
 
                                      // Create avi player
                                      var w = parseInt($("#divPlayer_VIDEO").css("width"), 10);
@@ -2544,8 +2550,8 @@
              if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
                  divControlsMask_VIDEO.hide();
              }
-             if (playerBox != null && playerBox.length) {
-                 playerBox.append(
+             if (PLAYER_BOX != null && PLAYER_BOX.length) {
+                 PLAYER_BOX.append(
                      "<div name='divComment' class='col-md-12' style='margin: 30px; margin-top:20px;'><div class='row'><h1 style='font-weight: bold;float:left;'>" +
                      timestamp +
                      "</h1></div><div class='row'><p class='pull-left' style='margin-top:15px;'>" +
@@ -2640,11 +2646,11 @@
 
                  var manual_offset = 52;
                  divPlayer_VIDEO.show();
-                 divPlayer_VIDEO.css("height", (parseInt(playerBox.css("height"), 10) - manual_offset - 2) + "px");
+                 divPlayer_VIDEO.css("height", (parseInt(PLAYER_BOX.css("height"), 10) - manual_offset - 2) + "px");
 
                  divControlsMask_VIDEO.show();
 
-                 divPlayer_VIDEO.offset({ top: playerBox.offset().top + manual_offset });
+                 divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top + manual_offset });
 
                  // Create avi player
                  var w = parseInt(divPlayer_VIDEO.css("width"), 10);
@@ -2745,8 +2751,8 @@
 
 
                              /*
-                             timeline_pointer.show();
-                             timeline_pointer.css("left", left);
+                             TIMELINE_POINTER.show();
+                             TIMELINE_POINTER.css("left", left);
                              */
 
                          }
@@ -3165,8 +3171,6 @@
 
      function videoPlayerINIT(fileName, duration, isExtra, segmentID, filePath, _url) {
 
-         var playerBox = $("div[id*='playerBox");
-
          /******** player control STYLES ********/
 
          // Player chronos
@@ -3177,17 +3181,17 @@
          $("#lblSoundTitle1_VIDEO, #lblSoundTitle2_VIDEO").text(fileName);
 
          // Remove player background image
-         playerBox.css("background-image", "");
+         PLAYER_BOX.css("background-image", "");
          $("#divPlayer_VIDEO").css("visibility", "hidden");
 
          // p = 'http://192.168.20.225:8080/icweb/replay?segid=1'; // TEST !!
 
          //var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + FBS_DEFAULT_Width + "' height='" + FBS_DEFAULT_Height + "' name='fbsviewer' id='fbsviewer' title='undefined'>";         
 
-         // Toma resolución del div contenedor (playerBox)
+         // Toma resolución del div contenedor (PLAYER_BOX)
 
-         playerBox_w = parseInt(playerBox.css("width"), 10);
-         playerBox_h = parseInt(playerBox.css("height"), 10);
+         playerBox_w = parseInt(PLAYER_BOX.css("width"), 10);
+         playerBox_h = parseInt(PLAYER_BOX.css("height"), 10);
 
          var left_offset = 25;
          var top_offset = 6;
@@ -3316,12 +3320,11 @@
      }
 
      function loadPlayerBoxImage(image_path) {
-         var playerBox = $("div[id*='playerBox");
-         if (playerBox != null && playerBox.length) {
-             playerBox.css("background-image", image_path);
-             playerBox.css("background-repeat", "no-repeat");
-             playerBox.css("background-position", "center");
-             playerBox.css("background-size", "250px 250px");
+         if (PLAYER_BOX != null && PLAYER_BOX.length) {
+             PLAYER_BOX.css("background-image", image_path);
+             PLAYER_BOX.css("background-repeat", "no-repeat");
+             PLAYER_BOX.css("background-position", "center");
+             PLAYER_BOX.css("background-size", "250px 250px");
          }
          $("#imgPlayer").hide();
      }
@@ -3414,8 +3417,8 @@
                      pointer_VIDEO.css("left", left);
 
                      /*
-                     timeline_pointer.show();
-                     timeline_pointer.css("left", left);
+                     TIMELINE_POINTER.show();
+                     TIMELINE_POINTER.css("left", left);
                      */
 
                      //divControlsMask_VIDEO.addClass("playing");
@@ -3443,7 +3446,7 @@
          if (divSoundPlayer != null && divSoundPlayer.length > 0) {
              if (divSoundPlayer.hasClass("playing")) {
 
-                 //timeline_pointer.show();
+                 //TIMELINE_POINTER.show();
 
                 // Set element Playing
                  setElementInMemoryIsPlaying(event.data._tapeID);
@@ -3986,7 +3989,7 @@
                      tr +="<td>";
                      tr +="<h5>" + "" + "</h5>";
                      tr +="<td>";
-                     tr +="<button type='button' class='btn btn-default btn-sm' style='color:orange; opacity: 0.9; background-color: #C4FFD6; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' ";
+                     tr += "<button type='button' class='btn btn-default btn-sm' style='color:orange; opacity: 0.9; background-color: beige; border: 1px solid black; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' ";
                      tr += "title='C' onclick='clickTimelineElement2(\"" + object.tapeID + "\", \"" + object.count + "\", \"" + object.duration + "\", \"" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "\", \"Comentario\", \"" + object.tapeID + "\", \"true\", \"" + object.fileName + "\", \"" + object.filePath + "\", \"" + object.duration_formatStr + "\", \"C\", \"OK\"" + ")' ><span class='glyphicon glyphicon-comment' aria-hidden='true'></span></button>";
                      tr +="<td>";
                      tr +="<h5 id='timestamp'>" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "</h5>";
@@ -4049,9 +4052,11 @@
 
        function initGlobalplay() {
 
-           if ($("#button_globalplay").hasClass("play")) {
-               $("#button_globalplay").removeClass("play");
-               $("#button_globalplay").addClass("pauseAudio");
+           if ($("#globalplay_play").hasClass("play")) {
+
+               // DO PLAY
+               $("#globalplay_play").removeClass("play");
+               $("#globalplay_play").addClass("pauseAudio");
 
                 // Start timer
                if (GLOBALPLAY_seconds_current == 0) {
@@ -4069,13 +4074,16 @@
                // If Fancybox is closed, open it
                var fancybox = $(".fancybox-wrap")[0];
                if (fancybox == null) {
+
+                   // DO CLICK
                    $("#btnForm").click();
                }
 
            } else {
 
-               $("#button_globalplay").removeClass("pauseAudio");
-               $("#button_globalplay").addClass("play");
+               // DO PAUSE
+               $("#globalplay_play").removeClass("pauseAudio");
+               $("#globalplay_play").addClass("play");
 
                // Stop timer
                $('#lblGlobalplay_timer_current').timer('pause');
@@ -4117,10 +4125,11 @@
            //console.log("GLOBALPLAY_seconds_current: " + GLOBALPLAY_seconds_current);
            //console.log("progress_percentage: " + progress_percentage);
 
-           if (progress_percentage <= 100) { // If it is still in range 
-               timeline_pointer.css("left", left_final_percentage);
+           // If it is still in range 
+           if (progress_percentage <= 100) { 
+               TIMELINE_POINTER.css("left", left_final_percentage);
 
-               /* Important: ----- Elements finding section ----- */
+               /* Important: ----- Finding elements section ----- */
 
                // Search elements in current playtime
                var elementsCandidate = getElementInMemoryByCurrentPlayingTime();
@@ -4131,47 +4140,51 @@
                        return el[0].tapeType == "V" || el[0].tapeType == "S" || el[0].tapeType == "I";
                    });
 
-
                    var flex_width_int = parseInt($(".flex").css("width"), 10);
                    var flex_height_int = parseInt($(".flex").css("height"), 10);
                    
-                   var visual_size = flex_width_int;
+                   var visual_size_w = flex_width_int - 80;
+                   var visual_size_h = flex_height_int - 80;
 
                    // Element distinct types 
                    switch (visual_queue.length) {
                        case 1:
                            {
-                               visual_size = flex_width_int; // 1000
+                               visual_size_w = flex_width_int - 80; 
+                               visual_size_h = flex_height_int - 80; 
                                break;
                            }
                        case 2:
                            {
-                               visual_size = flex_width_int / 2 - 20; // 480
+                               visual_size_w = flex_width_int / 2 - 80; // 480
+                               visual_size_h = flex_width_int / 2 - 80; // 480
                                break;
                            }
                        case 3:
                            {
-                               visual_size = 300;
+                               visual_size_w = 300;
+                               visual_size_h = 300;
                                break;
                            }
                        case 4:
                            {
-                               visual_size = 250;
+                               visual_size_w = 250;
+                               visual_size_h = 250;
                                break;
                            }
                        case 5:
                            {
-                               visual_size = 250;
+                               visual_size_w = 250;
+                               visual_size_h = 250;
                                break;
                            }
                        case 6:
                            {
-                               visual_size = 250;
+                               visual_size_w = 250;
+                               visual_size_h = 250;
                                break;
                            }
                    }
-
-
 
                    // Set label elements on play
                    $("#lblGlobalplay_element_count").text(elementsCandidate.length);
@@ -4252,75 +4265,12 @@
                                    var visual_correctorY = 0;
 
 
-
-                                   left_final += 350 * booleanX;
+                                   //
+                                   left_final += 450 * booleanX;
                                    top_final += 0;
 
                                    visual_correctorX = 1;
                                    visual_correctorY = 0;
-
-
-                                   
-                                   /*
-                                   // Posiciona los elementos de acuerdo a la cantidad que haya en ese momento
-                                   switch (visual_count) {
-                                       case 1: {
-
-                                           left_final = flex_width_int / 2 - visual_size / 2; // Centrar
-                                           top_final = 0;
-
-                                           visual_correctorX = 0;
-                                           visual_correctorY = 0;
-                                           break;
-                                       }
-                                       case 2: {
-
-                                           left_final += 300 * booleanX;
-                                           top_final += 0;
-
-                                           visual_correctorX = 1;
-                                           visual_correctorY = 0;
-                                           break;
-                                       }
-                                       case 3: {
-
-                                           left_final = 0;
-                                           top_final += 300 * booleanY;
-
-                                           visual_correctorX = 0;
-                                           visual_correctorY = 1;
-                                           break;
-                                       }
-                                       case 4: {
-
-                                           left_final += 300 * booleanX;
-                                           top_final += 300 * booleanY;
-
-                                           visual_correctorX = 1;
-                                           visual_correctorY = 1;
-                                           break;
-                                       }
-                                       case 5: {
-
-                                           left_final = 580;
-                                           top_final = 0;
-
-                                           visual_correctorX = 2;
-                                           visual_correctorY = 0;
-                                           break;
-                                       }
-                                       case 6: {
-
-                                           left_final = 580;
-                                           top_final = 280;
-
-                                           visual_correctorX = 0;
-                                           visual_correctorY = 2;
-                                           break;
-                                       }
-                                      
-                                   }
-                                   */
 
                                }
 
@@ -4350,7 +4300,7 @@
 
                                        if (getIsFirefoxOrIE()) {
 
-                                           var applet = "<object id='webchimera' type='application/x-chimera-plugin' width='" + visual_size + "' height='" + visual_size + "'>";
+                                           var applet = "<object id='webchimera' type='application/x-chimera-plugin' width='" + visual_size_w + "' height='" + visual_size_h + "'>";
                                            applet += "<param name='windowless' value='true' />";
                                            applet += "</object>";
                                            applet += "<div id='interface'></div>";
@@ -4391,7 +4341,7 @@
                                        if (getIsFirefoxOrIE()) {
                                            if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
 
-                                               var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size + "px' height='" + visual_size + "px' name='fbsviewer' id='fbsviewer' title='undefined'>";
+                                               var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' height='" + visual_size_h + "px' name='fbsviewer' id='fbsviewer' title='undefined'>";
 
                                                applet += "<param name='HOST' value=''>";
                                                applet += "<param name='PORT' value='5901'>";
@@ -4435,9 +4385,12 @@
 
                                        var global_elementID = "global_img_" + el[0].segmentID;
 
-                                       $('<a id="' + global_elementID + '" style="left:' + left_final + 'px; top:' + top_final + 'px; width:' + visual_size + 'px; height:' + visual_size + 'px; background-image:url(' + p + ')" width="' + (visual_size + 80) + '" height="' + (visual_size + 80) + '">' + el[0].fileName + '</a>').appendTo(flex_div);
-                                       setTimeout(function () { globalplay_removeElement(global_elementID) }, default_duration_image);
+                                       $('<a id="' + global_elementID + '" style="left:' + left_final + 'px; top:' + top_final + 'px; ' +
+                                           'width:' + visual_size_w + 'px; height:' + visual_size_h + 'px; background-image:url(' + p + ');' + // Tamaño contenedor 1
+                                           'background-size: auto 100%;"'+ // Tamaño real de imagen
+                                           'width="' + visual_size_w + '" height="' + visual_size_h + '">' + el[0].fileName + '</a>').appendTo(flex_div); // Tamaño contenedor 2
 
+                                       setTimeout(function () { globalplay_removeElement(global_elementID, el) }, default_duration_image);
                                        break;
                                    }
 
@@ -4489,8 +4442,25 @@
            $('#lblGlobalplay_timer_current').timer('pause');
        }
 
-       function globalplay_removeElement(global_elementID) {
+       function pre_abortGlobalplay() {
+
+           // DO PAUSE
+           $("#globalplay_play").removeClass("pauseAudio");
+           $("#globalplay_play").addClass("play");
+
+           // Close Fancybox - DO CLICK
+           $(".fancybox-close").click();
+
+           TIMELINE_POINTER.css("left", "0%");
+
+           abortGlobalplay();
+       }
+
+       function globalplay_removeElement(global_elementID, element) {
            $("#" + global_elementID).remove();
+
+           // Set available true back
+           element[1] = true;
        }
 
        function globalplay_clearLabel(label) {
@@ -4579,13 +4549,13 @@ div#playerBox {
     min-height:440px; 
     margin-left: 20px; 
     border: solid 0.17em; 
-    background: linear-gradient(to bottom, #9EA7B1, #9EA7B1); 
     position:relative;
 }
 
 .globalplayBox {
     min-width:1000px; 
-    min-height:650px; 
+    min-height:650px;
+    /*min-height:580px; */
     border: solid 0.17em; 
     background: linear-gradient(to bottom, #9EA7B1, #9EA7B1); 
     top: 10px;
@@ -4999,8 +4969,8 @@ div.disabled,button.disabled,a.disabled {
                         <div id="playerBox" class="img-rounded playerBox" runat="server">
 
                         <!-- GLOBALPLAY SCREEN -->
-                        <div id="divForm" class="globalplayBox img-rounded" style="display:none">
-                            <div class="flex" style="min-width: 1000px;">
+                        <div id="divForm" class="globalplayBox img-rounded" style="display:none;"> <!-- min-height:100%;"> -->
+                            <div class="flex" style="min-width: 1000px;"> <!--min-height:100%;">-->
 
                                 <div id="globalplay_divSpecialMessages" style="position: absolute; width: 100%;">
                                     <h2 class="label label-danger" style="z-index:1001; text-transform: none; font-size:20px; width: 50%; margin: 0 auto;"></h2>
@@ -5017,7 +4987,7 @@ div.disabled,button.disabled,a.disabled {
                         </div>
 
                                 <div id="divPlayer_VIDEO" style="display:none;" class='photobox'> <!-- Contiene el Applet --> </div>
-                                <img id="imgPlayer" class='photobox' style='max-height:390px; max-width:100%; margin: auto; display:none;' alt=''/> <!-- javascript:$("#imgPlayer").photobox(); -->
+                                <img id="imgPlayer" class='photobox' style='max-width:100%; margin: auto; display:none;' alt=''/> <!-- javascript:$("#imgPlayer").photobox(); max-height:390px --> 
 
                                 <!-- PLAYER - VIDEO - Controls Mask -->
                                 <div id="divControlsMask_VIDEO" class="sound_player_class1 sm2-bar-ui compact full-width" style="position:absolute; top: 0; right: 0; height: 54px; display: none;"> <!-- Controles -->
@@ -5366,12 +5336,12 @@ div.disabled,button.disabled,a.disabled {
 					                <a href="#" class="mute" data-attr="mute"></a>
 				                </li>
 				                <li>
-					                <a href="#" id="button_globalplay" class="play" data-attr="playPauseAudio" onclick="return initGlobalplay()"></a> <!-- pauseAudio -->
+					                <a href="#" id="globalplay_play" class="play" data-attr="playPauseAudio" onclick="return initGlobalplay()"></a> <!-- pauseAudio -->
                                    <a href="#divForm" id="btnForm" style="display:none;"></a>
 				                </li>
 				                <li>
-					                <a href="#" class="" data-attr="nextAudio">
-                                        <span class="glyphicon glyphicon-stop" aria-hidden="true"></span>
+					                <a href="#" id="globalplay_stop" class="" data-attr="nextAudio" onclick="return pre_abortGlobalplay()">
+                                        <span class="fa fa-stop-circle fa-2x" aria-hidden="true" style="color:white"></span>
 					                </a>
 				                </li>
 			                </ul>
