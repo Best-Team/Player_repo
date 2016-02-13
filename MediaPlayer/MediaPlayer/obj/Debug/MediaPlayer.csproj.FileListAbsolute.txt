@@ -50,3 +50,15 @@ C:\Projects\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.xml
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.dll
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.pdb
 C:\Projects\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.csprojResolveAssemblyReference.cache
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\bin\MediaPlayer.dll
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\bin\MediaPlayer.pdb
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\bin\Microsoft.WindowsAPICodePack.dll
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\bin\Microsoft.WindowsAPICodePack.Shell.dll
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\bin\MySql.Data.dll
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.dll
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.WindowsMediaFormat.dll
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\bin\Newtonsoft.Json.dll
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\bin\NAudio.xml
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.dll
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\obj\Debug\MediaPlayer.pdb
+C:\Users\GBORDEROLLE-PC\Documents\GitHub\Player_repo\MediaPlayer\MediaPlayer\bin\MediaPlayer.dll.config
