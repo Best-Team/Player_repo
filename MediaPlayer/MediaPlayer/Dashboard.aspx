@@ -63,6 +63,7 @@
        /**** General global variables ****/
 
        var MAX_DOWNLOAD_FILES = 6;
+       var GLOBALPLAY_DEFAULT_DURATION = 30000; // 30 s // 5000 = 5 seg
        var SVG_Height = 170;
        var addComment_active = false;
        var addFile_active = false;
@@ -419,6 +420,10 @@
                                                        _TL_DATA = new_timeline_data;
                                                        prepareTimelineReload(_TL_DATA);
                                                    }
+
+                                                   // Update elements count
+                                                   $("span[id*='lblResultsCount']").text($("tr[id*='tape_']:visible").length.toString());
+
                                                }, // end success
                                                failure: function (response) {
                                                    alert(response.d);
@@ -701,6 +706,13 @@
            var _hdnMaxElementsDownload = $("input[id*='_hdnMaxElementsDownload']");
            if (_hdnMaxElementsDownload != null && _hdnMaxElementsDownload.val() != null && _hdnMaxElementsDownload.val().length > 0) {
                MaxElementsDownload = _hdnMaxElementsDownload.val();
+           }
+
+           // Load Globalplay default duration on elements 
+           GLOBALPLAY_DEFAULT_DURATION = "6000";
+           var _hdnGlobalplay_defaultDuration = $("input[id*='_hdnGlobalplay_defaultDuration']");
+           if (_hdnGlobalplay_defaultDuration != null && _hdnGlobalplay_defaultDuration.val() != null && _hdnGlobalplay_defaultDuration.val().length > 0) {
+               GLOBALPLAY_DEFAULT_DURATION = _hdnGlobalplay_defaultDuration.val();
            }
        }
 
@@ -2881,6 +2893,9 @@
 
                                /******** Reload timeline END ********/
 
+                               // Update elements count
+                               $("span[id*='lblResultsCount']").text($("tr[id*='tape_']:visible").length.toString());
+
                                // Disable div player again
                                divPanel_PlayerControl.addClass("disabled");
 
@@ -4163,8 +4178,11 @@
                    var visual_size_w = flex_width_int - 80;
                    var visual_size_h = flex_height_int - 80;
 
+                   var visual_alreadyAdded = $(".flex a[name='visual']").length;
+                   var visual_count = visual_queue.length + visual_alreadyAdded;
+
                    // Element distinct types 
-                   switch (visual_queue.length) {
+                   switch (visual_count) {
                        case 1:
                            {
                                visual_size_w = flex_width_int - 80; 
@@ -4201,6 +4219,19 @@
                                visual_size_h = 250;
                                break;
                            }
+                   }
+
+                   // Resize elements already added
+                   if (visual_alreadyAdded > 0) {
+                       var visual_alreadyAdded_ids = [];
+                       $(".flex a[name='visual']").each(function () { visual_alreadyAdded_ids.push(this.id); });
+                       if (visual_alreadyAdded_ids.length > 0) {
+                           for (var i = 0; i < visual_alreadyAdded_ids.length; i++) {
+                               var id = visual_alreadyAdded_ids[i];
+                               $(".flex #" + id).css("width", visual_size_w);
+                               $(".flex #" + id).css("height", visual_size_h);
+                           }
+                       }
                    }
 
                    // Set label elements on play
@@ -4290,8 +4321,6 @@
                                    visual_correctorY = 0;
 
                                }
-
-                               var default_duration_image = 5000; // 5 seg
 
                                // IsExtra = If filePath is NOT empty, then is extra from incextras table
                                var isExtra = el[0].filePath.length == 0 ? false : true;
@@ -4403,12 +4432,12 @@
 
                                        var global_elementID = "global_img_" + el[0].segmentID;
 
-                                       $('<a id="' + global_elementID + '" style="left:' + left_final + 'px; top:' + top_final + 'px; ' +
+                                       $('<a name="visual" id="' + global_elementID + '" style="left:' + left_final + 'px; top:' + top_final + 'px; ' +
                                            'width:' + visual_size_w + 'px; height:' + visual_size_h + 'px; background-image:url(' + p + ');' + // Tamaño contenedor 1
                                            'background-size: auto 100%;"'+ // Tamaño real de imagen
                                            'width="' + visual_size_w + '" height="' + visual_size_h + '">' + el[0].fileName + '</a>').appendTo(flex_div); // Tamaño contenedor 2
 
-                                       setTimeout(function () { globalplay_removeElement(global_elementID, el) }, default_duration_image);
+                                       setTimeout(function () { globalplay_removeElement(global_elementID, el) }, GLOBALPLAY_DEFAULT_DURATION);
                                        break;
                                    }
 
@@ -4808,6 +4837,7 @@ h1 {
 /* ---- Div disabled styles */
 div.disabled,button.disabled,a.disabled {
     pointer-events: none;
+
 /* for "disabled" effect */
     opacity: .5;
     background: #CCC;
@@ -4819,20 +4849,8 @@ div.disabled,button.disabled,a.disabled {
 .flex {position:relative;width:50%;min-height:650px;margin:0 auto;border:0px solid red;margin-top:10px;}
 		.flex a {background-color:white;display:block;width:100px;height:100px;border-radius:8px;position:absolute;background-repeat:no-repeat;background-position:center;border:3px solid white;cursor:pointer;text-align:left;text-shadow:1px 1px 20px #000;color:white;font-size:18px;font-weight:bold;text-indent:10px;line-height:30px;text-decoration:none;}
 
-        /*
-		[bg=a] {background-image:url(http://farm8.staticflickr.com/7013/6448917381_0b754e86fb_z.jpg);}
-		[bg=b] {background-image:url(http://farm9.staticflickr.com/8156/7362866426_bf285ebd45.jpg);background-size:300px auto;}
-		[bg=c] {background-image:url(http://farm6.staticflickr.com/5117/7410370290_0935419fc3.jpg);}
-		[bg=d] {background-image:url(http://farm8.staticflickr.com/7262/7419245080_bb752ed1d6.jpg);}
-		[bg=e] {background-image:url(http://farm8.staticflickr.com/7003/6468321069_3375be3073_z.jpg);background-size:auto 280px;}
-		[bg=f] {background-image:url(http://farm8.staticflickr.com/7220/7342556872_46cddaf9b0.jpg);background-size:auto 280px;}
-		[bg=g] {background-image:url(http://farm9.staticflickr.com/8021/7322604950_348c535903.jpg);background-size:auto 200px;}
-		[bg=h] {background-image:url(http://farm8.staticflickr.com/7076/7286717012_6e6b450243.jpg);}
-		[bg=i] {background-image:url(http://farm8.staticflickr.com/7129/7452167788_a3f6aa3104.jpg);background-size:auto 200px;}
-		[bg=j] {background-image:url(http://farm8.staticflickr.com/7153/6480022425_a8d419e663_z.jpg);background-size:auto 280px;}
-		[bg=k] {background-image:url(http://farm8.staticflickr.com/7225/7269592732_c4b7918626.jpg);background-size:auto 280px;}
-            */
-   </style>
+</style>
+
 </asp:content>
 <asp:content id="Content3" ContentPlaceHolderID="ContentLoginStatus" runat="server">
     <div class="container-session" >
@@ -5465,6 +5483,8 @@ div.disabled,button.disabled,a.disabled {
    <asp:HiddenField ID="_hdnPlayerFBS_popup_height" runat="server" />
    <asp:HiddenField ID="_hdnWebchimera_Install_URL" runat="server" />
    <asp:HiddenField ID="_hdnMaxElementsDownload" runat="server" />
+   <asp:HiddenField ID="_hdnGlobalplay_defaultDuration" runat="server" />
+
 
 <!-- From Client to Server -->      
 </form>
