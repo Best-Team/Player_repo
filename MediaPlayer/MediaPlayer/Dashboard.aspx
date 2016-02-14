@@ -70,7 +70,7 @@
        var comment_popup_timestamp = "";
        var initial_size = 0;
        var elementsInMemory = [];
-       var stack_elements = [[], []];
+       var stack_elements = [[], []]; // [object, already_taken: bool]
        var selectedElementID = 0;
        var currrentVideoDuration = 0;
        var currentPointerPositionDate;
@@ -506,11 +506,12 @@
                    for (obj in objects) {
                        if (elementsInMemory != null) {
                            if (elementsInMemory.length > 0) {
-                               for (var i = 0; i < elementsInMemory
-                                   .length; i++) {
+
+                               for (var i = 0; i < elementsInMemory.length; i++) {
                                    var element = elementsInMemory[i];
                                    if (element != null) {
                                        var tapeID = element.tapeID;
+
                                        if (objects[obj] == tapeID) {
                                            var groupName = element.groupName;
                                            var tapeType = element.tapeType;
@@ -528,6 +529,7 @@
                                            if (tapeType == "S") {
                                                tapeType_str = "P";
                                            }
+
                                            // Create object
                                            var object_group = {};
                                            object_group.name = tapeType_str; //
@@ -580,10 +582,10 @@
                currentPointerPositionDate = position_date_str.format('DD-MM-YYYY HH:mm:ss');
 
                // Update popup dates: FileUpload and CommentUpload
-               $("#commentDate").val(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
-               $("input[id*='uploadDate']").val(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
+               $("#commentDate").val(currentPointerPositionDate);
+               $("input[id*='uploadDate']").val(currentPointerPositionDate);
 
-               // ******** Globalplay ********
+               /******** Globalplay ********/
 
                // Set current timer
                var start_date_str = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
@@ -607,6 +609,9 @@
                    seconds: Seconds_Between_Dates
                });
 
+               // Set current timer
+               $("#lblGlobalplay_timer_current_0").text(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
+
                // Pause global timer 
                $('#lblGlobalplay_timer_current').timer('pause');
 
@@ -624,11 +629,11 @@
            var posYfinal = posY - 78;
            var pop4_width = parseInt($(".box4.popbox4").css("width"), 10);
            if (posXfinal + pop4_width > $(window).width()) {
-               posXfinal = $(window).width() - pop4_width;
+               posXfinal = $(window).width() - pop4_width; 
            }
            $(".box4.popbox4").show("scale", 300);
            $(".box4.popbox4").offset({
-               left: posXfinal,
+               left: posXfinal - 28, // 28 Quitar?
                top: posYfinal
            });
            var date = window.timeframe_live.getTickDate(posX); // Datetime position - Formato: AÑO DIA MES
@@ -637,7 +642,7 @@
                $("#lblPopbox4").text(date_str.format('DD-MM-YYYY HH:mm:ss'));
            }
 
-           // ******** Globalplay ********
+           /******** Globalplay ********/
 
            // Stop timer 
            abortGlobalplay();
@@ -1965,6 +1970,8 @@
                        var _width_percentage = (5 / 100) * _width_int;
                        var _width = _width_int + _width_percentage + "px";
 
+                       sm2_progress_bd.css("padding", "0px");
+
                        sm2_progress.css('height', 15);
                        sm2_inline_element.css('width', _width);
                        //sm2_inline_element.css('left', vElementRect.offset().left); // + 3
@@ -1976,15 +1983,13 @@
                        sm2_progress_track.css('height', 15);
 
                        // Pointer left and top position
-                       TIMELINE_POINTER.offset({ left: vElement.offset().left });
+                       //TIMELINE_POINTER.offset({ left: vElement.offset().left });
 
                        sm2_inline_element.offset({ top: $("#divTimelineProgress").offset().top })
 
-               } else {
-                   // Timeline is not drawn yet
-
-
-               }
+                   } else {
+                       // TODO: Timeline is not drawn yet
+                   }
                } else {
                    // It does not exists elements
 
@@ -3740,7 +3745,7 @@
              if (tapes_array.length > 0) {
 
                  elementsInMemory = [];
-                 stack_elements = [[], []];
+                 stack_elements = [[], []]; // [object, already_taken: bool]
 
                  for (var i = 0; i < tapes_array.length; i++) {
                      if (tapes_array[i] != null) {
@@ -4048,7 +4053,7 @@
 
        /******** START: Media Player 2.0: Nuevo Requerimiento: Global Play ********/
 
-       // stack_elements [object, taken: bool]
+       // stack_elements [object, already_taken: bool]
 
        function initGlobalplay() {
 
@@ -4105,7 +4110,7 @@
 
            // Init event while playing if GLOBALPLAY_seconds_total is already loaded
            if (GLOBALPLAY_seconds_total > 0) {
-               timer_globalplay = setInterval(whilePlayingGlobalplay, 1000); 
+               timer_globalplay = setInterval(whilePlayingGlobalplay, 1000); // 1000
            }
 
            // Enable right side Player box
@@ -4117,17 +4122,29 @@
 
            // REAL TIMER MODE
 
-           GLOBALPLAY_seconds_current = $('#lblGlobalplay_timer_current').data('seconds');
+           GLOBALPLAY_seconds_current = $("#lblGlobalplay_timer_current").data('seconds');
 
            var progress_percentage = GLOBALPLAY_seconds_current * 100 / GLOBALPLAY_seconds_total;
            var left_final_percentage = progress_percentage + '%';
 
-           //console.log("GLOBALPLAY_seconds_current: " + GLOBALPLAY_seconds_current);
-           //console.log("progress_percentage: " + progress_percentage);
-
            // If it is still in range 
-           if (progress_percentage <= 100) { 
+           if (progress_percentage <= 100) {
+
+               // Move pointer 
                TIMELINE_POINTER.css("left", left_final_percentage);
+
+
+               //
+               var date_str2 = moment(_TL_ENDDATE, "DD-MM-YYYY HH:mm:ss");
+               $("#lblGlobalplay_timer_total_0").text(date_str2.format('DD-MM-YYYY HH:mm:ss'));
+
+               var posX = parseFloat(TIMELINE_POINTER.css("left"), 10);
+               var position_date = window.timeframe_live.getTickDate(posX); // Datetime position - Formato: AÑO DIA MES
+               if (position_date != null) {
+                   var position_date_str = moment(position_date, "YYYY-MM-DD HH:mm:ss");
+                   $("#lblGlobalplay_timer_current_0").text(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
+               }
+               //
 
                /* Important: ----- Finding elements section ----- */
 
@@ -4339,13 +4356,14 @@
                                    case "S": {
 
                                        if (getIsFirefoxOrIE()) {
-                                           if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
+                                           if (el[0].fileStatus != "PROCESSING" && el[0].fileStatus != "ERROR") {
 
-                                               var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' height='" + visual_size_h + "px' name='fbsviewer' id='fbsviewer' title='undefined'>";
+                                               var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' " +
+                                                   "height='" + visual_size_h + "px' name='fbsviewer' id='fbsviewer' title='undefined'>";
 
                                                applet += "<param name='HOST' value=''>";
                                                applet += "<param name='PORT' value='5901'>";
-                                               applet += "<param name='FBSURL' value='" + filePath_OREKA + "'>";
+                                               applet += "<param name='FBSURL' value='" + p + "'>";
                                                applet += "<param name='AUDIOURL' value=''>";
                                                applet += "<param name='SHOWPLAYERCONTROLS' value='NO'>"; // YES
                                                applet += "<param name='SHOWPLAYERTAGCONTROLS' value='YES'>";
@@ -4399,7 +4417,7 @@
                                        var duration = el[0].duration <= 1 ? 5000 : el[0].duration * 1000;
 
                                        var label = $(".flex #globalplay_divDocumentsName h2");
-                                       label.text(el[0].fileName);
+                                       label.text("Documento: " + el[0].fileName);
                                        setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration);
 
                                        break;
@@ -4453,6 +4471,9 @@
 
            TIMELINE_POINTER.css("left", "0%");
 
+           // Clean already_taken bool
+           setStack_elementsAlreadyTaken();
+
            abortGlobalplay();
        }
 
@@ -4489,6 +4510,18 @@
                        timeCurrent.toDate() <= element_end.toDate();
                });
                return array;
+           }
+       }
+
+       // Clean stack_elements already_taken bool
+       function setStack_elementsAlreadyTaken() {
+           if (stack_elements != null && stack_elements.length > 0) {
+               for (var i = 0; i < stack_elements.length; i++) {
+                   var el = stack_elements[i];
+                   if (el != null) {
+                       el[1] = false;
+                   }
+               }
            }
        }
 
@@ -5270,7 +5303,7 @@ div.disabled,button.disabled,a.disabled {
                         <div id="divUpload" class="form-group">
                            <div class="row row-short" style="padding: 10px;">
                               <label class="control-label">Documentos, videos y audios</label>
-                              <input id="MyFileUpload" type="file" runat="server" class="file" style="width: 85%;margin: auto; margin-top:8px;"/>
+                              <input id="MyFileUpload" type="file" runat="server" class="file" style="width: 85%; margin: auto; margin-top:8px; height:24px;"/>
                                <!--  -->
                            </div>
                            <div class="form-group">
@@ -5320,7 +5353,13 @@ div.disabled,button.disabled,a.disabled {
             <div id="divTimeline" class="div-panel2 col-md-12 col-xs-12 img-rounded" style="height:100%; z-index:0;left: 0; border-radius: 13px; width: 101%; margin-left: -13px;">
                <h1 style="margin-top: 5px;">
 
-                    <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label>/<label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label>
+                    <label id="lblGlobalplay_timer_current_0" class="label" style="font-size:100%; color:black;">00:00:00</label>
+                   /
+                   <label id="lblGlobalplay_timer_total_0" class="label" style="font-size:100%; color:black;">00:00:00</label>
+                     -  
+                   <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label>
+                    / 
+                   <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label>
                    
                    <span class="special-title label label-primary" style="font-weight: normal;">Timeline</span>
 

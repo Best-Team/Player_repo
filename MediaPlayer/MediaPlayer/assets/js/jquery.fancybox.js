@@ -423,8 +423,8 @@
 			    //
 				abortGlobalplay();
 
-				$("#button_globalplay").removeClass("pauseAudio");
-				$("#button_globalplay").addClass("play");
+				$("#globalplay_play").removeClass("pauseAudio");
+				$("#globalplay_play").addClass("play");
 
 			    // Stop timer
 				$('#lblGlobalplay_timer_current').timer('pause');

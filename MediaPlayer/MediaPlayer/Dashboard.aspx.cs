@@ -274,7 +274,13 @@ namespace MediaPlayer
 
                 /* ******** Save in DB ******** */
 
-                if (ok && !string.IsNullOrWhiteSpace(file_extension) && !string.IsNullOrWhiteSpace(fileName)
+                string real_fileName = string.Empty;
+                if (!string.IsNullOrWhiteSpace(fileName))
+                {
+                    real_fileName = Path.GetFileName(fileName);
+                }
+
+                if (ok && !string.IsNullOrWhiteSpace(file_extension) && !string.IsNullOrWhiteSpace(real_fileName)
                     && !string.IsNullOrWhiteSpace(relativeLocalPath) && !string.IsNullOrWhiteSpace(repoFilename))
                 {
                     // Get file MediaType
@@ -300,7 +306,8 @@ namespace MediaPlayer
 
                         string bd_path = relativeLocalPath.Replace("\\", "/") + repoFilename;
 
-                        Global.GlobalMethods.AddFolioFile(userID, folioID, fileName, datetime_final, Convert.ToInt32(seconds), mediaType, bd_path);
+
+                        Global.GlobalMethods.AddFolioFile(userID, folioID, real_fileName, datetime_final, Convert.ToInt32(seconds), mediaType, bd_path);
                     }
                     catch (Exception e)
                     {
