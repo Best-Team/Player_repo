@@ -1,5 +1,4 @@
-﻿using Alvas.Audio;
-using MediaPlayer.Domain;
+﻿using MediaPlayer.Domain;
 using MediaPlayer.Extras;
 using MediaPlayer.Global;
 using Microsoft.WindowsAPICodePack.Shell;
@@ -211,7 +210,7 @@ namespace MediaPlayer
                         // File name
                         repoFilename = guid + ".bin";
 
-                        // File name auxiliar with real extension ==> To get the real duration 
+                        // File name auxiliar with real extension ==> To get the real duration
                         repoFilenameAUX = guid + file_extension;
 
                         // Repository relative path
@@ -229,13 +228,13 @@ namespace MediaPlayer
                                     Directory.CreateDirectory(Path.GetDirectoryName(fullLocalPath));
                                 }
 
-                                // Is WAVE format file ==> Convert to .mp3
-                                if (file_extension.ToLowerInvariant().Equals(".wav"))
+                                if (GetAutomaticConvertWavToMp3OnFileUpload())
                                 {
-                                    isWavFile = true;
+                                    // Is WAVE format file ==> Convert to .mp3
+                                    isWavFile = file_extension.ToLowerInvariant().Equals(".wav") ? true : false;
                                 }
 
-                                // File name auxiliar with real extension ==> To get real duration 
+                                // File name auxiliar with real extension ==> To get real duration
                                 MyFileUpload.PostedFile.SaveAs(fullLocalPath + repoFilenameAUX);
                                 isFileAUX_created = true;
                             }
@@ -325,14 +324,37 @@ namespace MediaPlayer
                             Directory.CreateDirectory(Path.GetDirectoryName(fullLocalPath));
                         }
 
+                        bool normal_save = true;
+
                         // If .wav format file ==> convert to .mp3 then save the file
                         if (isWavFile)
                         {
-                            //ConvertAudio2(fullLocalPath + repoFilenameAUX, fullLocalPath + repoFilename);
-                            // Alva Audio Source: http://alvas.net/alvas.audio,tips.aspx
-                            BigWav2Mp3(fullLocalPath + repoFilenameAUX);
+                            // NAudio Source: http://stackoverflow.com/questions/7175701/converting-wav-file-to-wav-file-changing-format
+                            try
+                            {
+                                WaveFormat target = new WaveFormat(8000, 8, 1);
+                                using (WaveStream stream = new WaveFileReader(fullLocalPath + repoFilenameAUX))
+                                {
+                                    WaveFormatConversionStream str = new WaveFormatConversionStream(target, stream);
+                                    WaveFileWriter.CreateWaveFile(fullLocalPath + repoFilename, str);
+                                }
+
+                                // Update file name (new format: .mp3)
+                                if (!string.IsNullOrWhiteSpace(fileName))
+                                {
+                                    real_fileName = real_fileName.Substring(0, real_fileName.LastIndexOf('.')) + ".mp3";
+                                }
+                                normal_save = false;
+                            }
+                            catch (Exception e)
+                            {
+                                // #2- Logger exception
+                                Logger.LogError("(%s) (%s) -- Excepcion. Convirtiendo de .wav a mp3. Si falla lo guarda como .wav. ERROR: %s", className, methodName, e.Message);
+                                normal_save = true;
+                            }
                         }
-                        else
+
+                        if (normal_save)
                         {
                             // If not .wav format
                             MyFileUpload.PostedFile.SaveAs(fullLocalPath + repoFilename);
@@ -343,10 +365,9 @@ namespace MediaPlayer
                         /*************** Save in DB ***************/
 
                         string bd_path = relativeLocalPath.Replace("\\", "/") + repoFilename;
+                        Global.GlobalMethods.AddFolioFile(userID, folioID, real_fileName, datetime_final, Convert.ToInt32(seconds), mediaType, bd_path);
 
                         /*************** END ***************/
-
-                        Global.GlobalMethods.AddFolioFile(userID, folioID, real_fileName, datetime_final, Convert.ToInt32(seconds), mediaType, bd_path);
                     }
                     catch (Exception e)
                     {
@@ -376,6 +397,19 @@ namespace MediaPlayer
                 // Reload elements
                 SearchFolioElements();
             }
+        }
+
+        private bool GetAutomaticConvertWavToMp3OnFileUpload()
+        {
+            bool _AutomaticConvertWavToMp3OnFileUpload = true;
+            if (ConfigurationManager.AppSettings != null)
+            {
+                if (!bool.TryParse(ConfigurationManager.AppSettings["AutomaticConvertWavToMp3OnFileUpload"].ToString().ToLowerInvariant(), out _AutomaticConvertWavToMp3OnFileUpload))
+                {
+                    _AutomaticConvertWavToMp3OnFileUpload = true;
+                }
+            }
+            return _AutomaticConvertWavToMp3OnFileUpload;
         }
 
         private string GetFileMediaType(string file_extension)
@@ -702,7 +736,7 @@ namespace MediaPlayer
 
             /****** Table headers ******/
 
-                        htmlTable.AppendLine("<table class='table' id='tblLeftGridElements'>"); // style='display:none;'
+            htmlTable.AppendLine("<table class='table' id='tblLeftGridElements'>"); // style='display:none;'
             htmlTable.AppendLine("<thead>");
             htmlTable.AppendLine("<tr style='background: transparent'>");
             htmlTable.AppendLine("<th width='3%' style='text-align: center;'><input type='checkbox' id='chbSelectAll' name='timeline_elements_checkAll' class='button' checked></th>");
@@ -939,6 +973,7 @@ namespace MediaPlayer
             return onclick_event;
         }
 
+        /*
         private void ConvertAudio2(string pcmFile, string webFile)
         {
             //string webFile = @"D:\AudioCS\bin\Debug\_web.mp3";
@@ -1021,6 +1056,7 @@ namespace MediaPlayer
             }
         }
 
+        */
 
         #endregion Private Methods
 
