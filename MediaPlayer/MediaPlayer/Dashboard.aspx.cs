@@ -1,4 +1,5 @@
-﻿using MediaPlayer.Domain;
+﻿using Alvas.Audio;
+using MediaPlayer.Domain;
 using MediaPlayer.Extras;
 using MediaPlayer.Global;
 using Microsoft.WindowsAPICodePack.Shell;
@@ -173,7 +174,7 @@ namespace MediaPlayer
                 string userID = HttpContext.Current.Session["UserID"].ToString();
                 string folioID = ViewState["FolioID"].ToString();
                 string repoFilename = "", repoFilenameAUX = "", fullLocalPath = "", relativeLocalPath = "";
-                bool ok = true, isFileAUX_created = false;
+                bool ok = true, isFileAUX_created = false, isWavFile = false;
 
                 // File ID
                 string guid = Guid.NewGuid().ToString();
@@ -185,11 +186,14 @@ namespace MediaPlayer
 
                 DateTime datetime2_b = GetDateTime(camarasDate2, className, methodName);
 
+                // If is NOT camera recording system function
                 if (string.IsNullOrWhiteSpace(txbInputCameraNumber.Value))
                 {
-                    if (MyFileUpload != null && MyFileUpload.PostedFile != null && MyFileUpload.PostedFile.FileName.Length > 0)
+                    if (MyFileUpload != null && MyFileUpload.PostedFile != null && !string.IsNullOrWhiteSpace(MyFileUpload.PostedFile.FileName))
                     {
                         /* ******** Configuration variables ******** */
+
+                        string original_filePath = MyFileUpload.PostedFile.FileName;
 
                         // Repository path
                         string localRepoPath = string.Empty;
@@ -207,15 +211,16 @@ namespace MediaPlayer
                         // File name
                         repoFilename = guid + ".bin";
 
-                        // File name auxiliar with real extension
+                        // File name auxiliar with real extension ==> To get the real duration 
                         repoFilenameAUX = guid + file_extension;
 
                         // Repository relative path
-                        relativeLocalPath = datetime_final.Year.ToString("D4") + "\\" + datetime_final.Month.ToString("D2") + "\\" + datetime_final.Day.ToString("D2") + "\\" + datetime_final.Hour.ToString("D2") + "\\";
+                        relativeLocalPath = datetime_final.Year.ToString("D4") + "\\" + datetime_final.Month.ToString("D2") + "\\" +
+                            datetime_final.Day.ToString("D2") + "\\" + datetime_final.Hour.ToString("D2") + "\\";
 
                         fullLocalPath = localRepoPath + relativeLocalPath; // REAL
 
-                        if (!string.IsNullOrWhiteSpace(fullLocalPath) && !string.IsNullOrWhiteSpace(repoFilename))
+                        if (!string.IsNullOrWhiteSpace(fullLocalPath) && !string.IsNullOrWhiteSpace(repoFilenameAUX) && !string.IsNullOrWhiteSpace(file_extension))
                         {
                             try
                             {
@@ -223,14 +228,21 @@ namespace MediaPlayer
                                 {
                                     Directory.CreateDirectory(Path.GetDirectoryName(fullLocalPath));
                                 }
-                                MyFileUpload.PostedFile.SaveAs(fullLocalPath + repoFilename);
+
+                                // Is WAVE format file ==> Convert to .mp3
+                                if (file_extension.ToLowerInvariant().Equals(".wav"))
+                                {
+                                    isWavFile = true;
+                                }
+
+                                // File name auxiliar with real extension ==> To get real duration 
                                 MyFileUpload.PostedFile.SaveAs(fullLocalPath + repoFilenameAUX);
                                 isFileAUX_created = true;
                             }
                             catch (Exception e)
                             {
                                 // #2- Logger exception
-                                Logger.LogError("(%s) (%s) -- Excepcion. Subiendo archivo con local test. ERROR: %s", className, methodName, e.Message);
+                                Logger.LogError("(%s) (%s) -- Excepcion. Copiando archivo AUX al server. ERROR: %s", className, methodName, e.Message);
                                 ok = false;
                             }
                         }
@@ -238,7 +250,7 @@ namespace MediaPlayer
                 }
                 else
                 {
-                    // IS CAMERA SYSTEM ****************************************************
+                    // IS Camera recording system ****************************************************
                     ok = false;
 
                     string cameraNumber_str = txbInputCameraNumber.Value;
@@ -272,7 +284,7 @@ namespace MediaPlayer
                     wsClient.videoAsociado(folioID, userID, cameraNumber_str, datetime2_a.ToString("dd'/'MM'/'yyyy HH':'mm"), datetime2_b.ToString("dd'/'MM'/'yyyy HH':'mm"));
                 }
 
-                /* ******** Save in DB ******** */
+                /* ******** Save in DB - ONLY in NOT Camera recording system cases ******** */
 
                 string real_fileName = string.Empty;
                 if (!string.IsNullOrWhiteSpace(fileName))
@@ -281,20 +293,21 @@ namespace MediaPlayer
                 }
 
                 if (ok && !string.IsNullOrWhiteSpace(file_extension) && !string.IsNullOrWhiteSpace(real_fileName)
-                    && !string.IsNullOrWhiteSpace(relativeLocalPath) && !string.IsNullOrWhiteSpace(repoFilename))
+                    && !string.IsNullOrWhiteSpace(relativeLocalPath) && !string.IsNullOrWhiteSpace(repoFilename)
+                    && !string.IsNullOrWhiteSpace(fullLocalPath) && !string.IsNullOrWhiteSpace(repoFilenameAUX)
+                    && MyFileUpload != null && MyFileUpload.PostedFile != null)
                 {
                     // Get file MediaType
                     string mediaType = GetFileMediaType(file_extension);
 
-                    // Get file Duration
-                    // Source: http://stackoverflow.com/questions/1256841/c-sharp-get-video-file-duration-from-metadata
-                    //int real_duration = GetFileDuration(fullLocalPath + repoFilename, mediaType);
-
-                    //Source: http://www.codeproject.com/Articles/43208/How-to-get-the-length-duration-of-a-media-File-in-.aspx
-                    // http://forums.asp.net/t/1679210.aspx?Get+Video+duration+after+uploading+asp+net+C+
-
                     try
                     {
+                        /*************** Get file Duration ***************/
+                        // Source: http://stackoverflow.com/questions/1256841/c-sharp-get-video-file-duration-from-metadata
+
+                        //Source: http://www.codeproject.com/Articles/43208/How-to-get-the-length-duration-of-a-media-File-in-.aspx
+                        // http://forums.asp.net/t/1679210.aspx?Get+Video+duration+after+uploading+asp+net+C+
+
                         double seconds = 0;
                         ShellFile so = ShellFile.FromFilePath(fullLocalPath + repoFilenameAUX);
                         double nanoseconds;
@@ -303,20 +316,47 @@ namespace MediaPlayer
                         {
                             seconds = Convert100NanosecondsToMilliseconds(nanoseconds) / 1000;
                         }
+                        /*************** END ***************/
+
+                        /*************** Finally save the file in server ***************/
+
+                        if (!Directory.Exists(Path.GetDirectoryName(fullLocalPath)))
+                        {
+                            Directory.CreateDirectory(Path.GetDirectoryName(fullLocalPath));
+                        }
+
+                        // If .wav format file ==> convert to .mp3 then save the file
+                        if (isWavFile)
+                        {
+                            //ConvertAudio2(fullLocalPath + repoFilenameAUX, fullLocalPath + repoFilename);
+                            // Alva Audio Source: http://alvas.net/alvas.audio,tips.aspx
+                            BigWav2Mp3(fullLocalPath + repoFilenameAUX);
+                        }
+                        else
+                        {
+                            // If not .wav format
+                            MyFileUpload.PostedFile.SaveAs(fullLocalPath + repoFilename);
+                        }
+
+                        /*************** END ***************/
+
+                        /*************** Save in DB ***************/
 
                         string bd_path = relativeLocalPath.Replace("\\", "/") + repoFilename;
 
+                        /*************** END ***************/
 
                         Global.GlobalMethods.AddFolioFile(userID, folioID, real_fileName, datetime_final, Convert.ToInt32(seconds), mediaType, bd_path);
                     }
                     catch (Exception e)
                     {
                         // #2- Logger exception
-                        Logger.LogError("(%s) (%s) -- Excepcion. Obteniendo duración de archivo a subir y guardando en BD. ERROR: %s", className, methodName, e.Message);
+                        Logger.LogError("(%s) (%s) -- Excepcion. Obteniendo duración de archivo a subir, convirtiendo de .wav a mp3 si aplica, copiando archivo al server y guardando en BD. ERROR: %s", className, methodName, e.Message);
                         ok = false;
                     }
                 }
 
+                // Delete File name auxiliar with real extension
                 if (isFileAUX_created)
                 {
                     try
@@ -662,7 +702,7 @@ namespace MediaPlayer
 
             /****** Table headers ******/
 
-            htmlTable.AppendLine("<table class='table' id='tblLeftGridElements'>"); // style='display:none;'
+                        htmlTable.AppendLine("<table class='table' id='tblLeftGridElements'>"); // style='display:none;'
             htmlTable.AppendLine("<thead>");
             htmlTable.AppendLine("<tr style='background: transparent'>");
             htmlTable.AppendLine("<th width='3%' style='text-align: center;'><input type='checkbox' id='chbSelectAll' name='timeline_elements_checkAll' class='button' checked></th>");
@@ -898,6 +938,89 @@ namespace MediaPlayer
             }
             return onclick_event;
         }
+
+        private void ConvertAudio2(string pcmFile, string webFile)
+        {
+            //string webFile = @"D:\AudioCS\bin\Debug\_web.mp3";
+            //string pcmFile = @"D:\AudioCS\bin\Debug\_AudioCS.wav";
+            using (WaveReader wr = new WaveReader(File.OpenRead(pcmFile)))
+            {
+                IntPtr pcmFormat = wr.ReadFormat();
+                byte[] pcmData = wr.ReadData();
+                IntPtr webFormat = AudioCompressionManager.GetCompatibleFormat(pcmFormat, AudioCompressionManager.MpegLayer3FormatTag);
+                byte[] webData = AudioCompressionManager.Convert(pcmFormat, webFormat, pcmData, false);
+                MemoryStream ms = new MemoryStream();
+
+                using (WaveWriter ww = new WaveWriter(ms, AudioCompressionManager.FormatBytes(webFormat)))
+                {
+                    ww.WriteData(webData);
+                    using (WaveReader wr2 = new WaveReader(ms))
+                    {
+                        using (FileStream fs = File.OpenWrite(webFile))
+                        {
+                            wr2.MakeMP3(fs);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void BigWav2Mp3(string wavFile)
+        {
+            using (WaveReader wr = new WaveReader(File.OpenRead(wavFile)))
+            {
+                IntPtr format = wr.ReadFormat();
+                IntPtr formatMp3 = AudioCompressionManager.GetCompatibleFormat(format, AudioCompressionManager.MpegLayer3FormatTag);
+                AcmConverter acm = new AcmConverter(format, formatMp3, false);
+                const int seconds = 60;
+                using (Mp3Writer mw = new Mp3Writer(File.Create(wavFile + ".mp3")))
+                {
+                    int i = 0;
+                    while (true)
+                    {
+                        byte[] data = wr.ReadData(i * seconds, seconds);
+                        if (data == null || data.Length == 0)
+                        {
+                            break;
+                        }
+                        byte[] dataMp3 = acm.Convert(data);
+                        mw.WriteData(dataMp3);
+                        i += 1;
+                    }
+                }
+                acm.Close();
+            }
+        }
+
+        private void ConvertAudio()
+        {
+            string webFile = @"D:\AudioCS\bin\Debug\_web.mp3";
+            string pcmFile = @"D:\AudioCS\bin\Debug\_AudioCS.wav";
+            using (WaveReader wr = new WaveReader(File.OpenRead(pcmFile)))
+            {
+                IntPtr pcmFormat = wr.ReadFormat();
+                byte[] pcmData = wr.ReadData();
+                IntPtr webFormat = AudioCompressionManager.GetCompatibleFormat(pcmFormat,
+                AudioCompressionManager.MpegLayer3FormatTag);
+                byte[] webData = AudioCompressionManager.Convert(pcmFormat, webFormat,
+                pcmData, false);
+                MemoryStream ms = new MemoryStream();
+
+                using (WaveWriter ww = new WaveWriter(ms,
+                AudioCompressionManager.FormatBytes(webFormat)))
+                {
+                    ww.WriteData(webData);
+                    using (WaveReader wr2 = new WaveReader(ms))
+                    {
+                        using (FileStream fs = File.OpenWrite(webFile))
+                        {
+                            wr2.MakeMP3(fs);
+                        }
+                    }
+                }
+            }
+        }
+
 
         #endregion Private Methods
 
