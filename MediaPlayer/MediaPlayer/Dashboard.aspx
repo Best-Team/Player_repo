@@ -1341,6 +1341,7 @@
                //xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
                //yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
                //element = element.offsetParent;
+
                // NOTE: Firefox / Chrome way 1
                xPosition += (XY(element).x - element.scrollLeft + element.clientLeft);
                yPosition += (XY(element).y - element.scrollTop + element.clientTop);
@@ -1352,6 +1353,7 @@
            };
        }
        //#endregion 
+
        //#region JS Methods 3: timeframe_prepare | timeframe_draw | fire_event | locateEveryElementByType | onTick | clearAllStyleSettings | paintSelectionClick | getOffset | relMouseCoords | 
 
        function clear_timeline() {
@@ -4046,8 +4048,6 @@
              }
          });
 
-         //alert("Comentario guardado");
-
          $("#dialog p").text(hashMessages["ComentarioGuardado"]);
          $("#dialog").dialog({
              buttons: {
@@ -4115,8 +4115,8 @@
 
        var timer_globalplay; 
 
+       var isElementAdded = false;
        function startGlobalplay() {
-           //console.log("initGlobalplay");
 
            var w = $("#divTimelineProgress").css("width");
            $("#sm2-progress-track").css("width", w);
@@ -4125,6 +4125,8 @@
 
            // Init event while playing if GLOBALPLAY_seconds_total is already loaded
            if (GLOBALPLAY_seconds_total > 0) {
+
+               isElementAdded = false;
                timer_globalplay = setInterval(whilePlayingGlobalplay, 1000); // 1000
            }
 
@@ -4135,8 +4137,7 @@
        var timer = 0;
        function whilePlayingGlobalplay() {
 
-           // REAL TIMER MODE
-
+           // Update global variable: current timer
            GLOBALPLAY_seconds_current = $("#lblGlobalplay_timer_current").data('seconds');
 
            var progress_percentage = GLOBALPLAY_seconds_current * 100 / GLOBALPLAY_seconds_total;
@@ -4148,18 +4149,18 @@
                // Move pointer 
                TIMELINE_POINTER.css("left", left_final_percentage);
 
-
-               //
+               // Update current timer label
                var date_str2 = moment(_TL_ENDDATE, "DD-MM-YYYY HH:mm:ss");
                $("#lblGlobalplay_timer_total_0").text(date_str2.format('DD-MM-YYYY HH:mm:ss'));
 
                var posX = parseFloat(TIMELINE_POINTER.css("left"), 10);
-               var position_date = window.timeframe_live.getTickDate(posX); // Datetime position - Formato: AÑO DIA MES
+
+               // Datetime position - Formato: AÑO DIA MES
+               var position_date = window.timeframe_live.getTickDate(posX);
                if (position_date != null) {
                    var position_date_str = moment(position_date, "YYYY-MM-DD HH:mm:ss");
                    $("#lblGlobalplay_timer_current_0").text(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
                }
-               //
 
                /* Important: ----- Finding elements section ----- */
 
@@ -4175,9 +4176,10 @@
                    var flex_width_int = parseInt($(".flex").css("width"), 10);
                    var flex_height_int = parseInt($(".flex").css("height"), 10);
                    
-                   var visual_size_w = flex_width_int - 80;
-                   var visual_size_h = flex_height_int - 80;
+                   var visual_size_w = 300;
+                   var visual_size_h = 300;
 
+                   // Get visual elements already added in globalplay player
                    var visual_alreadyAdded = $(".flex a[name='visual']").length;
                    var visual_count = visual_queue.length + visual_alreadyAdded;
 
@@ -4185,53 +4187,24 @@
                    switch (visual_count) {
                        case 1:
                            {
-                               visual_size_w = flex_width_int - 80; 
-                               visual_size_h = flex_height_int - 80; 
+                               visual_size_w = flex_width_int - 80;
+                               visual_size_h = flex_height_int - 80;
                                break;
                            }
                        case 2:
                            {
-                               visual_size_w = flex_width_int / 2 - 80; // 480
-                               visual_size_h = flex_width_int / 2 - 80; // 480
-                               break;
-                           }
-                       case 3:
-                           {
-                               visual_size_w = 300;
-                               visual_size_h = 300;
-                               break;
-                           }
-                       case 4:
-                           {
-                               visual_size_w = 250;
-                               visual_size_h = 250;
-                               break;
-                           }
-                       case 5:
-                           {
-                               visual_size_w = 250;
-                               visual_size_h = 250;
-                               break;
-                           }
-                       case 6:
-                           {
-                               visual_size_w = 250;
-                               visual_size_h = 250;
+                               visual_size_w = flex_width_int / 2 - 80; 
+                               visual_size_h = flex_width_int / 2 - 80; 
                                break;
                            }
                    }
 
-                   // Resize elements already added
+                   // Resize elements already added 
                    if (visual_alreadyAdded > 0) {
-                       var visual_alreadyAdded_ids = [];
-                       $(".flex a[name='visual']").each(function () { visual_alreadyAdded_ids.push(this.id); });
-                       if (visual_alreadyAdded_ids.length > 0) {
-                           for (var i = 0; i < visual_alreadyAdded_ids.length; i++) {
-                               var id = visual_alreadyAdded_ids[i];
-                               $(".flex #" + id).css("width", visual_size_w);
-                               $(".flex #" + id).css("height", visual_size_h);
-                           }
-                       }
+                       $(".flex a[name='visual']").each(function (index, el) {
+                           $(this).css("width", visual_size_w);
+                           $(this).css("height", visual_size_h);
+                       });
                    }
 
                    // Set label elements on play
@@ -4245,28 +4218,13 @@
                    var flex_div = $("#divForm .flex");
 
                    // Location variables
-                   var visual_left = 0;
-                   var visual_delta_left = 250;
-                   var visual_top = 0;
-                   var visual_delta_top = 250;
-                   var visual_corrector = 0;
-                   var visual_count = 0;
-
-                   //
-                   var left_final = 50;
-                   var top_final = 0;
-                   var booleanX = 0;
-                   var booleanY = 0;
-
+                   var visual_count = visual_alreadyAdded; // = 0
+                   var visual_new = 0;
 
                    var ids = "";
                    for (var i = 0; i < elementsCandidate.length; i++) {
                        var el = elementsCandidate[i];
                        if (el != null) {
-
-                           //var isPar = visual_count % 2 == 0;
-                           //visual_corrector = isPar ? 0 : 1;
-
 
                            ids = ids + el[0].tapeID + "(" + el[0].tapeType + "), ";
 
@@ -4291,36 +4249,6 @@
                                D: Document
                                C: Comment
                                */
-
-                               //                              
-                               if (isVisual) {
-
-                                   visual_left += visual_delta_left * visual_corrector;
-                                   visual_top += visual_delta_top * visual_corrector;
-
-                                   visual_count++;
-                                   var isPar = visual_count % 2 == 0;
-                                   if (isPar) {
-                                       booleanX = 1;
-                                       booleanY = 0;
-                                   }
-                                   else {
-                                       booleanX = 0;
-                                       booleanY = 1;
-                                   }
-
-                                   var visual_correctorX = 0;
-                                   var visual_correctorY = 0;
-
-
-                                   //
-                                   left_final += 450 * booleanX;
-                                   top_final += 0;
-
-                                   visual_correctorX = 1;
-                                   visual_correctorY = 0;
-
-                               }
 
                                // IsExtra = If filePath is NOT empty, then is extra from incextras table
                                var isExtra = el[0].filePath.length == 0 ? false : true;
@@ -4432,10 +4360,11 @@
 
                                        var global_elementID = "global_img_" + el[0].segmentID;
 
-                                       $('<a name="visual" id="' + global_elementID + '" style="left:' + left_final + 'px; top:' + top_final + 'px; ' +
-                                           'width:' + visual_size_w + 'px; height:' + visual_size_h + 'px; background-image:url(' + p + ');' + // Tamaño contenedor 1
-                                           'background-size: auto 100%;"'+ // Tamaño real de imagen
-                                           'width="' + visual_size_w + '" height="' + visual_size_h + '">' + el[0].fileName + '</a>').appendTo(flex_div); // Tamaño contenedor 2
+                                       $('<a name="visual" id="' + global_elementID + '" style="width:' + visual_size_w + 'px; height:' + visual_size_h + 'px;' +
+                                          'background-image:url(' + p + '); float:left; position:relative; margin:10px; background-size: auto 100%;"' +
+                                          'width="' + visual_size_w + '" height="' + visual_size_h + '">' + el[0].fileName + '</a>').appendTo(flex_div).fadeIn(2000);
+
+                                       // Salvattore Source: http://webdesign.tutsplus.com/tutorials/build-a-dynamic-grid-with-salvattore-and-bootstrap-in-10-minutes--cms-20410
 
                                        setTimeout(function () { globalplay_removeElement(global_elementID, el) }, GLOBALPLAY_DEFAULT_DURATION);
                                        break;
@@ -4500,14 +4429,22 @@
 
            TIMELINE_POINTER.css("left", "0%");
 
-           // Clean already_taken bool
+           // Clean already_taken property of elements
            setStack_elementsAlreadyTaken();
+
+           // Remove elements from globalplay player
+           globalplay_removeAllElements();
 
            abortGlobalplay();
        }
 
+       // Remove elements from globalplay player
+       function globalplay_removeAllElements() {
+           $(".flex").not(".info-label").empty();
+       }
+
        function globalplay_removeElement(global_elementID, element) {
-           $("#" + global_elementID).remove();
+           $(".flex #" + global_elementID).remove();
 
            // Set available true back
            element[1] = true;
@@ -4560,6 +4497,7 @@
 
 
    </script>
+
    <style>
 
 /* ---------------------------------- */
@@ -5023,15 +4961,15 @@ div.disabled,button.disabled,a.disabled {
                         <div id="divForm" class="globalplayBox img-rounded" style="display:none;"> <!-- min-height:100%;"> -->
                             <div class="flex" style="min-width: 1000px;"> <!--min-height:100%;">-->
 
-                                <div id="globalplay_divSpecialMessages" style="position: absolute; width: 100%;">
+                                <div id="globalplay_divSpecialMessages" class="info-label" style="position: absolute; width: 100%; z-index:1001;">
                                     <h2 class="label label-danger" style="z-index:1001; text-transform: none; font-size:20px; width: 50%; margin: 0 auto;"></h2>
                                 </div>
 
-                                <div id="globalplay_divDocumentsName" style="position: absolute; width: 100%;">
+                                <div id="globalplay_divDocumentsName" class="info-label" style="position: absolute; width: 100%; z-index:1001;">
                                     <h2 class="label label-success" style="z-index:1001; text-transform: none; font-size:20px; width: 50%; margin: 0 auto;"></h2>
                                 </div>
 
-                                <div id="globalplay_divComments" style="position: absolute; bottom: 30px; width: 100%;">
+                                <div id="globalplay_divComments" class="info-label" style="position: absolute; bottom: 30px; width: 100%; z-index:1001;">
                                     <h2 class="label label-warning" style="z-index:1001; background-color: orange; text-transform: none; font-size:20px; width: 50%; margin: 0 auto;"></h2>
                                 </div>
 	                        </div>
