@@ -63,6 +63,7 @@
        /**** General global variables ****/
 
        var MAX_DOWNLOAD_FILES = 6;
+       var GLOBALPLAY_DEFAULT_DURATION = 30000; // 30 s // 5000 = 5 seg
        var SVG_Height = 170;
        var addComment_active = false;
        var addFile_active = false;
@@ -70,7 +71,7 @@
        var comment_popup_timestamp = "";
        var initial_size = 0;
        var elementsInMemory = [];
-       var stack_elements = [[], []];
+       var stack_elements = [[], []]; // [object, already_taken: bool]
        var selectedElementID = 0;
        var currrentVideoDuration = 0;
        var currentPointerPositionDate;
@@ -419,6 +420,10 @@
                                                        _TL_DATA = new_timeline_data;
                                                        prepareTimelineReload(_TL_DATA);
                                                    }
+
+                                                   // Update elements count
+                                                   $("span[id*='lblResultsCount']").text($("tr[id*='tape_']:visible").length.toString());
+
                                                }, // end success
                                                failure: function (response) {
                                                    alert(response.d);
@@ -506,11 +511,12 @@
                    for (obj in objects) {
                        if (elementsInMemory != null) {
                            if (elementsInMemory.length > 0) {
-                               for (var i = 0; i < elementsInMemory
-                                   .length; i++) {
+
+                               for (var i = 0; i < elementsInMemory.length; i++) {
                                    var element = elementsInMemory[i];
                                    if (element != null) {
                                        var tapeID = element.tapeID;
+
                                        if (objects[obj] == tapeID) {
                                            var groupName = element.groupName;
                                            var tapeType = element.tapeType;
@@ -528,6 +534,7 @@
                                            if (tapeType == "S") {
                                                tapeType_str = "P";
                                            }
+
                                            // Create object
                                            var object_group = {};
                                            object_group.name = tapeType_str; //
@@ -580,10 +587,10 @@
                currentPointerPositionDate = position_date_str.format('DD-MM-YYYY HH:mm:ss');
 
                // Update popup dates: FileUpload and CommentUpload
-               $("#commentDate").val(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
-               $("input[id*='uploadDate']").val(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
+               $("#commentDate").val(currentPointerPositionDate);
+               $("input[id*='uploadDate']").val(currentPointerPositionDate);
 
-               // ******** Globalplay ********
+               /******** Globalplay ********/
 
                // Set current timer
                var start_date_str = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
@@ -607,6 +614,9 @@
                    seconds: Seconds_Between_Dates
                });
 
+               // Set current timer
+               $("#lblGlobalplay_timer_current_0").text(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
+
                // Pause global timer 
                $('#lblGlobalplay_timer_current').timer('pause');
 
@@ -624,11 +634,11 @@
            var posYfinal = posY - 78;
            var pop4_width = parseInt($(".box4.popbox4").css("width"), 10);
            if (posXfinal + pop4_width > $(window).width()) {
-               posXfinal = $(window).width() - pop4_width;
+               posXfinal = $(window).width() - pop4_width; 
            }
            $(".box4.popbox4").show("scale", 300);
            $(".box4.popbox4").offset({
-               left: posXfinal,
+               left: posXfinal - 28, // 28 Quitar?
                top: posYfinal
            });
            var date = window.timeframe_live.getTickDate(posX); // Datetime position - Formato: AÑO DIA MES
@@ -637,7 +647,7 @@
                $("#lblPopbox4").text(date_str.format('DD-MM-YYYY HH:mm:ss'));
            }
 
-           // ******** Globalplay ********
+           /******** Globalplay ********/
 
            // Stop timer 
            abortGlobalplay();
@@ -696,6 +706,13 @@
            var _hdnMaxElementsDownload = $("input[id*='_hdnMaxElementsDownload']");
            if (_hdnMaxElementsDownload != null && _hdnMaxElementsDownload.val() != null && _hdnMaxElementsDownload.val().length > 0) {
                MaxElementsDownload = _hdnMaxElementsDownload.val();
+           }
+
+           // Load Globalplay default duration on elements 
+           GLOBALPLAY_DEFAULT_DURATION = "6000";
+           var _hdnGlobalplay_defaultDuration = $("input[id*='_hdnGlobalplay_defaultDuration']");
+           if (_hdnGlobalplay_defaultDuration != null && _hdnGlobalplay_defaultDuration.val() != null && _hdnGlobalplay_defaultDuration.val().length > 0) {
+               GLOBALPLAY_DEFAULT_DURATION = _hdnGlobalplay_defaultDuration.val();
            }
        }
 
@@ -1965,6 +1982,8 @@
                        var _width_percentage = (5 / 100) * _width_int;
                        var _width = _width_int + _width_percentage + "px";
 
+                       sm2_progress_bd.css("padding", "0px");
+
                        sm2_progress.css('height', 15);
                        sm2_inline_element.css('width', _width);
                        //sm2_inline_element.css('left', vElementRect.offset().left); // + 3
@@ -1976,15 +1995,13 @@
                        sm2_progress_track.css('height', 15);
 
                        // Pointer left and top position
-                       TIMELINE_POINTER.offset({ left: vElement.offset().left });
+                       //TIMELINE_POINTER.offset({ left: vElement.offset().left });
 
                        sm2_inline_element.offset({ top: $("#divTimelineProgress").offset().top })
 
-               } else {
-                   // Timeline is not drawn yet
-
-
-               }
+                   } else {
+                       // TODO: Timeline is not drawn yet
+                   }
                } else {
                    // It does not exists elements
 
@@ -2876,6 +2893,9 @@
 
                                /******** Reload timeline END ********/
 
+                               // Update elements count
+                               $("span[id*='lblResultsCount']").text($("tr[id*='tape_']:visible").length.toString());
+
                                // Disable div player again
                                divPanel_PlayerControl.addClass("disabled");
 
@@ -3740,7 +3760,7 @@
              if (tapes_array.length > 0) {
 
                  elementsInMemory = [];
-                 stack_elements = [[], []];
+                 stack_elements = [[], []]; // [object, already_taken: bool]
 
                  for (var i = 0; i < tapes_array.length; i++) {
                      if (tapes_array[i] != null) {
@@ -4048,7 +4068,7 @@
 
        /******** START: Media Player 2.0: Nuevo Requerimiento: Global Play ********/
 
-       // stack_elements [object, taken: bool]
+       // stack_elements [object, already_taken: bool]
 
        function initGlobalplay() {
 
@@ -4105,7 +4125,7 @@
 
            // Init event while playing if GLOBALPLAY_seconds_total is already loaded
            if (GLOBALPLAY_seconds_total > 0) {
-               timer_globalplay = setInterval(whilePlayingGlobalplay, 1000); 
+               timer_globalplay = setInterval(whilePlayingGlobalplay, 1000); // 1000
            }
 
            // Enable right side Player box
@@ -4117,17 +4137,29 @@
 
            // REAL TIMER MODE
 
-           GLOBALPLAY_seconds_current = $('#lblGlobalplay_timer_current').data('seconds');
+           GLOBALPLAY_seconds_current = $("#lblGlobalplay_timer_current").data('seconds');
 
            var progress_percentage = GLOBALPLAY_seconds_current * 100 / GLOBALPLAY_seconds_total;
            var left_final_percentage = progress_percentage + '%';
 
-           //console.log("GLOBALPLAY_seconds_current: " + GLOBALPLAY_seconds_current);
-           //console.log("progress_percentage: " + progress_percentage);
-
            // If it is still in range 
-           if (progress_percentage <= 100) { 
+           if (progress_percentage <= 100) {
+
+               // Move pointer 
                TIMELINE_POINTER.css("left", left_final_percentage);
+
+
+               //
+               var date_str2 = moment(_TL_ENDDATE, "DD-MM-YYYY HH:mm:ss");
+               $("#lblGlobalplay_timer_total_0").text(date_str2.format('DD-MM-YYYY HH:mm:ss'));
+
+               var posX = parseFloat(TIMELINE_POINTER.css("left"), 10);
+               var position_date = window.timeframe_live.getTickDate(posX); // Datetime position - Formato: AÑO DIA MES
+               if (position_date != null) {
+                   var position_date_str = moment(position_date, "YYYY-MM-DD HH:mm:ss");
+                   $("#lblGlobalplay_timer_current_0").text(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
+               }
+               //
 
                /* Important: ----- Finding elements section ----- */
 
@@ -4146,8 +4178,11 @@
                    var visual_size_w = flex_width_int - 80;
                    var visual_size_h = flex_height_int - 80;
 
+                   var visual_alreadyAdded = $(".flex a[name='visual']").length;
+                   var visual_count = visual_queue.length + visual_alreadyAdded;
+
                    // Element distinct types 
-                   switch (visual_queue.length) {
+                   switch (visual_count) {
                        case 1:
                            {
                                visual_size_w = flex_width_int - 80; 
@@ -4184,6 +4219,19 @@
                                visual_size_h = 250;
                                break;
                            }
+                   }
+
+                   // Resize elements already added
+                   if (visual_alreadyAdded > 0) {
+                       var visual_alreadyAdded_ids = [];
+                       $(".flex a[name='visual']").each(function () { visual_alreadyAdded_ids.push(this.id); });
+                       if (visual_alreadyAdded_ids.length > 0) {
+                           for (var i = 0; i < visual_alreadyAdded_ids.length; i++) {
+                               var id = visual_alreadyAdded_ids[i];
+                               $(".flex #" + id).css("width", visual_size_w);
+                               $(".flex #" + id).css("height", visual_size_h);
+                           }
+                       }
                    }
 
                    // Set label elements on play
@@ -4274,8 +4322,6 @@
 
                                }
 
-                               var default_duration_image = 5000; // 5 seg
-
                                // IsExtra = If filePath is NOT empty, then is extra from incextras table
                                var isExtra = el[0].filePath.length == 0 ? false : true;
 
@@ -4339,13 +4385,14 @@
                                    case "S": {
 
                                        if (getIsFirefoxOrIE()) {
-                                           if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
+                                           if (el[0].fileStatus != "PROCESSING" && el[0].fileStatus != "ERROR") {
 
-                                               var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' height='" + visual_size_h + "px' name='fbsviewer' id='fbsviewer' title='undefined'>";
+                                               var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' " +
+                                                   "height='" + visual_size_h + "px' name='fbsviewer' id='fbsviewer' title='undefined'>";
 
                                                applet += "<param name='HOST' value=''>";
                                                applet += "<param name='PORT' value='5901'>";
-                                               applet += "<param name='FBSURL' value='" + filePath_OREKA + "'>";
+                                               applet += "<param name='FBSURL' value='" + p + "'>";
                                                applet += "<param name='AUDIOURL' value=''>";
                                                applet += "<param name='SHOWPLAYERCONTROLS' value='NO'>"; // YES
                                                applet += "<param name='SHOWPLAYERTAGCONTROLS' value='YES'>";
@@ -4385,12 +4432,12 @@
 
                                        var global_elementID = "global_img_" + el[0].segmentID;
 
-                                       $('<a id="' + global_elementID + '" style="left:' + left_final + 'px; top:' + top_final + 'px; ' +
+                                       $('<a name="visual" id="' + global_elementID + '" style="left:' + left_final + 'px; top:' + top_final + 'px; ' +
                                            'width:' + visual_size_w + 'px; height:' + visual_size_h + 'px; background-image:url(' + p + ');' + // Tamaño contenedor 1
                                            'background-size: auto 100%;"'+ // Tamaño real de imagen
                                            'width="' + visual_size_w + '" height="' + visual_size_h + '">' + el[0].fileName + '</a>').appendTo(flex_div); // Tamaño contenedor 2
 
-                                       setTimeout(function () { globalplay_removeElement(global_elementID, el) }, default_duration_image);
+                                       setTimeout(function () { globalplay_removeElement(global_elementID, el) }, GLOBALPLAY_DEFAULT_DURATION);
                                        break;
                                    }
 
@@ -4399,7 +4446,7 @@
                                        var duration = el[0].duration <= 1 ? 5000 : el[0].duration * 1000;
 
                                        var label = $(".flex #globalplay_divDocumentsName h2");
-                                       label.text(el[0].fileName);
+                                       label.text("Documento: " + el[0].fileName);
                                        setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration);
 
                                        break;
@@ -4453,6 +4500,9 @@
 
            TIMELINE_POINTER.css("left", "0%");
 
+           // Clean already_taken bool
+           setStack_elementsAlreadyTaken();
+
            abortGlobalplay();
        }
 
@@ -4489,6 +4539,18 @@
                        timeCurrent.toDate() <= element_end.toDate();
                });
                return array;
+           }
+       }
+
+       // Clean stack_elements already_taken bool
+       function setStack_elementsAlreadyTaken() {
+           if (stack_elements != null && stack_elements.length > 0) {
+               for (var i = 0; i < stack_elements.length; i++) {
+                   var el = stack_elements[i];
+                   if (el != null) {
+                       el[1] = false;
+                   }
+               }
            }
        }
 
@@ -4775,6 +4837,7 @@ h1 {
 /* ---- Div disabled styles */
 div.disabled,button.disabled,a.disabled {
     pointer-events: none;
+
 /* for "disabled" effect */
     opacity: .5;
     background: #CCC;
@@ -4786,20 +4849,8 @@ div.disabled,button.disabled,a.disabled {
 .flex {position:relative;width:50%;min-height:650px;margin:0 auto;border:0px solid red;margin-top:10px;}
 		.flex a {background-color:white;display:block;width:100px;height:100px;border-radius:8px;position:absolute;background-repeat:no-repeat;background-position:center;border:3px solid white;cursor:pointer;text-align:left;text-shadow:1px 1px 20px #000;color:white;font-size:18px;font-weight:bold;text-indent:10px;line-height:30px;text-decoration:none;}
 
-        /*
-		[bg=a] {background-image:url(http://farm8.staticflickr.com/7013/6448917381_0b754e86fb_z.jpg);}
-		[bg=b] {background-image:url(http://farm9.staticflickr.com/8156/7362866426_bf285ebd45.jpg);background-size:300px auto;}
-		[bg=c] {background-image:url(http://farm6.staticflickr.com/5117/7410370290_0935419fc3.jpg);}
-		[bg=d] {background-image:url(http://farm8.staticflickr.com/7262/7419245080_bb752ed1d6.jpg);}
-		[bg=e] {background-image:url(http://farm8.staticflickr.com/7003/6468321069_3375be3073_z.jpg);background-size:auto 280px;}
-		[bg=f] {background-image:url(http://farm8.staticflickr.com/7220/7342556872_46cddaf9b0.jpg);background-size:auto 280px;}
-		[bg=g] {background-image:url(http://farm9.staticflickr.com/8021/7322604950_348c535903.jpg);background-size:auto 200px;}
-		[bg=h] {background-image:url(http://farm8.staticflickr.com/7076/7286717012_6e6b450243.jpg);}
-		[bg=i] {background-image:url(http://farm8.staticflickr.com/7129/7452167788_a3f6aa3104.jpg);background-size:auto 200px;}
-		[bg=j] {background-image:url(http://farm8.staticflickr.com/7153/6480022425_a8d419e663_z.jpg);background-size:auto 280px;}
-		[bg=k] {background-image:url(http://farm8.staticflickr.com/7225/7269592732_c4b7918626.jpg);background-size:auto 280px;}
-            */
-   </style>
+</style>
+
 </asp:content>
 <asp:content id="Content3" ContentPlaceHolderID="ContentLoginStatus" runat="server">
     <div class="container-session" >
@@ -5270,7 +5321,7 @@ div.disabled,button.disabled,a.disabled {
                         <div id="divUpload" class="form-group">
                            <div class="row row-short" style="padding: 10px;">
                               <label class="control-label">Documentos, videos y audios</label>
-                              <input id="MyFileUpload" type="file" runat="server" class="file" style="width: 85%;margin: auto; margin-top:8px;"/>
+                              <input id="MyFileUpload" type="file" runat="server" class="file" style="width: 85%; margin: auto; margin-top:8px; height:24px;"/>
                                <!--  -->
                            </div>
                            <div class="form-group">
@@ -5320,7 +5371,13 @@ div.disabled,button.disabled,a.disabled {
             <div id="divTimeline" class="div-panel2 col-md-12 col-xs-12 img-rounded" style="height:100%; z-index:0;left: 0; border-radius: 13px; width: 101%; margin-left: -13px;">
                <h1 style="margin-top: 5px;">
 
-                    <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label>/<label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label>
+                    <label id="lblGlobalplay_timer_current_0" class="label" style="font-size:100%; color:black;">00:00:00</label>
+                   /
+                   <label id="lblGlobalplay_timer_total_0" class="label" style="font-size:100%; color:black;">00:00:00</label>
+                     -  
+                   <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label>
+                    / 
+                   <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label>
                    
                    <span class="special-title label label-primary" style="font-weight: normal;">Timeline</span>
 
@@ -5426,6 +5483,8 @@ div.disabled,button.disabled,a.disabled {
    <asp:HiddenField ID="_hdnPlayerFBS_popup_height" runat="server" />
    <asp:HiddenField ID="_hdnWebchimera_Install_URL" runat="server" />
    <asp:HiddenField ID="_hdnMaxElementsDownload" runat="server" />
+   <asp:HiddenField ID="_hdnGlobalplay_defaultDuration" runat="server" />
+
 
 <!-- From Client to Server -->      
 </form>
