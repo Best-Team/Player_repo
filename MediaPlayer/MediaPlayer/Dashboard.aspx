@@ -30,10 +30,6 @@
     <script src="assets/js/jquery.inputmask.bundle.js"></script>
     <script src="assets/js/jquery.maskedinput.js"></script>
     <script src="assets/js/jquery.fancybox.js"></script>
-    <script src="assets/js/flowplayer.js"></script>
-
-
-
     <script src="assets/js/timer.jquery.js"></script>
 
     <!-- Styles -->
@@ -2251,6 +2247,12 @@
            var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=1";
            var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
 
+           // SET Element file path
+           var file_url = filePath_OREKA;
+           if (isExtra.toLowerCase() === "true") {
+               file_url = filePath_EXTRA;
+           }
+
            /************************ Elements path configuration END ************************/
 
            /************************ LOAD ELEMENT on Player BEGIN ************************/
@@ -2259,13 +2261,13 @@
                case "S":
                case "P": {
                    elementType_active = "S";
-                   loadElement_screenRecording(tapeID, fileStatus, divControlsMask_AUDIO, duration, divPlayer_VIDEO, filePath_OREKA, filePath_EXTRA, fileName, isExtra, segmentID, filePath, divControlsMask_VIDEO);
+                   loadElement_screenRecording(file_url, tapeID, fileStatus, divControlsMask_AUDIO, duration, divPlayer_VIDEO, fileName, segmentID, divControlsMask_VIDEO);
                    break;
                }
 
                case "A": {
                    elementType_active = "A";
-                   loadElement_audio(divControlsMask_AUDIO, fileName, filePath_OREKA, filePath_EXTRA, lnkSound_AUDIO, file_extension, isExtra, tapeID);
+                   loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_AUDIO, file_extension, tapeID);
                    break;
                }
 
@@ -2277,7 +2279,7 @@
 
                case "I": {
                    elementType_active = "I";
-                   loadElement_image(divControlsMask_VIDEO, divControlsMask_AUDIO, filePath_OREKA, filePath_EXTRA, isExtra, fileStatus);
+                   loadElement_image(file_url, divControlsMask_VIDEO, divControlsMask_AUDIO, fileStatus);
                    break;
                }
 
@@ -2289,7 +2291,7 @@
 
                case "V": {
                    elementType_active = "V";
-                   loadElement_video(filePath_OREKA, isExtra, filePath_EXTRA, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration);
+                   loadElement_video(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration);
                    break;
                }
            }
@@ -2297,8 +2299,8 @@
            /************************ Load element on Player END ************************/
        }
 
-       //********************************* 1. SCREEN RECORDING  *********************************
-       function loadElement_screenRecording(tapeID, fileStatus, divControlsMask_AUDIO, duration, divPlayer_VIDEO, filePath_OREKA, filePath_EXTRA, fileName, isExtra, segmentID, filePath, divControlsMask_VIDEO) {
+       //********************************* 1. SCREEN RECORDING Element *********************************
+       function loadElement_screenRecording(file_url, tapeID, fileStatus, divControlsMask_AUDIO, duration, divPlayer_VIDEO, fileName, segmentID, divControlsMask_VIDEO) {
            if (getIsFirefoxOrIE()) {
                screenRecording_segmentID = tapeID;
 
@@ -2353,13 +2355,7 @@
                }
                /************************ Styles END ************************/
 
-               // SET Element file path
-               var p = filePath_OREKA;
-               if (isExtra.toLowerCase() === "true") {
-                   p = filePath_EXTRA;
-               }
-
-               videoPlayerINIT(fileName, duration, isExtra, segmentID, filePath, p);
+               videoPlayerINIT(fileName, duration, segmentID);
 
                // Enable video player
                if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
@@ -2406,8 +2402,8 @@
            }
        }
 
-       //************************************** 2. AUDIO  ***************************************
-       function loadElement_audio(divControlsMask_AUDIO, fileName, filePath_OREKA, filePath_EXTRA, lnkSound_AUDIO, file_extension, isExtra, tapeID) {
+       //************************************** 2. AUDIO Element ***************************************
+       function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_AUDIO, file_extension, tapeID) {
 
            /************************ Local audio variables ************************/
 
@@ -2426,15 +2422,9 @@
            // Set title
            $("#lblSoundTitle1_AUDIO, #lblSoundTitle2_AUDIO").text(fileName);
 
-           // SET Element file path
-           var p = filePath_OREKA;
-           if (isExtra.toLowerCase() === "true") {
-               p = filePath_EXTRA;
-           }
-
            // Prepare audio player
-           lnkSound_AUDIO.attr("href", p);
-           SetAudioPlaylistURL(0, p);
+           lnkSound_AUDIO.attr("href", file_url);
+           SetAudioPlaylistURL(0, file_url);
 
            // Set Stop icon
            if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length > 0) {
@@ -2458,11 +2448,11 @@
                // Source: http://joliclic.free.fr/html/object-tag/en/
 
                // ActiveX object
-               var wav_object = "<object data='" + p + "' type='audio/x-wav' width='" + w + "' height='" + h + "'>";
+               var wav_object = "<object data='" + file_url + "' type='audio/x-wav' width='" + w + "' height='" + h + "'>";
                wav_object += " <param name='src' value='" + p + "'>";
                wav_object += " <param name='autoplay' value='false'>";
                wav_object += " <param name='autoStart' value='0'>";
-               wav_object += " <a href='" + p + "'>Play</a>";
+               wav_object += " <a href='" + file_url + "'>Play</a>";
                wav_object += " </object>";
 
                $("#audioContainer object").remove();
@@ -2472,7 +2462,7 @@
            /* Important: ----------- PCM WAVE - Case ----------- */
        }
 
-       //************************************* 3. COMMENT  **************************************
+       //************************************* 3. COMMENT Element **************************************
        function loadElement_comment(divControlsMask_VIDEO, timestamp, fileName) {
            removeDivPlayerContentExcept();
            if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
@@ -2491,8 +2481,8 @@
            $("#btnRemoveElement").removeClass("disabled");
        }
 
-       //*************************************** 4. IMAGE  **************************************
-       function loadElement_image(divControlsMask_VIDEO, divControlsMask_AUDIO, filePath_OREKA, filePath_EXTRA, isExtra, fileStatus) {
+       //*************************************** 4. IMAGE Element **************************************
+       function loadElement_image(file_url, divControlsMask_VIDEO, divControlsMask_AUDIO, fileStatus) {
            if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
                divControlsMask_VIDEO.hide();
            }
@@ -2502,12 +2492,7 @@
 
            removeDivPlayerContentExcept();
 
-           // Set Element file path
-           var p = filePath_OREKA;
-           if (isExtra.toLowerCase() === "true") {
-               p = filePath_EXTRA;
-           }
-           $("#imgPlayer").attr("src", p);
+           $("#imgPlayer").attr("src", file_url);
 
            // Style settings
            $("#imgPlayer").show("blind", 200);
@@ -2524,7 +2509,7 @@
            }
        }
 
-       //************************************ 5. DOCUMENT  **************************************
+       //************************************ 5. DOCUMENT Element **************************************
        function loadElement_document(divControlsMask_VIDEO, divControlsMask_VIDEO) {
            loadPlayerBoxImage("url(assets/images/document.png)");
            if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
@@ -2536,18 +2521,12 @@
            }
        }
 
-       //************************************** 6. VIDEO ****************************************
-       function loadElement_video(filePath_OREKA, isExtra, filePath_EXTRA, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration, fileStatus) {
+       //************************************** 6. VIDEO Element ***************************************
+       function loadElement_video(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration, fileStatus) {
 
            var ok = true;
 
-           // SET Element file path
-           var p = filePath_OREKA;
-           if (isExtra.toLowerCase() === "true") {
-               p = filePath_EXTRA;
-           }
-           // Source: https://github.com/LukasBombach/nw-webchimera-demos
-
+           // Webchimera plugin - Source: https://github.com/LukasBombach/nw-webchimera-demos
 
            /************************ Styles START ************************/
 
@@ -2568,11 +2547,11 @@
 
                // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
 
-               var js_player = '<video id="html_video" preload="none" style="width: ' + w + 'px; height: ' + h + 'px;">';// poster="https://media.w3.org/2010/05/sintel/poster.png">';
+               var js_player = '<video id="html_video" preload="none" style="width: ' + w + 'px; height: ' + h + 'px;">';
                //js_player += '<source id="mp4" src="http://media.w3.org/2010/05/bunny/trailer.mp4" type="video/mp4">'; // p
-               js_player += '<source id="mp4" src="' + p + '" type="video/mp4">';
-               js_player += '<source id="webm" src="' + p + '" type="video/webm">';
-               js_player += '<source id="ogv" src="' + p + '" type="video/ogg">';
+               js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
+               js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
+               js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
                js_player += '</video>';
 
                divPlayer_VIDEO.append(js_player);
@@ -2633,7 +2612,7 @@
 
                    // -----------------------------------------------------------------------------------------------
 
-                   var applet = "<object id='webchimera' type='application/x-chimera-plugin' width='" + w + "' height='" + h + "'>";
+                   var applet = "<object id='webchimera1' type='application/x-chimera-plugin' width='" + w + "' height='" + h + "'>";
                    applet += "<param name='windowless' value='true' />";
                    applet += "</object>";
                    applet += "<div id='interface'></div>";
@@ -2645,13 +2624,13 @@
                    var ok = true;
 
                    try {
-                       wjs("#webchimera").clearPlaylist();
-                       wjs("#webchimera").addPlaylist(p);
+                       wjs("#webchimera1").clearPlaylist();
+                       wjs("#webchimera1").addPlaylist(file_url);
                    } catch (err) {
                        console.log("Error loading webchimera");
                        console.log(err);
 
-                       // Alert message
+                       // Show alert message
                        $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
                        $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
                        $("#dialog_WebChimera a").text("aquí.")
@@ -2683,30 +2662,29 @@
                            if (divControlsMask_VIDEO.hasClass("paused")) {
                                divControlsMask_VIDEO.addClass("playing");
                                divControlsMask_VIDEO.removeClass("paused");
-                               wjs("#webchimera").play();
+                               wjs("#webchimera1").play();
 
                            } else {
                                divControlsMask_VIDEO.addClass("paused");
                                divControlsMask_VIDEO.removeClass("playing");
-                               wjs("#webchimera").pause();
+                               wjs("#webchimera1").pause();
                            }
                        }
                    });
 
                    // Event: While playing
                    var previousSecsAVI = 0;
-                   wjs("#webchimera").onTime(function () {
-                       console.log("playing");
+                   wjs("#webchimera1").onTime(function () {
                        var timer_VIDEO = $('#sm2-inline-time_VIDEO');
                        var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
                        var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
-                       var currentSecs = wjs("#webchimera").time() / 1000;
+                       var currentSecs = wjs("#webchimera1").time() / 1000;
 
                        if (currentSecs < duration && /* currentSecs >= previousSecs && */ currentSecs != 0) {
                            previousSecsAVI = currentSecs;
-                           var left = (wjs("#webchimera").position() * 100) + "%";
+                           var left = (wjs("#webchimera1").position() * 100) + "%";
                            var secs_int = parseInt(currentSecs, 10);
-                           timer_VIDEO.text(getTime(wjs("#webchimera").time(), true).toString());
+                           timer_VIDEO.text(getTime(wjs("#webchimera1").time(), true).toString());
 
                            // Pointers progress
                            pointer_VIDEO.css("left", left);
@@ -2792,7 +2770,7 @@
        // Event: While Playing of HTML5 Video tag (webm, mp4, ogg)
        function onTrackedVideoFrame(currentTime, duration, timer_VIDEO, divControlsMask_VIDEO) {
            var currentTime_int = parseFloat(currentTime, 10);
-           var currentTime_final = getFormatDuration(currentTime_int);
+           var currentTime_final = getFormatDuration_short(currentTime_int);
            var max_time = $("#sm2-inline-duration_VIDEO").text();
 
            if (currentTime < duration && currentTime != 0) {
@@ -2806,13 +2784,18 @@
                    pointer_VIDEO.css("left", left_final_percentage);
                }
 
+               // Update current timer label
                timer_VIDEO.text(currentTime_final);
            } else {
-               divControlsMask_VIDEO.addClass("paused");
-               divControlsMask_VIDEO.removeClass("playing");
+               if (currentTime != 0) {
+                   divControlsMask_VIDEO.addClass("paused");
+                   divControlsMask_VIDEO.removeClass("playing");
 
-               if (currentTime >= duration && max_time != "N/A") {
-                   timer_VIDEO.text(max_time);
+                   if (currentTime >= duration && max_time != "N/A") {
+
+                       // Update current timer label to reach the maximum
+                       timer_VIDEO.text(max_time);
+                   }
                }
            }
        }
@@ -2987,8 +2970,8 @@
                  // TODO: adapt to html5 video - flowplayer
 
                  if (elementType_active === "V") {
-                     if (wjs("#webchimera") != null) {
-                         wjs("#webchimera").time(currentSecs);
+                     if (wjs("#webchimera1") != null) {
+                         wjs("#webchimera1").time(currentSecs);
                      }
                  }
              }
@@ -3060,7 +3043,7 @@
          var duration_final = "";
          var duration_int = parseInt(duration, 10);
          if (duration_int > 0) {
-             duration_final = getFormatDuration(duration);
+             duration_final = getFormatDuration_short(duration);
          } else {
              duration_final = "N/A";
          }
@@ -3192,7 +3175,7 @@
          stopFBSPlayer();
      }
 
-     function videoPlayerINIT(fileName, duration, isExtra, segmentID, filePath, _url) {
+     function videoPlayerINIT(fileName, duration, segmentID) {
 
          /******** player control STYLES ********/
 
@@ -3263,6 +3246,7 @@
          // Inicia FBS player para pre-cargar
          //TimeRefreshLoop(duration); 
      }
+
      // Called from client side
 
      function clickTimelineElement1(tapeID, count, duration, timestamp, type_longStr, segmentID, isExtra, fileName, filePath,
@@ -3677,6 +3661,11 @@
            return moment("2015-01-01").startOf('day').seconds(duration).format('HH:mm:ss');
        }
 
+       // Get duration format: m:ss
+       function getFormatDuration_short(duration) {
+           return moment("2015-01-01").startOf('day').seconds(duration).format('m:ss');
+       }
+
        // Get file extension
      function getFileExtension(fileName) {
          return (/[.]/.exec(fileName)) ? /[^.]+$/.exec(fileName) : undefined;
@@ -4073,6 +4062,10 @@
 
        function globalplay_init() {
 
+           // Hide Video player box
+           var divPlayer_VIDEO = $("#divPlayer_VIDEO");
+           divPlayer_VIDEO.css("visibility", "hidden");
+
            if ($("#globalplay_play").hasClass("play")) {
 
                // DO PLAY
@@ -4239,25 +4232,25 @@
 
                var ids = "";
                for (var i = 0; i < elementsCandidate.length; i++) {
-                   var el = elementsCandidate[i];
-                   if (el != null) {
+                   var element = elementsCandidate[i];
+                   if (element != null) {
 
                        // Set ids label
-                       ids = ids + el[0].tapeID + "(" + el[0].tapeType + "), ";
+                       ids = ids + element[0].tapeID + "(" + element[0].tapeType + "), ";
                        $("#lblGlobalplay_element_ids").text(ids);
 
                        var current_duration = GLOBALPLAY_seconds_current;
                        var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
                        timeCurrent.add(current_duration, "seconds");
 
-                       var element_end = moment(el[0].timestamp, "DD-MM-YYYY HH:mm:ss");
-                       element_end.add(el[0].duration, "seconds");
+                       var element_end = moment(element[0].timestamp, "DD-MM-YYYY HH:mm:ss");
+                       element_end.add(element[0].duration, "seconds");
 
                        // Si el elemento no fue procesado, hacerlo
-                       if (el[1] == false) {
-                           el[1] = true;
+                       if (element[1] == false) {
+                           element[1] = true;
 
-                           var type = el[0].tapeType;
+                           var type = element[0].tapeType;
                            var isVisual = (type == "V" || type == "S" || type == "I") ? true : false;
                            /*
                            A: Audio
@@ -4269,11 +4262,11 @@
                            */
 
                            // IsExtra = If filePath is NOT empty, then is extra from incextras table
-                           var isExtra = el[0].filePath.length == 0 ? false : true;
+                           var isExtra = element[0].filePath.length == 0 ? false : true;
 
                            // Prepare URL elements
-                           var path_extra = filePath_EXTRA + "?id=" + el[0].segmentID + "&isExtra=1";
-                           var path_oreka = filePath_OREKA + "?segid=" + el[0].segmentID;
+                           var path_extra = filePath_EXTRA + "?id=" + element[0].segmentID + "&isExtra=1";
+                           var path_oreka = filePath_OREKA + "?segid=" + element[0].segmentID;
 
                            // SET Element file path
                            var file_url = isExtra ? path_extra : path_oreka;
@@ -4285,28 +4278,27 @@
                                }
 
                                case "V": {
-                                   globalplay_video(file_url, visual_size_w, visual_size_h, flex_div, el[0].duration);
+                                   globalplay_video(file_url, visual_size_w, visual_size_h, flex_div, element);
                                    break;
                                }
 
                                case "S": {
-                                   globalplay_screenRecording(file_url, el[0].fileStatus, visual_size_w, visual_size_h, flex_div, el[0].duration);
+                                   globalplay_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element);
                                    break;
                                }
 
                                case "I": {
-
-                                   globalplay_image(file_url, visual_size_w, visual_size_h, el[0].segmentID, el[0].fileName, flex_div, el);
+                                   globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element);
                                    break;
                                }
 
                                case "D": {
-                                   globalplay_document(file_url, el[0].duration, el[0].fileName);
+                                   globalplay_document(file_url, element);
                                    break;
                                }
 
                                case "C": {
-                                   globalplay_comment(el[0].duration, el[0].fileName);
+                                   globalplay_comment(element);
                                    break;
                                }
                            }
@@ -4325,10 +4317,13 @@
            audio.play();
        }
 
-       function globalplay_video(file_url, visual_size_w, visual_size_h, flex_div, duration) {
+       function globalplay_video(file_url, visual_size_w, visual_size_h, flex_div, element) {
            if (getIsFirefoxOrIE()) {
 
-               var applet = "<object id='webchimera' type='application/x-chimera-plugin' width='" + visual_size_w + "' height='" + visual_size_h + "'>";
+               var global_elementID = "webchimera2";
+               var duration = element[0].duration;
+
+               var applet = "<object id='" + global_elementID + "' type='application/x-chimera-plugin' width='" + visual_size_w + "' height='" + visual_size_h + "'>";
                applet += "<param name='windowless' value='true' />";
                applet += "</object>";
                applet += "<div id='interface'></div>";
@@ -4337,12 +4332,13 @@
 
                // Play webchimera
                try {
-                   wjs("#webchimera").clearPlaylist();
-                   wjs("#webchimera").addPlaylist(file_url);
+                   wjs(global_elementID).clearPlaylist();
+                   wjs(global_elementID).addPlaylist(file_url);
                } catch (err) {
                    console.log("Error loading webchimera");
                    console.log(err);
 
+                   // Show alert message
                    $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
                    $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
                    $("#dialog_WebChimera a").text("aquí.")
@@ -4354,6 +4350,8 @@
                        }
                    });
                }
+
+               setTimeout(function () { globalplay_removeElement(global_elementID, element) }, duration);
            }
            else {
                var label = $(".flex #globalplay_divSpecialMessages h2");
@@ -4362,12 +4360,16 @@
            }
        }
 
-       function globalplay_screenRecording(file_url, fileStatus, visual_size_w, visual_size_h, flex_div, duration) {
+       function globalplay_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element) {
            if (getIsFirefoxOrIE()) {
                if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
 
+                   var global_elementID = "fbsviewer2";
+                   var duration = element[0].duration;
+                   var fileStatus = element[0].fileStatus;
+
                    var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' " +
-                       "height='" + visual_size_h + "px' name='fbsviewer' id='fbsviewer' title='undefined'>";
+                       "height='" + visual_size_h + "px' name='fbsviewer' id='" + global_elementID + "' title='undefined'>";
 
                    applet += "<param name='HOST' value=''>";
                    applet += "<param name='PORT' value='5901'>";
@@ -4386,17 +4388,7 @@
 
                    flex_div.append(applet);
 
-                   // Stop FBS player if it is playing
-                   //stopFBSPlayer();
-                   try {
-                       if (document.fbsviewer != null) {
-                           document.fbsviewer.pause();
-                       }
-                   } catch (err) {
-                       console.log("Oreka Player (.fbs) error try catch");
-                       console.log(err);
-                   }
-
+                   setTimeout(function () { globalplay_removeElement(global_elementID, element) }, duration);
                }
            } else {
                var label = $(".flex #globalplay_divSpecialMessages h2");
@@ -4405,8 +4397,10 @@
            }
        }
 
-       function globalplay_image(file_url, visual_size_w, visual_size_h, segmentID, fileName, flex_div, el) {
+       function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element) {
            var global_elementID = "global_img_" + segmentID;
+           var segmentID = element[0].segmentID;
+           var fileName = element[0].fileName;
 
            $('<a name="visual" id="' + global_elementID + '" style="width:' + visual_size_w + 'px; height:' + visual_size_h + 'px;' +
               'background-image:url(' + file_url + '); float:left; position:relative; margin:10px; background-size: auto 100%;"' +
@@ -4414,18 +4408,24 @@
 
            // Salvattore Source: http://webdesign.tutsplus.com/tutorials/build-a-dynamic-grid-with-salvattore-and-bootstrap-in-10-minutes--cms-20410
 
-           setTimeout(function () { globalplay_removeElement(global_elementID, el) }, GLOBALPLAY_DEFAULT_DURATION);
+           setTimeout(function () { globalplay_removeElement(global_elementID, element) }, GLOBALPLAY_DEFAULT_DURATION);
        }
 
-       function globalplay_document(file_url, duration, fileName) {
+       function globalplay_document(file_url, element) {
+           var duration = element[0].duration;
+           var fileName = element[0].fileName;
            var duration_final = duration <= 1 ? 5000 : duration * 1000;
            var label = $(".flex #globalplay_divDocumentsName h2");
+
            label.text("Documento: " + fileName);
            setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_final);
        }
 
-       function globalplay_comment(duration, fileName) {
+       function globalplay_comment(element) {
+           var duration = element[0].duration;
+           var fileName = element[0].fileName;
            var duration_final = duration <= 1 ? 5000 : duration * 1000;
+
            var label = $(".flex #globalplay_divComments h2");
            label.text(fileName);
            setTimeout(function () { globalplay_clearLabel(label) }, duration_final);
@@ -4828,41 +4828,6 @@ div.disabled,button.disabled,a.disabled {
 
 .flex {position:relative;width:50%;min-height:650px;margin:0 auto;border:0px solid red;margin-top:10px;}
 .flex a {background-color:white;display:block;width:100px;height:100px;border-radius:8px;position:absolute;background-repeat:no-repeat;background-position:center;border:3px solid white;cursor:pointer;text-align:left;text-shadow:1px 1px 20px #000;color:white;font-size:18px;font-weight:bold;text-indent:10px;line-height:30px;text-decoration:none;}
-
-/************* Flowplayer js  *************/
-
-/* make room for fixed controls */
-.flowplayer {
-  margin-bottom: 30px;
-}
- 
-/* default cursor for screen */
-.flowplayer .fp-ui {
-  cursor: default;
-}
-/* reinstate pointer for ui elements */
-.flowplayer .fp-controls,
-.flowplayer .fp-embed,
-.flowplayer .fp-time,
-.flowplayer .fp-duration,
-.flowplayer .fp-remaining {
-  cursor: pointer;
-}
-/* no screen play button */
-.is-paused.flowplayer .fp-ui {
-  background-image: none;
-}
- 
-/* for devices which enforce a splash setup, e.g. iOS */
-.is-splash.flowplayer {
-  /* background color similar to first frame of video
-     could also be a background image */
-  background-color: #001f1f;
-}
-/* show the controls in splash state */
-.is-splash.flowplayer .fp-controls {
-  display: block !important;
-}
 
 </style>
 

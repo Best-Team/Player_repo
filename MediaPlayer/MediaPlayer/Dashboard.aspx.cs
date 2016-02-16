@@ -332,7 +332,7 @@ namespace MediaPlayer
                             // NAudio Source: http://stackoverflow.com/questions/7175701/converting-wav-file-to-wav-file-changing-format
                             try
                             {
-                                WaveFormat target = new WaveFormat(8000, 8, 1);
+                                WaveFormat target = new WaveFormat(44100, 16, 1);
                                 using (WaveStream stream = new WaveFileReader(fullLocalPath + repoFilenameAUX))
                                 {
                                     WaveFormatConversionStream str = new WaveFormatConversionStream(target, stream);

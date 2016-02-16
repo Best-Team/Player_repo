@@ -420,7 +420,7 @@
 
 				F.transitions[F.current.closeMethod]();
 
-			    //
+			    /************** Globalplay BEGIN **************/
 				globalplay_abort();
 
 				$("#globalplay_play").removeClass("pauseAudio");
@@ -428,7 +428,12 @@
 
 			    // Stop timer
 				$('#lblGlobalplay_timer_current').timer('pause');
-                //
+
+			    // Show Video player box
+				var divPlayer_VIDEO = $("#divPlayer_VIDEO");
+				divPlayer_VIDEO.css("visibility", "visible");
+
+			    /************** Globalplay END **************/
 			}
 		},
 
