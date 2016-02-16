@@ -3,19 +3,22 @@
 1] Multimdia compatibility applications by formats:
 
 Audio:
-.wav - html5 - sound manager js
 .mp3 - html5 - sound manager js
 .wma - html5 - sound manager js
 .m4a - html5 - sound manager js
 .oga - html5 - sound manager js
+.wav - html5 - sound manager js
+.wav (IE) - IE ActiveX object
 
 Screen recording:
 .fbs - oreka player java
 
 Video:
 .avi - webchimera player js
-.mp4 - webchimera player js
 .wmv - webchimera player js
+.ogg - html5 - video tag
+.mp4 - html5 - video tag
+.webm - html5 - video tag
 
 Image:
 .jpg - html5

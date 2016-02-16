@@ -301,7 +301,7 @@ namespace MediaPlayer
 
                     try
                     {
-                        /*************** Get file Duration ***************/
+                        /*************** Get Duration ***************/
                         // Source: http://stackoverflow.com/questions/1256841/c-sharp-get-video-file-duration-from-metadata
 
                         //Source: http://www.codeproject.com/Articles/43208/How-to-get-the-length-duration-of-a-media-File-in-.aspx
@@ -435,6 +435,9 @@ namespace MediaPlayer
                     }
                 case "avi":
                 case "wmv":
+                case "mp4":
+                case "webm":
+                case "ogg":
                     {
                         mediaType = "V";
                         break;
@@ -972,91 +975,6 @@ namespace MediaPlayer
             }
             return onclick_event;
         }
-
-        /*
-        private void ConvertAudio2(string pcmFile, string webFile)
-        {
-            //string webFile = @"D:\AudioCS\bin\Debug\_web.mp3";
-            //string pcmFile = @"D:\AudioCS\bin\Debug\_AudioCS.wav";
-            using (WaveReader wr = new WaveReader(File.OpenRead(pcmFile)))
-            {
-                IntPtr pcmFormat = wr.ReadFormat();
-                byte[] pcmData = wr.ReadData();
-                IntPtr webFormat = AudioCompressionManager.GetCompatibleFormat(pcmFormat, AudioCompressionManager.MpegLayer3FormatTag);
-                byte[] webData = AudioCompressionManager.Convert(pcmFormat, webFormat, pcmData, false);
-                MemoryStream ms = new MemoryStream();
-
-                using (WaveWriter ww = new WaveWriter(ms, AudioCompressionManager.FormatBytes(webFormat)))
-                {
-                    ww.WriteData(webData);
-                    using (WaveReader wr2 = new WaveReader(ms))
-                    {
-                        using (FileStream fs = File.OpenWrite(webFile))
-                        {
-                            wr2.MakeMP3(fs);
-                        }
-                    }
-                }
-            }
-        }
-
-        private static void BigWav2Mp3(string wavFile)
-        {
-            using (WaveReader wr = new WaveReader(File.OpenRead(wavFile)))
-            {
-                IntPtr format = wr.ReadFormat();
-                IntPtr formatMp3 = AudioCompressionManager.GetCompatibleFormat(format, AudioCompressionManager.MpegLayer3FormatTag);
-                AcmConverter acm = new AcmConverter(format, formatMp3, false);
-                const int seconds = 60;
-                using (Mp3Writer mw = new Mp3Writer(File.Create(wavFile + ".mp3")))
-                {
-                    int i = 0;
-                    while (true)
-                    {
-                        byte[] data = wr.ReadData(i * seconds, seconds);
-                        if (data == null || data.Length == 0)
-                        {
-                            break;
-                        }
-                        byte[] dataMp3 = acm.Convert(data);
-                        mw.WriteData(dataMp3);
-                        i += 1;
-                    }
-                }
-                acm.Close();
-            }
-        }
-
-        private void ConvertAudio()
-        {
-            string webFile = @"D:\AudioCS\bin\Debug\_web.mp3";
-            string pcmFile = @"D:\AudioCS\bin\Debug\_AudioCS.wav";
-            using (WaveReader wr = new WaveReader(File.OpenRead(pcmFile)))
-            {
-                IntPtr pcmFormat = wr.ReadFormat();
-                byte[] pcmData = wr.ReadData();
-                IntPtr webFormat = AudioCompressionManager.GetCompatibleFormat(pcmFormat,
-                AudioCompressionManager.MpegLayer3FormatTag);
-                byte[] webData = AudioCompressionManager.Convert(pcmFormat, webFormat,
-                pcmData, false);
-                MemoryStream ms = new MemoryStream();
-
-                using (WaveWriter ww = new WaveWriter(ms,
-                AudioCompressionManager.FormatBytes(webFormat)))
-                {
-                    ww.WriteData(webData);
-                    using (WaveReader wr2 = new WaveReader(ms))
-                    {
-                        using (FileStream fs = File.OpenWrite(webFile))
-                        {
-                            wr2.MakeMP3(fs);
-                        }
-                    }
-                }
-            }
-        }
-
-        */
 
         #endregion Private Methods
 

@@ -421,7 +421,7 @@
 				F.transitions[F.current.closeMethod]();
 
 			    //
-				abortGlobalplay();
+				globalplay_abort();
 
 				$("#globalplay_play").removeClass("pauseAudio");
 				$("#globalplay_play").addClass("play");
