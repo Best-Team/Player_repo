@@ -2260,36 +2260,41 @@
                case "P": {
                    elementType_active = "S";
                    loadElement_screenRecording(tapeID, fileStatus, divControlsMask_AUDIO, duration, divPlayer_VIDEO, filePath_OREKA, filePath_EXTRA, fileName, isExtra, segmentID, filePath, divControlsMask_VIDEO);
+                   break;
                }
 
                case "A": {
                    elementType_active = "A";
                    loadElement_audio(divControlsMask_AUDIO, fileName, filePath_OREKA, filePath_EXTRA, lnkSound_AUDIO, file_extension, isExtra, tapeID);
+                   break;
                }
 
                case "C": {
                    elementType_active = "C";
                    loadElement_comment(divControlsMask_VIDEO, timestamp, fileName);
+                   break;
                }
 
                case "I": {
                    elementType_active = "I";
                    loadElement_image(divControlsMask_VIDEO, divControlsMask_AUDIO, filePath_OREKA, filePath_EXTRA, isExtra, fileStatus);
+                   break;
                }
 
                case "D": {
                    elementType_active = "D";
                    loadElement_document(divControlsMask_VIDEO, divControlsMask_VIDEO);
+                   break;
                }
 
                case "V": {
-                   elementType_active = "D";
-                   loadElement_document(divControlsMask_VIDEO, divControlsMask_VIDEO);
+                   elementType_active = "V";
+                   loadElement_video(filePath_OREKA, isExtra, filePath_EXTRA, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration);
+                   break;
                }
            }
 
            /************************ Load element on Player END ************************/
-
        }
 
        //********************************* 1. SCREEN RECORDING  *********************************
@@ -2519,7 +2524,7 @@
            }
        }
 
-       //*************************************** 5. DOCUMENT  **************************************
+       //************************************ 5. DOCUMENT  **************************************
        function loadElement_document(divControlsMask_VIDEO, divControlsMask_VIDEO) {
            loadPlayerBoxImage("url(assets/images/document.png)");
            if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
@@ -2532,7 +2537,7 @@
        }
 
        //************************************** 6. VIDEO ****************************************
-       function loadElement_video(filePath_OREKA, isExtra, filePath_EXTRA, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration) {
+       function loadElement_video(filePath_OREKA, isExtra, filePath_EXTRA, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration, fileStatus) {
 
            var ok = true;
 
@@ -2769,7 +2774,6 @@
 
            }
 
-
            // Enable/Disable functions
            if (fileStatus != "PROCESSING" && fileStatus != "ERROR" && ok) {
                $("#btnFullscreen").removeClass("disabled");
@@ -2789,6 +2793,7 @@
        function onTrackedVideoFrame(currentTime, duration, timer_VIDEO, divControlsMask_VIDEO) {
            var currentTime_int = parseFloat(currentTime, 10);
            var currentTime_final = getFormatDuration(currentTime_int);
+           var max_time = $("#sm2-inline-duration_VIDEO").text();
 
            if (currentTime < duration && currentTime != 0) {
 
@@ -2806,8 +2811,7 @@
                divControlsMask_VIDEO.addClass("paused");
                divControlsMask_VIDEO.removeClass("playing");
 
-               if (currentTime >= duration) {
-                   var max_time = $("#sm2-inline-duration_VIDEO").text();
+               if (currentTime >= duration && max_time != "N/A") {
                    timer_VIDEO.text(max_time);
                }
            }
