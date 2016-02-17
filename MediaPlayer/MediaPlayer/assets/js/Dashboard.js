@@ -644,7 +644,7 @@ function initVariables() {
 
     currentDateToday = dd + '/' + mm + '/' + yyyy;
 
-    var text = " <%:Session["UserName"]%>, " + currentDateToday;
+    var text = " " + globalUserName + ", " + currentDateToday;
     $('.usernameInfo').html(text);
 
     // Load alert message: Get Max Elements download from web.config
@@ -2803,7 +2803,7 @@ function loadClickConfirmRemoveButton_event(tapeID, isExtra) {
 
     btnConfirmRemoveElement.bind("click", function () {
 
-        var userID = '<%= Session["UserID"] %>';
+        var userID = globalUserID;
         var password_input = $("#txbConfirmRemoveElement");
 
         if (userID != null && userID != "" && password_input != null && password_input.val() != "") {
@@ -3884,7 +3884,7 @@ function prepareFileUpload_b(e) {
 //#endregion 
 
 function confirmAddComment() {
-    var userID = '<%= Session["UserID"] %>';
+    var userID = globalUserID;
          
     // Check if folio is selected
     var folioID = 0;
@@ -3937,7 +3937,7 @@ function confirmAddComment() {
                         isPlaying: "false",
                         fileStatus: "OK"
                     };
-                    var username = '<%:Session["UserName"]%>';
+                    var username = globalUserName;
 
                     // Create new row to HTML table
                     var tr = "<tr id='tape_" + object.tapeID + "'>";
@@ -3999,13 +3999,7 @@ function confirmAddComment() {
         });
     }
 }
-/******** Event: Enter Key listener ********/
 
-function enterSearchBox(e) {
-    if (e.keyCode == 13) {
-        __doPostBack('<%=btnSearchCandidate.UniqueID%>', "");
-    }
-}
 
 /******** START: Media Player 2.0: Nuevo Requerimiento: Global Play ********/
 

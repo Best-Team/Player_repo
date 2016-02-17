@@ -33,6 +33,19 @@
     <script src="assets/js/jquery.maskedinput.js"></script>
     <script src="assets/js/jquery.fancybox.js"></script>
     <script src="assets/js/jquery.flex.js"></script>
+
+    <script type="text/javascript">
+        /*** global variables ***/
+        window.globalUserID = '<%= Session["UserID"] %>';
+        window.globalUserName = '<%:Session["UserName"]%>';
+
+        /******** Event: Enter Key listener ********/
+        function enterSearchBox(e) {
+            if (e.keyCode == 13) {
+                __doPostBack('<%=btnSearchCandidate.UniqueID%>', "");
+            }
+        }
+    </script>
     <script src="assets/js/Dashboard.js"></script>
 
     <!-- Styles -->
@@ -52,7 +65,8 @@
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="ContentLoginStatus" runat="server">
     <div class="container-session">
-        <div class="hidden-xs" style="color: #446e9b; margin-left: 15px; margin-right: 20px; cursor: default;"><span class="fa fa-user pull-left" aria-hidden="true"></span>
+        <div class="hidden-xs" style="color: #446e9b; margin-left: 15px; margin-right: 20px; cursor: default;">
+            <span class="fa fa-user pull-left" aria-hidden="true"></span>
             <div class="usernameInfo" style="font: 11px/1.4em FontAwesome, Helvetica, Arial, sans-serif"></div>
         </div>
         <button id="btn_close" class="btn btn-primary btn-xs" style="color: white; background-color: #446e9b; text-transform: none; letter-spacing: inherit;" runat="server" onserverclick="btn_close_ServerClick">

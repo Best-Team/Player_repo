@@ -25,6 +25,10 @@ namespace MediaPlayer
 {
     public partial class Dashboard : System.Web.UI.Page
     {
+
+        private bool _signalSearchFolioElements = false;
+        private string _argSearchFolioElements = null;
+
         #region Properties
 
         private List<Folio> folio_list;
@@ -87,6 +91,14 @@ namespace MediaPlayer
                     returnURL += "&loginToken=" + qs_loginToken;
                 }
                 Response.Redirect(returnURL);
+            }
+        }
+
+        protected void Page_LoadComplete(object sender, EventArgs e)
+        {
+            if (_signalSearchFolioElements)
+            {
+                DoSearchFolioelements(_argSearchFolioElements);
             }
         }
 
@@ -730,6 +742,13 @@ namespace MediaPlayer
         /// </summary>
         /// <param name="qs_folioID"></param>
         private void SearchFolioElements(string qs_folioID = "")
+        {
+            //Prepare to run the search after loading & event handling stage in page lifecycle:
+            _signalSearchFolioElements = true;
+            _argSearchFolioElements = qs_folioID;
+        }
+
+        private void DoSearchFolioelements(string qs_folioID = "")
         {
             int index = 0;
             StringBuilder htmlTable = new StringBuilder();
