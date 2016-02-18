@@ -31,6 +31,8 @@
 	<script src="assets/js/jquery.maskedinput.js"></script>
 	<script src="assets/js/jquery.fancybox.js"></script>
 	<script src="assets/js/timer.jquery.js"></script>
+	<script src="assets/js/bootstrap-confirmation.js"></script>
+
 
 	<!-- Styles -->
 	<link href="assets/css/datetimepicker.css" type="text/css" rel="stylesheet"/>
@@ -244,9 +246,8 @@
 		   /**** Load Globalplay settings ****/
 		   loadGlobalplay_settings();
 
-
 		   // Remove padding, set opening and closing animations, close if clicked and disable overlay
-		   $("#btnForm").fancybox({
+		   $("#btnOpenFancybox").fancybox({
 			   padding: 0,
 			   closeClick: true,
 
@@ -255,7 +256,7 @@
 
 			   closeEffect: 'elastic',
 			   closeSpeed: 150,
-
+			   
 			   helpers: {
 				   overlay: null
 			   }
@@ -274,7 +275,49 @@
 		   var playerBox_h = parseInt(PLAYER_BOX.css("height"), 10);
 		   $("#imgPlayer").css("max-height", playerBox_h);
 
+
+           /*
+		   $('[data-toggle="confirmation"]').confirmation();
+
+$('[data-toggle="confirmation"]').confirmation({
+placement: 'top', // How to position the confirmation - top | bottom | left | right
+trigger: 'click', // How confirmation is triggered - click | hover | focus | manual
+target : '_self', // Default target value if `data-target` attribute isn't present.
+href   : '#', // Default href value if `data-href` attribute isn't present.
+title: 'Are you sure?', // Default title value if `data-title` attribute isn't present
+template: '<div class="popover">' +
+				'<div class="arrow"></div>' +
+				'<h3 class="popover-title"></h3>' +
+				'<div class="popover-content text-center">' +
+				'<div class="btn-group">' +
+				'<a class="btn btn-small" href="" target=""></a>' +
+				'<a class="btn btn-small" data-dismiss="confirmation"></a>' +
+				'</div>' +
+				'</div>' +
+				'</div>',
+btnOkClass:  'btn-primary', // Default btnOkClass value if `data-btnOkClass` attribute isn't present.
+btnCancelClass:  '', // Default btnCancelClass value if `data-btnCancelClass` attribute isn't present.
+btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Yes', // Default btnOkLabel value if `data-btnOkLabel` attribute isn't present.
+btnCancelLabel: '<i class="icon-remove-sign"></i> No', // Default btnCancelLabel value if `data-btnCancelLabel` attribute isn't present.
+singleton: false, // Set true to allow only one confirmation to show at a time.
+popout: false, // Set true to hide the confirmation when user clicks outside of it.
+onConfirm: function(){}, // Set event when click at confirm button
+onCancel: function(){}}) // Set event when click at cancel button
+
+
+
+// Reveals an elements confirmation.
+$('#element').confirmation('show')
+// Hides an elements confirmation.
+$('#element').confirmation('hide')
+// Toggles an elements confirmation.
+$('#element').confirmation('toggle')
+// Hides and destroys an element's confirmation.
+$('#element').confirmation('destroy')
+*/
 	   }); // END On Ready
+
+
 
 
 	   function loadGlobalplay_settings() {
@@ -607,10 +650,10 @@
 			   GLOBALPLAY_seconds_current = Seconds_Between_Dates;
 
 			   // Clear global timer
-			   $('#lblGlobalplay_timer_current').timer('remove');
+			   $('#divGlobalplay_timer').timer('remove');
 
 			   // Set global timer current progress
-			   $('#lblGlobalplay_timer_current').timer({
+			   $('#divGlobalplay_timer').timer({
 				   format: '%H:%M:%S',
 				   seconds: Seconds_Between_Dates
 			   });
@@ -619,7 +662,7 @@
 			   $("#lblGlobalplay_timer_current_longFormat").text(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
 
 			   // Pause global timer 
-			   $('#lblGlobalplay_timer_current').timer('pause');
+			   $('#divGlobalplay_timer').timer('pause');
 
 			   // Set player mask pause
 			   $("#globalplay_play").removeClass("pauseAudio");
@@ -825,32 +868,7 @@
 
 	   function openFullscreen() {
 
-		   if (elementType_active === "A") {
-
-			   /* ------------------  AUDIO CASE ------------------ */
-
-			   /*
-			   var light = $("#light");
-			   var fade = $("#fade");
-			   var divPlayer_VIDEO = $("#divPlayer_VIDEO");
-			   var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
-
-			   if (light != null && light.length && fade != null && fade.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length) {
-
-				   // Move player and banner to modal box
-				   divPlayer_VIDEO.prependTo(light);
-				   divControlsMask_VIDEO.prependTo(light);
-				   
-				   // Styles
-				   divControlsMask_VIDEO.css('height', '71px');
-
-				   // Show effect
-				   // Source: https://jqueryui.com/show/
-				   fade.show();
-				   light.show("blind", 500);
-			   }
-			   */
-		   } else if (elementType_active === "S") {
+		   if (elementType_active === "S") {
 
 			   /* ------------------  SCREEN RECORDING CASE ------------------ */
 			   // http://stackoverflow.com/questions/22248670/html-object-tag-data-attribute-wont-update-with-jquery-change
@@ -1150,21 +1168,20 @@
 							   object_group.id = tapeID;
 							   object_group.role = groupName;
 							   object_group.type = tapeType;
+
 							   /* ************* Hide or show each element in the grid panel ************* */
 							   if (filterType === "role") {
 								   // Roles
-								   if (filterValue === groupName || groupName ===
-									   "") {
+								   if (filterValue === groupName || groupName === "") {
 									   objects_group_role.push(object_group);
 								   }
 								   if (checked) {
-									   if (filterValue === groupName ||
-										   groupName === "") {
-										   $("#tape_" + tapeID).show();
+									   if (filterValue === groupName || groupName === "") {
+									       $("#tblLeftGridElements #tape_" + tapeID).show();
 									   }
 								   } else {
-									   if (filterValue === groupName) {
-										   $("#tape_" + tapeID).hide(); // hide row
+								       if (filterValue === groupName) {
+								           $("#tblLeftGridElements #tape_" + tapeID).hide(); // hide row
 									   }
 								   }
 							   } else if (filterType === "type") {
@@ -1174,11 +1191,11 @@
 								   }
 								   if (checked) {
 									   if (filterValue === tapeType) {
-										   $("#tape_" + tapeID).show();
+									       $("#tblLeftGridElements #tape_" + tapeID).show();
 									   }
 								   } else {
 									   if (filterValue === tapeType) {
-										   $("#tape_" + tapeID).hide(); // hide row
+									       $("#tblLeftGridElements #tape_" + tapeID).hide(); // hide row
 									   }
 								   }
 							   }
@@ -1498,217 +1515,217 @@
 
 			   if (elementsInMemory.length > 0) {
 
-				   // Loop into elements in memory
-				   for (var i = 0; i < elementsInMemory.length; i++) {
-					   var element = elementsInMemory[i];
-					   if (element != null) {
-						   var tapeID = element.tapeID;
-						   var groupName = element.groupName;
-						   var tapeType = element.tapeType;
-						   var duration = element.duration;
-						   var timestamp = element.timestamp;
-						   var segmentID = element.segmentID;
-						   var count = element.count;
-						   var fileName = element.fileName;
-						   var endDate = element.endDate;
-						   var filePath = element.filePath;
-						   var fileStatus = element.fileStatus;
-						   var duration_formatStr = element.duration_formatStr;
+			       // Loop into elements in memory
+			       for (var i = 0; i < elementsInMemory.length; i++) {
+			           var element = elementsInMemory[i];
+			           if (element != null) {
+			               var tapeID = element.tapeID;
+			               var groupName = element.groupName;
+			               var tapeType = element.tapeType;
+			               var duration = element.duration;
+			               var timestamp = element.timestamp;
+			               var segmentID = element.segmentID;
+			               var count = element.count;
+			               var fileName = element.fileName;
+			               var endDate = element.endDate;
+			               var filePath = element.filePath;
+			               var fileStatus = element.fileStatus;
+			               var duration_formatStr = element.duration_formatStr;
 
-						   /* ************* Objects: timeline features and styles by element types ************* */
+			               /* ************* Objects: timeline features and styles by element types ************* */
 
-						   // IsExtra = If filePath is NOT empty, then is extra from incextras table
-						   var isExtra = filePath.length == 0 ? false : true;
-						   var color_str = rectColor_values.grabacion;
-						   var tapeType_longStr = rectTitle_values.grabacion;
-						   var line_opacity = 0.7;
-						   var x_extra = 5;
-						   var ELEMENT = $("#timeframe #tlTape_" + tapeID);
-						   var ELEMENT_rect = $("#timeframe #tlTape_" + tapeID + " > rect");
-						   var ELEMENT_text = $("#timeframe #tlTape_" + tapeID + " > text");
+			               // IsExtra = If filePath is NOT empty, then is extra from incextras table
+			               var isExtra = filePath.length == 0 ? false : true;
+			               var color_str = rectColor_values.grabacion;
+			               var tapeType_longStr = rectTitle_values.grabacion;
+			               var line_opacity = 0.7;
+			               var x_extra = 5;
+			               var ELEMENT = $("#timeframe #tlTape_" + tapeID);
+			               var ELEMENT_rect = $("#timeframe #tlTape_" + tapeID + " > rect");
+			               var ELEMENT_text = $("#timeframe #tlTape_" + tapeID + " > text");
 
-						   // Border not rounded
-						   if (ELEMENT_rect != null && ELEMENT_rect.length) {
-							   ELEMENT_rect.attr("rx", 0);
-							   ELEMENT_rect.attr("ry", 0);
-						   }
-						   var toolTip_title = "";
-						   switch (tapeType) {
-							   case "S": // P
-								   {
-									   tapeType_longStr = rectTitle_values.grabacion;
-									   color_str = rectColor_values.grabacion;
-									   toolTip_title = "Elemento #" + count + " (Grabación de pantalla)";
+			               // Border not rounded
+			               if (ELEMENT_rect != null && ELEMENT_rect.length) {
+			                   ELEMENT_rect.attr("rx", 0);
+			                   ELEMENT_rect.attr("ry", 0);
+			               }
+			               var toolTip_title = "";
+			               switch (tapeType) {
+			                   case "S": 
+			                       {
+			                           tapeType_longStr = rectTitle_values.grabacion;
+			                           color_str = rectColor_values.grabacion;
+			                           toolTip_title = "Elemento #" + count + " (Grabación de pantalla)";
 
-									   // Border rounded
-									   if (ELEMENT_rect != null && ELEMENT_rect.length) {
-										   ELEMENT_rect.attr("rx", 4);
-										   ELEMENT_rect.attr("ry", 4);
-									   }
-									   break;
-								   }
-							   case "V":
-								   {
-									   tapeType_longStr = rectTitle_values.video;
-									   toolTip_title = "Elemento #" + count + " (" + tapeType_longStr + ")";
-									   color_str = rectColor_values.video;
+			                           // Border rounded
+			                           if (ELEMENT_rect != null && ELEMENT_rect.length) {
+			                               ELEMENT_rect.attr("rx", 4);
+			                               ELEMENT_rect.attr("ry", 4);
+			                           }
+			                           break;
+			                       }
+			                   case "V":
+			                       {
+			                           tapeType_longStr = rectTitle_values.video;
+			                           toolTip_title = "Elemento #" + count + " (" + tapeType_longStr + ")";
+			                           color_str = rectColor_values.video;
 
-									   // Border rounded
-									   if (ELEMENT_rect != null && ELEMENT_rect
+			                           // Border rounded
+			                           if (ELEMENT_rect != null && ELEMENT_rect
 										   .length) {
-										   ELEMENT_rect.attr("rx", 4);
-										   ELEMENT_rect.attr("ry", 4);
-									   }
-									   break;
-								   }
-							   case "A":
-								   {
-									   tapeType_longStr = rectTitle_values.audio;
-									   toolTip_title = "Elemento #" + count + " (" + tapeType_longStr + ")";
-									   color_str = rectColor_values.audio;
+			                               ELEMENT_rect.attr("rx", 4);
+			                               ELEMENT_rect.attr("ry", 4);
+			                           }
+			                           break;
+			                       }
+			                   case "A":
+			                       {
+			                           tapeType_longStr = rectTitle_values.audio;
+			                           toolTip_title = "Elemento #" + count + " (" + tapeType_longStr + ")";
+			                           color_str = rectColor_values.audio;
 
-									   // Border rounded
-									   if (ELEMENT_rect != null && ELEMENT_rect
+			                           // Border rounded
+			                           if (ELEMENT_rect != null && ELEMENT_rect
 										   .length) {
-										   ELEMENT_rect.attr("rx", 4);
-										   ELEMENT_rect.attr("ry", 4);
-									   }
-									   break;
-								   }
-							   case "D":
-								   {
-									   tapeType_longStr = rectTitle_values.documento;
-									   toolTip_title = "Elemento #" + count + " (" + tapeType_longStr + ")";
-									   color_str = rectColor_values.documento;
-									   line_opacity = 1;
-									   break;
-								   }
-							   case "C":
-								   {
-									   tapeType_longStr = rectTitle_values.comentario;
-									   color_str = rectColor_values.comentario;
+			                               ELEMENT_rect.attr("rx", 4);
+			                               ELEMENT_rect.attr("ry", 4);
+			                           }
+			                           break;
+			                       }
+			                   case "D":
+			                       {
+			                           tapeType_longStr = rectTitle_values.documento;
+			                           toolTip_title = "Elemento #" + count + " (" + tapeType_longStr + ")";
+			                           color_str = rectColor_values.documento;
+			                           line_opacity = 1;
+			                           break;
+			                       }
+			                   case "C":
+			                       {
+			                           tapeType_longStr = rectTitle_values.comentario;
+			                           color_str = rectColor_values.comentario;
 
-									   // Special styles
-									   ELEMENT_rect.attr("y", Math.floor(ELEMENT_rect.attr("y")) + MAIN_LINE_top - 85);
-									   ELEMENT_rect.attr("height", MAIN_LINE_height - 5);
-									   var new_y = parseInt(ELEMENT_rect.attr("y"), 10) + parseInt(ELEMENT_rect.attr("height"), 10) + 17;
-									   ELEMENT_text.attr("y", new_y);
-									   toolTip_title = "Elemento #" + count + ": " + fileName + " (Comentario)";
-									   break;
-								   }
-							   case "I":
-								   {
-									   tapeType_longStr = rectTitle_values.imagen;
-									   toolTip_title = "Elemento #" + count + " (" + tapeType_longStr + ")";
-									   color_str = rectColor_values.imagen;
-									   line_opacity = 1;
-									   break;
-								   }
-						   }
-						   if (ELEMENT != null && ELEMENT.length) {
+			                           // Special styles
+			                           ELEMENT_rect.attr("y", Math.floor(ELEMENT_rect.attr("y")) + MAIN_LINE_top - 85);
+			                           ELEMENT_rect.attr("height", MAIN_LINE_height - 5);
+			                           var new_y = parseInt(ELEMENT_rect.attr("y"), 10) + parseInt(ELEMENT_rect.attr("height"), 10) + 17;
+			                           ELEMENT_text.attr("y", new_y);
+			                           toolTip_title = "Elemento #" + count + ": " + fileName + " (Comentario)";
+			                           break;
+			                       }
+			                   case "I":
+			                       {
+			                           tapeType_longStr = rectTitle_values.imagen;
+			                           toolTip_title = "Elemento #" + count + " (" + tapeType_longStr + ")";
+			                           color_str = rectColor_values.imagen;
+			                           line_opacity = 1;
+			                           break;
+			                       }
+			               }
+			               if (ELEMENT != null && ELEMENT.length) {
 
-							   // Set special tooltip
-							   ELEMENT.qtip({
-								   position: {
-									   corner: {
-										   target: 'topRight',
-										   tooltip: 'bottomLeft'
-									   }
-								   },
-								   style: {
-									   name: 'cream',
-									   padding: '7px 13px',
-									   width: {
-										   max: 210,
-										   min: 0
-									   },
-									   tip: true
-								   }
-							   });
-							   if (fileName.length > 0) {
-								   ELEMENT.attr("title", toolTip_title);
-							   }
-						   }
-						   if (ELEMENT != null && ELEMENT.length && ELEMENT_rect != null && ELEMENT_rect.length) {
+			                   // Set special tooltip
+			                   ELEMENT.qtip({
+			                       position: {
+			                           corner: {
+			                               target: 'topRight',
+			                               tooltip: 'bottomLeft'
+			                           }
+			                       },
+			                       style: {
+			                           name: 'cream',
+			                           padding: '7px 13px',
+			                           width: {
+			                               max: 210,
+			                               min: 0
+			                           },
+			                           tip: true
+			                       }
+			                   });
+			                   if (fileName.length > 0) {
+			                       ELEMENT.attr("title", toolTip_title);
+			                   }
+			               }
+			               if (ELEMENT != null && ELEMENT.length && ELEMENT_rect != null && ELEMENT_rect.length) {
 
-							   // Set element type to element
-							   ELEMENT.attr("type_name", tapeType);
+			                   // Set element type to element
+			                   ELEMENT.attr("type_name", tapeType);
 
-							   // Set default cursor
-							   ELEMENT.css('cursor', 'default');
+			                   // Set default cursor
+			                   ELEMENT.css('cursor', 'default');
 
-							   // Hide Element letters
-							   ELEMENT_text.css('display', 'none');
+			                   // Hide Element letters
+			                   ELEMENT_text.css('display', 'none');
 
-							   // Elements no comments - comment exception
-							   if (tapeType != "C") {
+			                   // Elements no comments - comment exception
+			                   if (tapeType != "C") {
 
-								   // Set cursor
-								   ELEMENT_rect.css('cursor', 'pointer');
-								   ELEMENT_rect.css('z-index', 10);                                   
+			                       // Set cursor
+			                       ELEMENT_rect.css('cursor', 'pointer');
+			                       ELEMENT_rect.css('z-index', 10);
 
-								   ELEMENT.css('z-index', 10);
+			                       ELEMENT.css('z-index', 10);
 
-								   // Element click bottom
-								   // Carga los parámetros con el valor actual de sus parámetros para que se envíen dinámicamente con el evento click
-								   ELEMENT_rect.on("click", {
-									   _tapeID: tapeID,
-									   _count: count,
-									   _duration: duration,
-									   _timestamp: timestamp,
-									   _tapeType_longStr: tapeType_longStr,
-									   _segmentID: segmentID,
-									   _isExtra: isExtra.toString().toLowerCase(),
-									   _fileName: fileName,
-									   _filePath: filePath,
-									   _duration_formatStr: duration_formatStr,
-									   _tapeType: tapeType,
-									   _fileStatus: fileStatus
-								   }, fire_event);
+			                       // Element click bottom
+			                       // Carga los parámetros con el valor actual de sus parámetros para que se envíen dinámicamente con el evento click
+			                       ELEMENT_rect.on("click", {
+			                           _tapeID: tapeID,
+			                           _count: count,
+			                           _duration: duration,
+			                           _timestamp: timestamp,
+			                           _tapeType_longStr: tapeType_longStr,
+			                           _segmentID: segmentID,
+			                           _isExtra: isExtra.toString().toLowerCase(),
+			                           _fileName: fileName,
+			                           _filePath: filePath,
+			                           _duration_formatStr: duration_formatStr,
+			                           _tapeType: tapeType,
+			                           _fileStatus: fileStatus
+			                       }, fire_event);
 
-							   } else {
+			                   } else {
 
-								   // Is Comment type Element
-								   ELEMENT.css('z-index', -10); //50
-								   ELEMENT_rect.css('z-index', -10); //50
+			                       // Is Comment type Element
+			                       ELEMENT.css('z-index', -10); //50
+			                       ELEMENT_rect.css('z-index', -10); //50
 
-								   // new
-								   line_opacity = 0.6;
-							   }
-							   // Get Tape text, set bold
-							   if (ELEMENT_text != null && ELEMENT_text.length) {
-								   var x = Math.floor(ELEMENT_text.attr("x")) + x_extra;
-								   ELEMENT_text.attr("x", x);
-								   ELEMENT_text.css('z-index', 99);
-								   ELEMENT_text.attr("font-weight", "Bold");
-							   }
-						   }
+			                       // new
+			                       line_opacity = 0.6;
+			                   }
+			                   // Get Tape text, set bold
+			                   if (ELEMENT_text != null && ELEMENT_text.length) {
+			                       var x = Math.floor(ELEMENT_text.attr("x")) + x_extra;
+			                       ELEMENT_text.attr("x", x);
+			                       ELEMENT_text.css('z-index', 99);
+			                       ELEMENT_text.attr("font-weight", "Bold");
+			                   }
+			               }
 
-						   /* **** ELEMENTS Styles **** */
+			               /* **** ELEMENTS Styles **** */
 
-						   if (ELEMENT_rect != null && ELEMENT_rect.length) {
-							   ELEMENT_rect.attr("fill", color_str);
-								ELEMENT_rect.attr("fill-opacity", line_opacity);
+			               if (ELEMENT_rect != null && ELEMENT_rect.length) {
+			                   ELEMENT_rect.attr("fill", color_str);
+			                   ELEMENT_rect.attr("fill-opacity", line_opacity);
 
-							   // Sacar?
-							   // Si el elemento es demasiado corto (pintado), fija un largo mínimo en px
-							   // Si hay un sólo elemento, deja que se pinte todo el timeline con el, aunque no tenga duración
-							   var elements_selected_count = $('tr:visible td input:checked').length;
-							   if (elements_selected_count != 1) {
-								   var w1 = ELEMENT_rect.attr("width");
-								   if (parseInt(w1, 10) <= 1) {
-									   ELEMENT_rect.attr("width", "6");
-								   }
-							   } else {
-								   if (duration == 0) {
-									   var x1 = parseInt(MAIN_LINE.attr("x1"), 10);
-									   var x2 = parseInt(MAIN_LINE.attr("x2"), 10);
-									   ELEMENT_rect.attr("width", x2 - x1);
-								   }
-							   }
-						   }
-					   }
-				   } // for
+			                   // Sacar?
+			                   // Si el elemento es demasiado corto (pintado), fija un largo mínimo en px
+			                   // Si hay un sólo elemento, deja que se pinte todo el timeline con el, aunque no tenga duración
+			                   var elements_selected_count = $('tr:visible td input:checked').length;
+			                   if (elements_selected_count != 1) {
+			                       var w1 = ELEMENT_rect.attr("width");
+			                       if (parseInt(w1, 10) <= 1) {
+			                           ELEMENT_rect.attr("width", "6");
+			                       }
+			                   } else {
+			                       if (duration == 0) {
+			                           var x1 = parseInt(MAIN_LINE.attr("x1"), 10);
+			                           var x2 = parseInt(MAIN_LINE.attr("x2"), 10);
+			                           ELEMENT_rect.attr("width", x2 - x1);
+			                       }
+			                   }
+			               }
+			           }
+			       } // for
 			   }
 
 			   // Visual effect
@@ -1867,8 +1884,7 @@
 				   }
 		   }
 		   /******** Paint timeline elements ********/
-		   $("button[name='btnTimelineElement']").css("background-color",
-			   color_str);
+		   $("button[name='btnTimelineElement']").css("background-color", color_str);
 		   $("g[id^='tlTape_']").attr("fill", color_str);
 	   }
 
@@ -1894,9 +1910,8 @@
 		   /******** Set new styles ********/
 
 		   // Left panel
-		   $("#tape_" + tapeID + " > td > h5").attr("style",
-			   "color:DodgerBlue ;");
-		   $("#tape_" + tapeID).css("background-color", "lightgray");
+		   $("#tblLeftGridElements #tape_" + tapeID + " > td > h5").attr("style", "color:DodgerBlue");
+		   $("#tblLeftGridElements #tape_" + tapeID).css("background-color", "lightgray");
 
 		   // Bottom
 		   var vBottom_text = $("#timeframe #tlTape_" + tapeID + " > text");
@@ -1965,7 +1980,8 @@
 		   var sm2_inline_element = $("#sm2-inline-element");
 		   var sm2_progress_bd = $("#sm2-progress-bd");
 		   var sm2_progress = $("#sm2-progress");
-		   var sm2_progress_track = $("#sm2-progress-track");
+		   var sm2_progress_track = $("#sm2-progress-track");		   
+
 		   if (TIMELINE_POINTER != null && sm2_inline_element != null && sm2_inline_element.length &&
 			   sm2_progress_bd != null && sm2_progress_bd.length && sm2_progress != null && sm2_progress.length &&
 			   sm2_progress_track != null && sm2_progress_track.length && timeline != null) {
@@ -1988,9 +2004,16 @@
 					   sm2_progress_bd.css("padding", "0px");
 
 					   sm2_progress.css('height', 15);
+
 					   sm2_inline_element.css('width', _width);
-					   //sm2_inline_element.css('left', vElementRect.offset().left); // + 3
-					   sm2_inline_element.offset({ left: vElementRect.offset().left });
+
+					   var MAIN_LINE = $("#timeframe > svg > g:first > line:first");
+					   if (MAIN_LINE != null && MAIN_LINE.length) {
+					       sm2_inline_element.offset({ left: MAIN_LINE.offset().left });
+					   }
+
+					   //sm2_inline_element.offset({ left: vElementRect.offset().left });
+
 					   sm2_progress_bd.css('width', _width);
 
 					   sm2_progress_bd.css('left', _width);
@@ -2749,7 +2772,6 @@
 				   divControlsMask_AUDIO.addClass("disabled");
 			   }
 
-
 		   }
 
 		   // Enable/Disable functions
@@ -2764,7 +2786,6 @@
 		   }
 
 		   //#endregion
-
 	   }
 
 	   // Event: While Playing of HTML5 Video tag (webm, mp4, ogg)
@@ -2836,9 +2857,11 @@
 					   contentType: "application/json; charset=utf-8",
 					   dataType: "json",
 					   success: function (response) {
-						   if (response.d == 1) {
+					       if (response.d == 1) {
+
 							   // Hide element from search panel
-							   $("#tape_" + tapeID).hide();
+						       $("#tblLeftGridElements #tape_" + tapeID).hide();
+
 
 							   // Disable element in memory elements 
 							   var _hdnIsUpdateNeeded = $("input[id*='_hdnIsUpdateNeeded']");
@@ -3495,7 +3518,6 @@
 				 var arrow_w = parseInt($(".box2.popbox2 .arrow").css("width"), 10);
 				 var btn_w = parseInt($("#btnAddComment").css("width"), 10);
 
-				 //$(".box2.popbox2").offset({ left: posXoff });
 				 $(".box2.popbox2").offset({ left: posXoff - pop_w + (btn_w / 2) + (arrow_w / 2) });
 				 $(".box2.popbox2 .arrow").css("left", (pop_w - arrow_w - 3) + "px");
 				 $(".box2.popbox2 .arrow-border").css("left", (pop_w - arrow_w - 3) + "px");
@@ -4072,8 +4094,10 @@
 
 	       if ($("#globalplay_play").hasClass("play")) {
 
+               // Queue of current elements playing
 	           queue_elements = [[], [], []];
 
+               // ID dynamic
 	           dynamic_number = 0;
 
 	           // DO PLAY
@@ -4082,7 +4106,7 @@
 
 	           // Start timer
 	           if (GLOBALPLAY_seconds_current == 0) {
-	               $('#lblGlobalplay_timer_current').timer({
+	               $('#divGlobalplay_timer').timer({
 	                   format: '%H:%M:%S',
 	                   seconds: 0
 	               });
@@ -4090,7 +4114,7 @@
 	           }
 	           else {
 	               // Resume timer
-	               $('#lblGlobalplay_timer_current').timer('resume');
+	               $('#divGlobalplay_timer').timer('resume');
 	           }
 
 	           globalplay_start();
@@ -4099,8 +4123,14 @@
 	           var fancybox = $(".fancybox-wrap")[0];
 	           if (fancybox == null) {
 
-	               // DO CLICK
-	               $("#btnForm").click();
+	               // Open fancybox - DO CLICK
+	               $("#btnOpenFancybox").click();
+
+                   // Show overlay
+	               $("#fade").show();
+
+                   // Load info labels
+	               loadGlobalplay_settings();
 	           }
 
 	       } else {
@@ -4110,7 +4140,7 @@
 	           $("#globalplay_play").addClass("play");
 
 	           // Stop timer
-	           $('#lblGlobalplay_timer_current').timer('pause');
+	           $('#divGlobalplay_timer').timer('pause');
 
 	           // Stop timer 
 	           globalplay_abort();
@@ -4169,31 +4199,36 @@
 	       } //for
 	   }
 
+       // Stopeable timer
 	   var timer_globalplay; 
-	  
-
 	   function globalplay_start() {
 
 	       var w = $("#divTimelineProgress").css("width");
 	       $("#sm2-progress-track").css("width", w);
 
-	       // Timer Source: http://jquerytimer.com/
-
 	       // Init event while playing if GLOBALPLAY_seconds_total is already loaded
 	       if (GLOBALPLAY_seconds_total > 0) {
 
-	           timer_globalplay = setInterval(globalplay_whilePlaying, 1000);
+               // Little delay to begin
+	           setTimeout(function () { timer_globalplay = setInterval(globalplay_whilePlaying, 1000); }, 800);
 	       }
 
 	       // Enable right side Player box
 	       $("#divPanel_PlayerControl").removeClass("disabled");
 	   }
 
-	   var timer = 0;
 	   function globalplay_whilePlaying() {
 
+	       // Load elements in this pointer position
+	       globalplay_loadElements();
+
+	       // Timer Source: http://jquerytimer.com/
+
 		   // Update global variable: current timer
-		   GLOBALPLAY_seconds_current = $("#lblGlobalplay_timer_current").data('seconds');
+	       GLOBALPLAY_seconds_current = $("#divGlobalplay_timer").data('seconds');
+
+	       // Update current timer label
+	       $("#lblGlobalplay_timer_current").text($("#divGlobalplay_timer").text());
 
 		   var progress_percentage = GLOBALPLAY_seconds_current * 100 / GLOBALPLAY_seconds_total;
 		   var left_final_percentage = progress_percentage + '%';
@@ -4217,8 +4252,7 @@
 				   $("#lblGlobalplay_timer_current_longFormat").text(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
 			   }
 
-		       // Load elements 
-			   globalplay_loadElements();
+		       
 
 		   } else {
 			   // Pointer arrived to the end
@@ -4228,178 +4262,184 @@
 		   }
 	   }
 
+	   // Load elements in this pointer position
 	   function globalplay_loadElements() {
 
-		   // Search elements in current playtime
-		   var elementsCandidate = getElementInMemoryByCurrentPlayingTime();
-		   if (elementsCandidate != null && elementsCandidate.length > 0) {
+	       // Search elements in current playtime
+	       var elementsCandidate = getElementInMemoryByCurrentPlayingTime();
+	       if (elementsCandidate != null && elementsCandidate.length > 0) {
 
-			   // visual_queue: video, screen_recording and images
-			   var visual_queue = $.grep(elementsCandidate, function (el, i) {
-				   return el[0].tapeType == "V" || el[0].tapeType == "S" || el[0].tapeType == "I";
-			   });
+	           // visual_queue: video, screen_recording and images
+	           var visual_queue = $.grep(elementsCandidate, function (el, i) {
+	               return el[0].tapeType == "V" || el[0].tapeType == "S" || el[0].tapeType == "I";
+	           });
 
-			   var flex_width_int = parseInt($(".flex").css("width"), 10);
-			   var flex_height_int = parseInt($(".flex").css("height"), 10);
+	           var flex_width_int = parseInt($(".flex").css("width"), 10);
+	           var flex_height_int = parseInt($(".flex").css("height"), 10);
 
-			   var visual_size_w = 300;
-			   var visual_size_h = 300;
+	           var visual_size_w = 300;
+	           var visual_size_h = 300;
 
-			   // Get visual elements already added in globalplay player
-			   var visual_alreadyAdded = $(".flex").find('*').not('.info-label, .info-label *').length;
-			    var visual_count = visual_queue.length + visual_alreadyAdded;
+	           // Get visual elements already added in globalplay player
+	           var visual_alreadyAdded = $(".flex").find('*').not('.info-label, .info-label *').length;
+	           var visual_count = visual_queue.length + visual_alreadyAdded;
 
-			   // Element distinct types 
-			   switch (visual_count) {
-				   case 1:
-					   {
-						   visual_size_w = flex_width_int - 80;
-						   visual_size_h = flex_height_int - 80;
-						   break;
-					   }
-				   case 2:
-					   {
-						   visual_size_w = flex_width_int / 2 - 80;
-						   visual_size_h = flex_width_int / 2 - 80;
-						   break;
-					   }
-			   }
+	           // Element distinct types 
+	           switch (visual_count) {
+	               case 1:
+	                   {
+	                       visual_size_w = flex_width_int - 80;
+	                       visual_size_h = flex_height_int - 80;
+	                       break;
+	                   }
+	               case 2:
+	                   {
+	                       visual_size_w = flex_width_int / 2 - 80;
+	                       visual_size_h = flex_width_int / 2 - 80;
+	                       break;
+	                   }
+	           }
 
-			   // Resize elements already added 
-			   if (visual_alreadyAdded > 0) {
+	           // Resize elements already added 
+	           if (visual_alreadyAdded > 0) {
 
-			       //$(".flex a[name='visual_element']").each(function (index, el) {
-			       $(".flex").find('*').not('.info-label, .info-label *').each(function (index, el) {
-					   $(this).css("width", visual_size_w);
-					   $(this).css("height", visual_size_h);
-				   });
-			   }
+	               //$(".flex a[name='visual_element']").each(function (index, el) {
+	               $(".flex").find('*').not('.info-label, .info-label *').each(function (index, el) {
+	                   $(this).css("width", visual_size_w);
+	                   $(this).css("height", visual_size_h);
+	               });
+	           }
 
-			   // Set label elements on play
-			   $("#lblGlobalplay_element_count").text(elementsCandidate.length);
+	           // Set label elements on play
+	           $("#lblGlobalplay_element_count").text(elementsCandidate.length);
 
-			   // Prepare URL elements to reproduce
-			   var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download;
-			   var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
+	           // Prepare URL elements to reproduce
+	           var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download;
+	           var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
 
-			   // globalplay box container
-			   var flex_div = $("#divForm .flex");
+	           // globalplay box container
+	           var flex_div = $("#divGlobalplay_screen .flex");
 
-			   // Location variables
-			   var visual_count = visual_alreadyAdded; // = 0
-			   var visual_new = 0;
+	           // Location variables
+	           var visual_count = visual_alreadyAdded; // = 0
+	           var visual_new = 0;
 
 
-			   var id_list = "";
-			   for (var i = 0; i < elementsCandidate.length; i++) {
-				   var element = elementsCandidate[i];
-				   if (element != null) {
+	           var id_list = "";
+	           for (var i = 0; i < elementsCandidate.length; i++) {
+	               var element = elementsCandidate[i];
+	               if (element != null) {
 
-				       dynamic_number++;
+	                   dynamic_number++;
 
-				       // Set id_list label
-				       id_list = id_list + element[0].tapeID + "(" + element[0].tapeType + "), ";
-				       $("#lblGlobalplay_element_ids").text(id_list);
+	                   // Set id_list label
+	                   id_list = id_list + element[0].tapeID + "(" + element[0].tapeType + "), ";
+	                   $("#lblGlobalplay_element_ids").text(id_list);
 
-					   var current_duration = GLOBALPLAY_seconds_current;
-					   var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
-					   timeCurrent.add(current_duration, "seconds");
+	                   var current_duration = GLOBALPLAY_seconds_current;
+	                   var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
+	                   timeCurrent.add(current_duration, "seconds");
 
-					   var element_end = moment(element[0].timestamp, "DD-MM-YYYY HH:mm:ss");
-					   element_end.add(element[0].duration, "seconds");
+	                   var element_end = moment(element[0].timestamp, "DD-MM-YYYY HH:mm:ss");
+	                   element_end.add(element[0].duration, "seconds");
 
-					   // Si el elemento no fue procesado, hacerlo
-					   if (element[1] == false) {
-						   element[1] = true;
+	                   // Si el elemento no fue procesado, hacerlo
+	                   if (element[1] == false) {
+	                       element[1] = true;
 
-						   var tapeType = element[0].tapeType;
-						   var isVisual = (tapeType == "V" || tapeType == "S" || tapeType == "I") ? true : false;
-						   /*
+	                       var tapeType = element[0].tapeType;
+	                       var isVisual = (tapeType == "V" || tapeType == "S" || tapeType == "I") ? true : false;
+	                       /*
 						   A: Audio
 						   V: Video
 						   S: Screen recording
 						   I: Image
 						   D: Document
 						   C: Comment
-						   */ 
+						   */
 
-						   // IsExtra = If filePath is NOT empty, then is extra from incextras table
-						   var isExtra = element[0].filePath.length == 0 ? false : true;
+	                       // IsExtra = If filePath is NOT empty, then is extra from incextras table
+	                       var isExtra = element[0].filePath.length == 0 ? false : true;
 
-						   // Prepare URL elements
-						   var path_extra = filePath_EXTRA + "?id=" + element[0].segmentID + "&isExtra=1";
-						   var path_oreka = filePath_OREKA + "?segid=" + element[0].segmentID;
+	                       // Prepare URL elements
+	                       var path_extra = filePath_EXTRA + "?id=" + element[0].segmentID + "&isExtra=1";
+	                       var path_oreka = filePath_OREKA + "?segid=" + element[0].segmentID;
 
-						   // SET Element file path
-						   var file_url = isExtra ? path_extra : path_oreka;
+	                       // SET Element file path
+	                       var file_url = isExtra ? path_extra : path_oreka;
 
-						   var dynamic_id = "";
-						   var audio_object = null;
+	                       var dynamic_id = "";
+	                       var audio_object = null;
 
-						   switch (tapeType) {
-							   case "A": {
-							       audio_object = globalplay_audio(file_url, element, dynamic_number);
-								   break;
-							   }
+	                       switch (tapeType) {
+	                           case "A": {
+	                               audio_object = globalplay_audio(file_url, element, dynamic_number);
+	                               break;
+	                           }
 
-							   case "V": {
-							       dynamic_id = globalplay_video(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
-								   break;
-							   }
+	                           case "V": {
+	                               dynamic_id = globalplay_video(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
+	                               break;
+	                           }
 
-							   case "S": {
-							       dynamic_id = globalplay_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
-								   break;
-							   }
+	                           case "S": {
+	                               dynamic_id = globalplay_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
+	                               break;
+	                           }
 
-							   case "I": {
-							       dynamic_id = globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
-								   break;
-							   }
+	                           case "I": {
+	                               dynamic_id = globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
+	                               break;
+	                           }
 
-							   case "D": {
-							       dynamic_id = globalplay_document(file_url, element, dynamic_number);
-								   break;
-							   }
+	                           case "D": {
+	                               dynamic_id = globalplay_document(file_url, element, dynamic_number);
+	                               break;
+	                           }
 
-							   case "C": {
-							       dynamic_id = globalplay_comment(element, dynamic_number);
-								   break;
-							   }
-						   }
+	                           case "C": {
+	                               dynamic_id = globalplay_comment(element, dynamic_number);
+	                               break;
+	                           }
+	                       }
 
-						   var dynamic_object = null;
-						   if (audio_object != null) {
-						       dynamic_id = audio_object[0];
-						       dynamic_object = audio_object[1];
-						   }
+	                       var dynamic_object = null;
+	                       if (audio_object != null) {
+	                           dynamic_id = audio_object[0];
+	                           dynamic_object = audio_object[1];
+	                       }
 
-						   // element[0] = Element
-						   // element[1] = Dynamic ID
-						   // element[2] = Dynamic Object
-						   if (dynamic_id != "") {
-							   var array = new Array();
-							   array[0] = element[0];
-							   array[1] = dynamic_id;
-							   array[2] = dynamic_object;
-							   queue_elements.push(array);
-						   }
+	                       // element[0] = Element
+	                       // element[1] = Dynamic ID
+	                       // element[2] = Dynamic Object
+	                       if (dynamic_id != "") {
+	                           var array = new Array();
+	                           array[0] = element[0];
+	                           array[1] = dynamic_id;
+	                           array[2] = dynamic_object;
+	                           queue_elements.push(array);
+	                       }
 
-					   } // else: elemento ya procesado
+	                   } // else: elemento ya procesado
 
-				   }
-			   } // for
+	               }
+	           } // for
 
-		   }
+	       }
 	   }
 
 	   /********* Individual elements section *********/
 
 	   function globalplay_audio(file_url, element, dynamic_number) {
 	       var global_elementID = "audio_" + dynamic_number;
-		   var duration = element[0].duration;
-		   var duration_timeout = getDurationInMS(duration);
+	       var fileName = element[0].fileName;
+	       var tapeID = element[0].tapeID;
+	       var duration = element[0].duration;
+	       var duration_timeout = getDurationInMS(duration);// * 1.3;
 		  
+		   var label = $(".flex #globalplay_divAudioName h2");
+		   label.text(fileName);
+
 		   var audio = new Audio(file_url);
 		   audio.play();
 
@@ -4407,7 +4447,16 @@
 		   object[0] = global_elementID;
 		   object[1] = audio;
 
-		   setTimeout(function () { globalplay_removeElement(global_elementID, element) }, duration_timeout);
+	       // Mute Source: http://www.jqueryscript.net/other/Clean-jQuery-Confirmation-Dialog-Plugin-with-Bootstrap-Popovers-Bootstrap-Confirmation.html
+
+	       // TODO: Mute function: Add on over event
+		   var audio_timeline = $("#timeframe #tlTape_" + tapeID + " > rect");
+		   // audio_timeline
+
+
+
+		   setTimeout(function () { globalplay_removeElement(global_elementID, element); globalplay_clearLabel(label); }, duration_timeout);
+
 		   return object;
 	   }
 
@@ -4579,7 +4628,7 @@
 	   // Stop timer 
 	   function globalplay_abort() {
 		   clearInterval(timer_globalplay);
-		   $('#lblGlobalplay_timer_current').timer('pause');
+		   $('#divGlobalplay_timer').timer('pause');
 	   }
 
 	   function globalplay_stop() {
@@ -4588,8 +4637,8 @@
 		   $("#globalplay_play").removeClass("pauseAudio");
 		   $("#globalplay_play").addClass("play");
 
-		   // Close Fancybox - DO CLICK
-		   $(".fancybox-close").click();
+		   // Close Fancybox 
+		   $.fancybox.close();
 
 		   TIMELINE_POINTER.css("left", "0%");
 
@@ -4609,7 +4658,7 @@
 		   GLOBALPLAY_seconds_current = 0;
 
 		   // Clear global timer
-		   $('#lblGlobalplay_timer_current').timer('remove');
+		   $('#divGlobalplay_timer').timer('remove');
 	   }
 
 	   // Clean info labels
@@ -4642,8 +4691,6 @@
 		   queue_elements = $.grep(queue_elements, function (el, i) {
 			   return el[1] != global_elementID;
 		   });
-
-
 
 	   }
 
@@ -4698,6 +4745,23 @@
 
    <style>
 
+       .divTimeline {
+           height: 100%;
+           left: 0;
+           border-radius: 13px;
+           width: 101%;
+           margin-left: -13px;
+           z-index: 1002;
+       }
+
+       .timeframe {
+           width: 94%;
+           margin: auto;
+           background: transparent;
+           background-color: inherit !important;
+           padding-left: 0;
+       }
+
 /* ---------------------------------- */
 
 .black_overlay {
@@ -4709,8 +4773,8 @@
 	height: 100%;
 	background-color: #000;
 	z-index: 1001;
-	-moz-opacity: .8;
-	opacity: .8;
+	-moz-opacity: 0.7;
+	opacity: 0.5;
 	filter: alpha(opacity=80);
 }
 
@@ -5156,7 +5220,7 @@ div.disabled,button.disabled,a.disabled {
 						<div id="playerBox" class="img-rounded playerBox" runat="server">
 
 						<!-- GLOBALPLAY SCREEN -->
-						<div id="divForm" class="globalplayBox img-rounded" style="display:none;"> <!-- min-height:100%;"> -->
+						<div id="divGlobalplay_screen" class="globalplayBox img-rounded" style="display:none;"> <!-- min-height:100%;"> -->
 							<div class="flex" style="min-width: 1000px;"> <!--min-height:100%;">-->
 
 								<div id="globalplay_divSpecialMessages" class="info-label" style="position: absolute; width: 100%; z-index:1001;">
@@ -5165,6 +5229,10 @@ div.disabled,button.disabled,a.disabled {
 
 								<div id="globalplay_divDocumentsName" class="info-label" style="position: absolute; width: 100%; z-index:1001;">
 									<h2 class="label label-success" style="z-index:1001; text-transform: none; font-size:20px; width: 50%; margin: 0 auto;"></h2>
+								</div>
+
+                                <div id="globalplay_divAudioName" class="info-label" style="position: absolute; width: 100%; z-index:1001;">
+									<h2 class="label label-danger" style="z-index:1001; text-transform: none; font-size:20px; width: 50%; margin: 0 auto;"></h2>
 								</div>
 
 								<div id="globalplay_divComments" class="info-label" style="position: absolute; bottom: 30px; width: 100%; z-index:1001;">
@@ -5504,20 +5572,22 @@ div.disabled,button.disabled,a.disabled {
 					 </div>
 
 			<!-- PANEL TIMELINE -->
-			<div id="divTimeline" class="div-panel2 col-md-12 col-xs-12 img-rounded" style="height:100%; z-index:0;left: 0; border-radius: 13px; width: 101%; margin-left: -13px;">
+            <div id="divGlobalplay_timer" style="display:none;"></div>
+			<div id="divTimeline" class="divTimeline div-panel2 col-md-12 col-xs-12 img-rounded">
 			   <h1 style="margin-top: 5px;">
 
+                   <!--
 					<label id="lblGlobalplay_timer_current_longFormat" class="label" style="font-size:100%; color:black;">00:00:00</label>
-				   /
 				   <label id="lblGlobalplay_timer_total_longFormat" class="label" style="font-size:100%; color:black;">00:00:00</label>
-					 -  
 				   <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label>
-					/ 
 				   <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label>
-				   
+					Cantidad: <label id="lblGlobalplay_element_count" class="label" style="font-size:100%; color:black;">0</label>: IDs: <label id="lblGlobalplay_element_ids" class="label" style="font-size:100%; color:black;">0</label>
+                   <a class="btn btn-large" data-toggle="confirmation">Click to toggle confirmation</a>
+				   -->
+
 				   <span class="special-title label label-primary" style="font-weight: normal;">Timeline</span>
 
-					Cantidad: <label id="lblGlobalplay_element_count" class="label" style="font-size:100%; color:black;">0</label>: IDs: <label id="lblGlobalplay_element_ids" class="label" style="font-size:100%; color:black;">0</label>
+
 			   </h1>
 
 				<div class="row" style="display:inline">
@@ -5529,11 +5599,11 @@ div.disabled,button.disabled,a.disabled {
 									<a href="#" class="mute" data-attr="mute"></a>
 								</li>
 								<li>
-									<a href="#" id="globalplay_play" class="play" data-attr="playPauseAudio" onclick="return globalplay_init()"></a> <!-- Play/Pause button -->
-								   <a href="#divForm" id="btnForm" style="display:none;"></a>
+									<a href="#divGlobalplay_screen" id="globalplay_play" class="play" data-attr="playPauseAudio" onclick="return globalplay_init()"></a> <!-- Play/Pause button -->
+								   <a href="#divGlobalplay_screen" id="btnOpenFancybox" style="display:none;"></a>
 								</li>
 								<li>
-									<a href="#" id="globalplay_stop" class="" data-attr="nextAudio" onclick="return globalplay_stop()"> <!-- Stop button -->
+									<a href="#divGlobalplay_screen" id="globalplay_stop" class="" data-attr="nextAudio" onclick="return globalplay_stop()"> <!-- Stop button -->
 										<span class="fa fa-stop-circle fa-2x" aria-hidden="true" style="color:white"></span>
 									</a>
 								</li>
@@ -5543,7 +5613,7 @@ div.disabled,button.disabled,a.disabled {
 
 					<div id="divTimelineProgress" style="height:8px; position:absolute; margin-top: -5px;"></div> <!-- Contenedor draggable para el Progress Pointer -->
 
-					<div id="timeframe" class="col-md-10" style="width:94%; margin:auto; background:transparent; padding-left: 0;"></div>
+					<div id="timeframe" class="timeframe col-md-10"></div>
 
 					<div id="sm2-inline-element" class="sm2-inline-element sm2-inline-status" style="position:absolute;">
 						<div id="sm2-progress" class="sm2-progress">

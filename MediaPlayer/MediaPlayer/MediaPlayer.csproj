@@ -128,6 +128,7 @@
     <Content Include="assets\images\pointer.png" />
     <Content Include="assets\js\bar-ui.js" />
     <Content Include="assets\js\BootSideMenu.js" />
+    <Content Include="assets\js\bootstrap-confirmation.js" />
     <Content Include="assets\js\bootstrap.min.js" />
     <Content Include="assets\js\datetimepicker.full.min.js" />
     <Content Include="assets\js\draggable-0.1.js" />
