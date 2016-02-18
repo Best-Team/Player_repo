@@ -44,6 +44,7 @@
 
         this.svg = $(svg("svg"))
 			.attr("width", this.outerWidth)
+			//.attr("width", 1000)
 			.attr("height", this.outerHeight)
 			.attr("id", "svg_timeframe")
 			//.attr("onclick", "clicked(evt)")

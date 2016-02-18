@@ -17,7 +17,7 @@
 
 
 /* Player Controls */
-#playerContainer { background-color:#333333;  }
+/*#playerContainer { background-color:#333333;  }*/
 .controls li:first{ margin-right:10px; }
 .controls li { display:inline-block; text-align:center; margin-top:10px;}
 

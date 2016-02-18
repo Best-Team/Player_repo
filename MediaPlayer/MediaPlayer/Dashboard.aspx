@@ -610,14 +610,14 @@ $('#element').confirmation('destroy')
 
 	   // If timeline is already drawn, set to divTimelineProgress the main line real width 
 	   function divTimelineProgress_SetWidth() {
-		   var MAIN_LINE = $("#timeframe > svg > g:first > line:first");
+	       var MAIN_LINE = $("#svg_timeframe > g:first > line:first");
 		   if (MAIN_LINE != null && MAIN_LINE.length) {
 			   var x1 = parseInt(MAIN_LINE.attr("x1"), 10);
 			   var x2 = parseInt(MAIN_LINE.attr("x2"), 10);
 
 			   $('#divTimelineProgress').css("width", (x2 - x1 + 4) + "px");
 			   $("#divTimelineProgress").offset({
-				   left: $("#timeframe > svg").offset().left + 42 //Fix Left Offset 
+			       left: $("#svg_timeframe").offset().left + 42 //Fix Left Offset 
 			   })
 		   }
 	   }
@@ -1321,7 +1321,7 @@ $('#element').confirmation('destroy')
 	   }
 
 	   function events_line_click(event) {
-		   var MAIN_LINE = $("#timeframe > svg > g:first > line:first");
+	       var MAIN_LINE = $("#svg_timeframe > g:first > line:first");
 		   if (MAIN_LINE != null && MAIN_LINE.length && TIMELINE_POINTER != null && TIMELINE_POINTER.length) {
 
 			   // Show timeline pointer
@@ -1490,21 +1490,22 @@ $('#element').confirmation('destroy')
 
 			   /* **** MAIN LINE **** */
 
-			   var MAIN_LINE = $("#timeframe > svg > g:first > line:first");
+			   var MAIN_LINE = $("#svg_timeframe > g:first > line:first");
 			   if (MAIN_LINE != null && MAIN_LINE.length) {
 				   MAIN_LINE.attr("stroke-opacity", 0.8);
 				   MAIN_LINE.attr("stroke", "SlateGray ");
 				   MAIN_LINE.attr("y1", MAIN_LINE_top);
 				   MAIN_LINE.attr("y2", MAIN_LINE_top);
 				   MAIN_LINE.attr("stroke-width", MAIN_LINE_height);
+
 			   }
 
 			   /* **** EVENTS LINE **** */
-			   var EVENTS_LINE = $("#timeframe > svg > g:first > line:nth(1)");
+			   var EVENTS_LINE = $("#svg_timeframe > g:first > line:nth(1)");
 			   if (EVENTS_LINE != null && EVENTS_LINE.length) {
 				   EVENTS_LINE.css('cursor', 'crosshair');
 			   }
-			   var svg = $("#timeframe > svg");
+			   var svg = $("#svg_timeframe");
 			   if (svg != null && svg.length) {
 				   svg.attr("height", SVG_Height);
 			   }
@@ -1731,6 +1732,11 @@ $('#element').confirmation('destroy')
 			   // Visual effect
 			   $("#timeframe").show("blind", 50);
 			   locateEveryElementByType();
+
+
+			   //$("#playerContainer").offset({ top: $("#timeframe").offset().top + 10 })
+			   //$("#playerContainer").css("height", MAIN_LINE_height);
+
 		   }
 	   }
 
@@ -2007,7 +2013,7 @@ $('#element').confirmation('destroy')
 
 					   sm2_inline_element.css('width', _width);
 
-					   var MAIN_LINE = $("#timeframe > svg > g:first > line:first");
+					   var MAIN_LINE = $("#svg_timeframe > g:first > line:first");
 					   if (MAIN_LINE != null && MAIN_LINE.length) {
 					       sm2_inline_element.offset({ left: MAIN_LINE.offset().left });
 					   }
@@ -4095,7 +4101,7 @@ $('#element').confirmation('destroy')
 	       if ($("#globalplay_play").hasClass("play")) {
 
                // Queue of current elements playing
-	           queue_elements = [[], [], []];
+	           // queue_elements = [[], [], []];
 
                // ID dynamic
 	           dynamic_number = 0;
@@ -4115,6 +4121,8 @@ $('#element').confirmation('destroy')
 	           else {
 	               // Resume timer
 	               $('#divGlobalplay_timer').timer('resume');
+
+	               globalplay_resumeAllCurrentMedia();
 	           }
 
 	           globalplay_start();
@@ -4146,14 +4154,14 @@ $('#element').confirmation('destroy')
 	           globalplay_abort();
 
 	           // Pause all media current playing elements
-	           pauseAllCurrentMedia();	           
+	           globalplay_pauseAllCurrentMedia();
 
 	       }
 	       return false;
 	   }
 
 	   // Pause all media current playing elements
-	   function pauseAllCurrentMedia() {
+	   function globalplay_pauseAllCurrentMedia() {
 	       // queue_elements:
 
 	       // element[0] = Element
@@ -4183,7 +4191,8 @@ $('#element').confirmation('destroy')
                                file_extension[0] === "webm" || file_extension[0] === "ogg") {
 	                           $("#" + playID)[0].pause();
 	                       } else {
-	                           $("#webchimera2").pause();
+	                           wjs("#webchimera2").pause();
+
 	                       }
 
 	                       break;
@@ -4191,6 +4200,52 @@ $('#element').confirmation('destroy')
 
 	                   case "S": {
 	                       $("#fbsviewer2")[0].pause();
+	                       break;
+	                   }
+
+	               }
+	           }
+	       } //for
+	   }
+
+	   function globalplay_resumeAllCurrentMedia() {
+	       // queue_elements:
+
+	       // element[0] = Element
+	       // element[1] = Dynamic ID
+	       // element[2] = Dynamic Object
+	       for (var i = 0; i < queue_elements.length; i++) {
+	           var element = queue_elements[i];
+	           if (element != null && element[0] != null && element[0].tapeType != null) {
+	               var tapeType = element[0].tapeType;
+	               var fileName = element[0].fileName;
+	               var playID = element[1];
+	               var dynamic_object = element[2];
+
+	               // Get file extension
+	               var file_extension = getFileExtension(fileName);
+
+	               switch (tapeType) {
+	                   case "A": {
+	                       dynamic_object.play();
+	                       break;
+	                   }
+
+	                   case "V": {
+
+	                       // HTML5 video supported formats
+	                       if (file_extension != null && file_extension.length > 0 && file_extension[0] === "mp4" ||
+                               file_extension[0] === "webm" || file_extension[0] === "ogg") {
+	                           $("#" + playID)[0].play();
+	                       } else {
+	                           wjs("#webchimera2").play();
+                           }
+
+	                       break;
+	                   }
+
+	                   case "S": {
+	                       $("#fbsviewer2")[0].play();
 	                       break;
 	                   }
 
@@ -4496,7 +4551,7 @@ $('#element').confirmation('destroy')
 		           global_elementID = "webchimera2";
 
 		           var applet = "<object id='" + global_elementID + "' type='application/x-chimera-plugin' width='" + visual_size_w + "' " +
-                       "height='" + visual_size_h + "' name='visual_element' style='position:relative; float:left;'>";
+                                "height='" + visual_size_h + "' name='visual_element' style='position:relative; float:left; margin: 10px;'>";
 		           applet += "<param name='windowless' value='true' />";
 		           applet += "</object>";
 		           applet += "<div id='interface'></div>";
@@ -4592,6 +4647,9 @@ $('#element').confirmation('destroy')
 
 		   // Salvattore Source: http://webdesign.tutsplus.com/tutorials/build-a-dynamic-grid-with-salvattore-and-bootstrap-in-10-minutes--cms-20410
 
+
+           // DURATION TEST
+
 		   setTimeout(function () { globalplay_removeElement(global_elementID, element) }, GLOBALPLAY_DEFAULT_DURATION);
 		   return global_elementID;
 	   }
@@ -4632,6 +4690,10 @@ $('#element').confirmation('destroy')
 	   }
 
 	   function globalplay_stop() {
+
+
+	       // Queue of current elements playing
+	       queue_elements = [[], [], []];
 
 		   // DO PAUSE
 		   $("#globalplay_play").removeClass("pauseAudio");
@@ -4755,11 +4817,21 @@ $('#element').confirmation('destroy')
        }
 
        .timeframe {
-           width: 94%;
+           /* display: inline; */
+           width: 94%;  /* 94 %*/
            margin: auto;
            background: transparent;
            background-color: inherit !important;
            padding-left: 0;
+       }
+
+       .playerContainer {
+           width: 55px; 
+           height: 140px;
+           padding-right: 55px;
+           margin-top: 10px;
+           background-color: #446e9b;
+           background-image: linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 45%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.1) 51%, rgba(0,0,0,0.1) 95%);
        }
 
 /* ---------------------------------- */
@@ -5592,7 +5664,10 @@ div.disabled,button.disabled,a.disabled {
 
 				<div class="row" style="display:inline">
 
-					<div id="playerContainer" class="col-md-2 img-rounded" style="height: 140px; width:55px; margin-top:10px; background-color: #446e9b; background-image: linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 45%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.1) 51%, rgba(0,0,0,0.1) 95%);">
+
+                     <!-- -->
+                            
+					 <div id="playerContainer" class="playerContainer col-md-2"> <!-- img-rounded -->
 						<div id="controlContainer">
 							<ul class="controls"> <!-- Controls mask Source: http://www.jqueryrain.com/?vXjX8BEk -->
 								<li>
@@ -5611,9 +5686,17 @@ div.disabled,button.disabled,a.disabled {
 						</div>
 					</div>
 
+                        <!-- -->
+
+
 					<div id="divTimelineProgress" style="height:8px; position:absolute; margin-top: -5px;"></div> <!-- Contenedor draggable para el Progress Pointer -->
 
-					<div id="timeframe" class="timeframe col-md-10"></div>
+					<div id="timeframe" class="timeframe col-md-10">
+                      
+
+
+
+					</div>
 
 					<div id="sm2-inline-element" class="sm2-inline-element sm2-inline-status" style="position:absolute;">
 						<div id="sm2-progress" class="sm2-progress">
