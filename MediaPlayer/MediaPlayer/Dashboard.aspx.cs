@@ -28,6 +28,7 @@ namespace MediaPlayer
 
         private bool _signalSearchFolioElements = false;
         private string _argSearchFolioElements = null;
+        private bool? _isPostbackExpected = null;
 
         #region Properties
 
@@ -35,6 +36,19 @@ namespace MediaPlayer
 
         private List<Folio> folio_filteredList;
 
+
+        private bool IsPostbackExpected
+        {
+            get
+            {
+                if (!_isPostbackExpected.HasValue)
+                {
+                    _isPostbackExpected = ViewState["RequestTimestamp"].ToString() == Session["RequestTimestamp"].ToString();
+
+                }
+                return _isPostbackExpected.Value;
+            }
+        }
         #endregion Properties
 
         #region Events
@@ -98,9 +112,17 @@ namespace MediaPlayer
         {
             if (_signalSearchFolioElements)
             {
-                DoSearchFolioelements(_argSearchFolioElements);
+                DoSearchFolioElements(_argSearchFolioElements);
             }
         }
+
+        protected void Page_PreRender(object sender, EventArgs e)
+        {
+            Session["RequestTimestamp"] = DateTime.Now.Ticks.ToString();
+            ViewState["RequestTimestamp"] = Session["RequestTimestamp"].ToString(); 
+        }
+
+
 
         protected void btnDownload_Click(object sender, EventArgs e)
         {
@@ -119,7 +141,10 @@ namespace MediaPlayer
 
         protected void btnConfirmUploadElement_ServerClick(object sender, EventArgs e)
         {
-            UploadFile();
+            if (this.IsPostbackExpected)
+            {
+                UploadFile();
+            }
         }
 
         protected void btnSearchCandidate_Click(object sender, EventArgs e)
@@ -748,7 +773,7 @@ namespace MediaPlayer
             _argSearchFolioElements = qs_folioID;
         }
 
-        private void DoSearchFolioelements(string qs_folioID = "")
+        private void DoSearchFolioElements(string qs_folioID = "")
         {
             int index = 0;
             StringBuilder htmlTable = new StringBuilder();
