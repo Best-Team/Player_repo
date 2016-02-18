@@ -96,6 +96,7 @@
     <Content Include="assets\css\bootstrap.css" />
     <Content Include="assets\css\bootstrap.icon-large.css" />
     <Content Include="assets\css\bootstrap.min.css" />
+    <Content Include="assets\css\Dashboard.css" />
     <Content Include="assets\css\datetimepicker.css" />
     <Content Include="assets\css\font-awesome.css" />
     <Content Include="assets\css\highlight.css" />
@@ -129,6 +130,7 @@
     <Content Include="assets\js\bar-ui.js" />
     <Content Include="assets\js\BootSideMenu.js" />
     <Content Include="assets\js\bootstrap.min.js" />
+    <Content Include="assets\js\Dashboard.js" />
     <Content Include="assets\js\datetimepicker.full.min.js" />
     <Content Include="assets\js\draggable-0.1.js" />
     <Content Include="assets\js\highlight.js" />
