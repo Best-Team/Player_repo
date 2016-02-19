@@ -65,11 +65,6 @@ namespace MediaPlayer
         {
             if (!string.IsNullOrWhiteSpace(username) || !string.IsNullOrWhiteSpace(password))
             {
-                // #1- Logger variables
-                System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame();
-                string className = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
-                string methodName = stackFrame.GetMethod().Name;
-
                 bool ok = false;
                 try
                 {
@@ -101,6 +96,11 @@ namespace MediaPlayer
                 catch (Exception e)
                 {
                     ScriptManager.RegisterStartupScript(this, typeof(Page), "ShowErrorMessage", "ShowErrorMessage('" + 3 + "');", true);
+
+                    // #1- Logger variables
+                    System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame();
+                    string className = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
+                    string methodName = stackFrame.GetMethod().Name;
 
                     // #2- Logger exception
                     Logger.LogError("(%s) (%s) -- Excepcion. Haciendo login. ERROR: %s", className, methodName, e.Message);

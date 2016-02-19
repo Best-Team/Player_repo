@@ -96,6 +96,8 @@
     <Content Include="assets\css\bootstrap.css" />
     <Content Include="assets\css\bootstrap.icon-large.css" />
     <Content Include="assets\css\bootstrap.min.css" />
+    <Content Include="assets\css\darktooltip.css" />
+    <Content Include="assets\css\Dashboard.css" />
     <Content Include="assets\css\datetimepicker.css" />
     <Content Include="assets\css\font-awesome.css" />
     <Content Include="assets\css\highlight.css" />
@@ -130,6 +132,7 @@
     <Content Include="assets\js\BootSideMenu.js" />
     <Content Include="assets\js\bootstrap-confirmation.js" />
     <Content Include="assets\js\bootstrap.min.js" />
+    <Content Include="assets\js\Dashboard.js" />
     <Content Include="assets\js\datetimepicker.full.min.js" />
     <Content Include="assets\js\draggable-0.1.js" />
     <Content Include="assets\js\highlight.js" />
@@ -137,6 +140,7 @@
     <Content Include="assets\js\inputmask.dependencyLib.jquery.js" />
     <Content Include="assets\js\inputmask.extensions.js" />
     <Content Include="assets\js\inputmask.js" />
+    <Content Include="assets\js\jquery.darktooltip.js" />
     <Content Include="assets\js\jquery.fancybox.js" />
     <Content Include="assets\js\jquery.inputmask.bundle.js" />
     <Content Include="assets\js\jquery-ui.js" />
