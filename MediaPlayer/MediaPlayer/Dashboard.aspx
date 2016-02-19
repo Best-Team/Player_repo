@@ -4520,7 +4520,8 @@ $('#element').confirmation('destroy')
 		   var duration = element[0].duration;
 		   var fileName = element[0].fileName;
 
-		   var duration_final = duration <= 8 ? 10000 : duration * 1000;
+		   //var duration_final = duration <= 8 ? 10000 : duration * 1000;
+		   var duration_final = duration <= 7 ? duration * 1000 * 1.5 : duration * 1000;
 		   var ok = false;
 
 
@@ -4535,7 +4536,7 @@ $('#element').confirmation('destroy')
 
 		       global_elementID = "video_" + dynamic_number;
 
-		       var js_player = '<video id="' + global_elementID + '" preload="none" style="width: ' + visual_size_w + 'px; height: ' + visual_size_h + 'px;"  name="visual_element" autoplay>';
+		       var js_player = '<video id="' + global_elementID + '" preload="none" style="width: ' + visual_size_w + 'px; height: ' + visual_size_h + 'px; margin-top:30px;" name="visual_element" autoplay>';
 		       js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
 		       js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
 		       js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
@@ -4613,7 +4614,7 @@ $('#element').confirmation('destroy')
 				   applet += "<param name='PORT' value='5901'>";
 				   applet += "<param name='FBSURL' value='" + file_url + "'>";
 				   applet += "<param name='AUDIOURL' value=''>";
-				   applet += "<param name='SHOWPLAYERCONTROLS' value='NO'>"; // YES
+				   applet += "<param name='SHOWPLAYERCONTROLS' value='YES'>"; // YES
 				   applet += "<param name='SHOWPLAYERTAGCONTROLS' value='YES'>";
 				   applet += "<param name='TIMECOUNTDOWN' value='NO'>";
 				   applet += "<param name='CACHE' value='NO'>";
@@ -4801,11 +4802,13 @@ $('#element').confirmation('destroy')
 
 	   /******** END: Media Player 2.0: Nuevo Requerimiento: Global Play ********/
 
-
-
    </script>
 
    <style>
+
+       .ui-dialog {
+           z-index: 2500;
+       }
 
        .divTimeline {
            height: 100%;
