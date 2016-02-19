@@ -24,7 +24,6 @@ var initial_size = 0;
 var elementsInMemory = [];
 var stack_elements = [[], []]; // [object, already_taken: bool]
 var selectedElementID = 0;
-var currrentVideoDuration = 0;
 var currentPointerPositionDate;
 
 // Timeline Global Pointer
@@ -850,8 +849,8 @@ function openFullscreen() {
             var w = MONITOR_WIDTH - (MONITOR_WIDTH * 40 / 100);
             var h = MONITOR_HEIGHT - (MONITOR_HEIGHT * 40 / 100);
 
-            document.getElementById("webchimera").width = w;
-            document.getElementById("webchimera").height = h;
+            document.getElementById("webchimera1").width = w;
+            document.getElementById("webchimera1").height = h;
 
             light.css('width', '70%');
             light.css('height', '80%');
@@ -954,8 +953,8 @@ function closeFullscreen() {
         var divPlayer_VIDEO_w = parseInt(divPlayer_VIDEO.css("width"), 10);
         var divPlayer_VIDEO_h = parseInt(divPlayer_VIDEO.css("height"), 10);
 
-        document.getElementById("webchimera").width = divPlayer_VIDEO_w;
-        document.getElementById("webchimera").height = divPlayer_VIDEO_h;
+        document.getElementById("webchimera1").width = divPlayer_VIDEO_w;
+        document.getElementById("webchimera1").height = divPlayer_VIDEO_h;
     }
 }
 
@@ -2182,11 +2181,16 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
 
     /************************ LOAD ELEMENT on Player BEGIN ************************/
 
+    elementType_active = tapeType;
+
     switch (tapeType) {
         case "S":
-        case "P": {
-            elementType_active = "S";
-            loadElement_screenRecording(file_url, tapeID, fileStatus, divControlsMask_AUDIO, duration, divPlayer_VIDEO, fileName, segmentID, divControlsMask_VIDEO);
+        case "P":
+        case "V": {
+            elementType_active = tapeType == "P" ? "S" : tapeType;
+
+            //loadElement_screenRecording(file_url, tapeID, fileStatus, divControlsMask_AUDIO, duration, divPlayer_VIDEO, fileName, segmentID, divControlsMask_VIDEO);
+            loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration, fileStatus, tapeID, segmentID);
             break;
         }
 
@@ -2214,102 +2218,78 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
             break;
         }
 
+            /*
         case "V": {
             elementType_active = "V";
             loadElement_video(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration);
             break;
         }
+            */
     }
 
     /************************ Load element on Player END ************************/
 }
 
-//********************************* 1. SCREEN RECORDING Element *********************************
-function loadElement_screenRecording(file_url, tapeID, fileStatus, divControlsMask_AUDIO, duration, divPlayer_VIDEO, fileName, segmentID, divControlsMask_VIDEO) {
-    if (getIsFirefoxOrIE()) {
-        screenRecording_segmentID = tapeID;
+//************************************** 1. VIDEO Element OR SCREEN RECORDING Element ***************************************
+function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration, fileStatus, tapeID, segmentID) {
 
-        SetAudioPlaylistURL(1, "");
+    /*
+     * Steps:
+     * 1. File extension
+     * 2. Browser support
+     * 
+     */
 
-        // Enable/Disable functions
-        if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
-            $("#btnFullscreen").removeClass("disabled");
-            $("#aBtnFullscreen").removeClass("disabled");
-            $("#divControlsMask_VIDEO").removeClass("disabled");
-            $("#lnkElementDownload").removeClass("disabled");
-        } else {
-            $("#btnFullscreen").addClass("disabled");
-            $("#aBtnFullscreen").addClass("disabled");
-            $("#divControlsMask_VIDEO").addClass("disabled");
-            $("#lnkElementDownload").addClass("disabled");
+    var ok = true;
+
+    if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
+
+        switch (file_extension[0]) {
+
+            // HTML5 support:
+            case "mp4":
+            case "webm":
+            case "ogg": {
+
+                loadPlayer_HTML5_Webchimera_Styles1(divPlayer_VIDEO, divControlsMask_VIDEO);
+
+                // HTML5 support:
+                ok = loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divControlsMask_VIDEO);
+
+                loadPlayer_HTML5_Webchimera_Styles2(fileName, duration, divControlsMask_AUDIO, fileStatus, ok);
+
+                break;
+            }
+
+                // Oreka Player:
+            case "fbs": {
+
+                // Oreka Player:
+                loadPlayer_OrekaPlayer(tapeID, fileStatus, duration, divControlsMask_AUDIO, divPlayer_VIDEO, divControlsMask_AUDIO, fileName, segmentID, divControlsMask_VIDEO)
+
+                break;
+            }
+
+                // Webchimera Plugin Player or else:
+            case "avi":
+            case "bin":
+            default: {
+
+                loadPlayer_HTML5_Webchimera_Styles1(divPlayer_VIDEO, divControlsMask_VIDEO);
+
+                // Webchimera plugin - Source: https://github.com/LukasBombach/nw-webchimera-demos
+
+                // Webchimera Plugin Player or else:
+                ok = loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divControlsMask_VIDEO, duration);
+
+                loadPlayer_HTML5_Webchimera_Styles2(fileName, duration, divControlsMask_AUDIO, fileStatus, ok);
+
+                break;
+            }
         }
+    }
 
-        currrentVideoDuration = duration;
-
-        /************************ Events START ************************/
-
-        // Click over progress bar 
-        // Video player
-        $("#sm2-progress-track_VIDEO").on("click", { _duration: duration, _d: $(this) }, setVideoCurrent);
-
-        // Bottom progress track
-
-        $("#sm2-progress-track").on("click", { _duration: duration }, setVideoCurrent);
-
-        // Click over play/pause button 
-        divControlsMask_AUDIO.on("click", { _tapeID: tapeID }, playAudioElement);
-
-        /************************ Events END ************************/
-
-        // Clear Audio and Video player
-        emptyAudioPlayer();
-        emptyVideoPlayer();
-
-        // Play/Pause actions button
-        ActionVideoPlay(tapeID, duration, false);
-
-        /************************ Styles START ************************/
-
-        // Show Video Player
-        if (divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
-            divPlayer_VIDEO.show();
-        }
-        // Disable audio player
-        if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length) {
-            divControlsMask_AUDIO.addClass("disabled");
-        }
-        /************************ Styles END ************************/
-
-        videoPlayerINIT(fileName, duration, segmentID);
-
-        // Enable video player
-        if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
-
-            divControlsMask_VIDEO.removeClass("disabled");
-
-            // Set playing
-            divControlsMask_VIDEO.addClass("playing");
-            divControlsMask_VIDEO.removeClass("paused");
-            TimeRefreshLoop(duration);
-
-            // Coloca los controles en top = 0, por si antes fue usado el Video player (webchimera player)
-            divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top });
-
-        }
-
-        // Set duration
-        setVideoLength(duration);
-
-        $("#aBtnFullscreen").removeClass("disabled");
-        $("#aBtnFullscreen").show();
-        $("#btnFullscreen").hide();
-
-        // Hide masked controls - Quitar? 
-        divPlayer_VIDEO.css("visibility", "visible");
-        $("#divControlsMask_VIDEO").hide();
-
-    } else { // It is not Firefox
-
+    if (!ok) {
         $("#dialog p").text(hashMessages["UtilizarNavegador1"]);
         $("#dialog").dialog({
             buttons: {
@@ -2324,7 +2304,10 @@ function loadElement_screenRecording(file_url, tapeID, fileStatus, divControlsMa
             divControlsMask_VIDEO.addClass("disabled");
             divControlsMask_AUDIO.addClass("disabled");
         }
+
     }
+
+    //#endregion
 }
 
 //************************************** 2. AUDIO Element ***************************************
@@ -2446,15 +2429,9 @@ function loadElement_document(divControlsMask_VIDEO, divControlsMask_VIDEO) {
     }
 }
 
-//************************************** 6. VIDEO Element ***************************************
-function loadElement_video(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration, fileStatus) {
 
-    var ok = true;
-
-    // Webchimera plugin - Source: https://github.com/LukasBombach/nw-webchimera-demos
-
+function loadPlayer_HTML5_Webchimera_Styles1(divPlayer_VIDEO, divControlsMask_VIDEO) {
     /************************ Styles START ************************/
-
     var manual_offset = 52;
     divPlayer_VIDEO.show();
     divPlayer_VIDEO.css("height", (parseInt(PLAYER_BOX.css("height"), 10) - manual_offset - 2) + "px");
@@ -2463,180 +2440,12 @@ function loadElement_video(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, fil
 
     divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top + manual_offset });
 
-    // Create video player
-    var w = parseInt(divPlayer_VIDEO.css("width"), 10);
-    var h = parseInt(divPlayer_VIDEO.css("height"), 10);
+    /************************ Styles END ************************/
+}
 
-    // HTML5 video supported formats
-    if (file_extension != null && file_extension.length > 0 && file_extension[0] === "mp4" ||
-        file_extension[0] === "webm" || file_extension[0] === "ogg") {
+function loadPlayer_HTML5_Webchimera_Styles2(fileName, duration, divControlsMask_AUDIO, fileStatus, ok) {
 
-        // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
-
-        var js_player = '<video id="html_video" preload="none" style="width: ' + w + 'px; height: ' + h + 'px;">';
-        //js_player += '<source id="mp4" src="http://media.w3.org/2010/05/bunny/trailer.mp4" type="video/mp4">'; // p
-        js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
-        js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
-        js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
-        js_player += '</video>';
-
-        divPlayer_VIDEO.append(js_player);
-
-
-        /************************ Events START ************************/
-
-        // Clear previous onclick events
-        aPlayPause_VIDEO.attr('onclick', '');
-        $("#aPlayPause_VIDEO").off("click");
-
-        // Click on Play icon VIDEO
-        $("#aPlayPause_VIDEO").bind("click", function () {
-
-            if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
-
-                if (divControlsMask_VIDEO.hasClass("paused")) {
-                    divControlsMask_VIDEO.addClass("playing");
-                    divControlsMask_VIDEO.removeClass("paused");
-                    $("#html_video")[0].play()
-
-                } else {
-                    divControlsMask_VIDEO.addClass("paused");
-                    divControlsMask_VIDEO.removeClass("playing");
-                    $("#html_video")[0].pause();
-                }
-            }
-        });
-
-        var timer_VIDEO = $('#sm2-inline-time_VIDEO');
-        var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
-
-        // Event: While Playing
-        $("#html_video").on("timeupdate", function (event) {
-            onTrackedVideoFrame(this.currentTime, this.duration, timer_VIDEO, divControlsMask_VIDEO);
-        });
-
-
-        /*
-        // TODO
-     // Bottom progress track
-            $("#sm2-progress-track").on("click", {
-                _duration: duration
-            }, setVideoCurrent);
-
-
-        */
-
-        /************************ Events END ************************/
-
-    }
-    else {
-
-        // INIT webchimera
-        if (getIsFirefoxOrIE()) {
-
-
-            // -----------------------------------------------------------------------------------------------
-
-            var applet = "<object id='webchimera1' type='application/x-chimera-plugin' width='" + w + "' height='" + h + "'>";
-            applet += "<param name='windowless' value='true' />";
-            applet += "</object>";
-            applet += "<div id='interface'></div>";
-
-            $("#divPlayer_VIDEO object").remove();
-            divPlayer_VIDEO.append(applet);
-
-            // If it does not fail to load webchimera plugin
-            var ok = true;
-
-            try {
-                wjs("#webchimera1").clearPlaylist();
-                wjs("#webchimera1").addPlaylist(file_url);
-            } catch (err) {
-                console.log("Error loading webchimera");
-                console.log(err);
-
-                // Show alert message
-                $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
-                $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
-                $("#dialog_WebChimera a").text("aquí.")
-                $("#dialog_WebChimera").dialog({
-                    buttons: {
-                        "OK": function () {
-                            $(this).dialog("close");
-                        }
-                    }
-                });
-
-                // Disable player
-                ok = false;
-            }
-
-
-            // Clear previous onclick events
-            aPlayPause_VIDEO.attr('onclick', '');
-            $("#aPlayPause_VIDEO").off("click");
-
-            //setTimeout(function () {
-            // Source: http://wiki.webchimera.org/Player_JavaScript_API
-
-            // Click on Play icon VIDEO
-            $("#aPlayPause_VIDEO").bind("click", function () {
-
-                if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
-
-                    if (divControlsMask_VIDEO.hasClass("paused")) {
-                        divControlsMask_VIDEO.addClass("playing");
-                        divControlsMask_VIDEO.removeClass("paused");
-                        wjs("#webchimera1").play();
-
-                    } else {
-                        divControlsMask_VIDEO.addClass("paused");
-                        divControlsMask_VIDEO.removeClass("playing");
-                        wjs("#webchimera1").pause();
-                    }
-                }
-            });
-
-            // Event: While playing
-            var previousSecsAVI = 0;
-            wjs("#webchimera1").onTime(function () {
-                var timer_VIDEO = $('#sm2-inline-time_VIDEO');
-                var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
-                var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
-                var currentSecs = wjs("#webchimera1").time() / 1000;
-
-                if (currentSecs < duration && /* currentSecs >= previousSecs && */ currentSecs != 0) {
-                    previousSecsAVI = currentSecs;
-                    var left = (wjs("#webchimera1").position() * 100) + "%";
-                    var secs_int = parseInt(currentSecs, 10);
-                    timer_VIDEO.text(getTime(wjs("#webchimera1").time(), true).toString());
-
-                    // Pointers progress
-                    pointer_VIDEO.css("left", left);
-                }
-            });
-
-
-            // }, 1000); // SetTimeout
-
-            // Bottom progress track
-            $("#sm2-progress-track").on("click", {
-                _duration: duration
-            }, setVideoCurrent);
-
-            /************************ Events END ************************/
-
-
-
-        } else {
-            ok = false;
-        }
-
-    } // END webchimera
-
-
-    // -----------------------------------------------------------------------------------------------
-
+    /************************ Styles START ************************/
     // Set mask title
     $("#lblSoundTitle1_VIDEO").text(fileName);
 
@@ -2645,37 +2454,19 @@ function loadElement_video(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, fil
 
     // Disable audio player
     divControlsMask_AUDIO.addClass("disabled");
-
     /************************ Styles END ************************/
 
     /************************ Events START ************************/
-
     // Click over progress bar 
     // Video player
     $("#sm2-progress-track_VIDEO").on("click", { _duration: duration, _d: $(this) }, setVideoCurrent);
+
     // Bottom progress track
     $("#sm2-progress-track").on("click", { _duration: duration }, setVideoCurrent);
+    /************************ Events END ************************/
 
 
-
-    if (!ok) {
-        $("#dialog p").text(hashMessages["UtilizarNavegador1"]);
-        $("#dialog").dialog({
-            buttons: {
-                "Confirmar": function () {
-                    $(this).dialog("close");
-                }
-            }
-        });
-
-        // Disable video player & audio player
-        if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divControlsMask_AUDIO != null && divControlsMask_AUDIO.length) {
-            divControlsMask_VIDEO.addClass("disabled");
-            divControlsMask_AUDIO.addClass("disabled");
-        }
-
-    }
-
+    /************************ Styles START ************************/
     // Enable/Disable functions
     if (fileStatus != "PROCESSING" && fileStatus != "ERROR" && ok) {
         $("#btnFullscreen").removeClass("disabled");
@@ -2686,8 +2477,255 @@ function loadElement_video(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, fil
         $("#divControlsMask_VIDEO").addClass("disabled");
         $("#lnkElementDownload").addClass("disabled");
     }
+    /************************ Events END ************************/
 
-    //#endregion
+}
+
+
+// Oreka Player:
+function loadPlayer_OrekaPlayer(tapeID, fileStatus, duration, divControlsMask_AUDIO, divPlayer_VIDEO, divControlsMask_AUDIO, fileName, segmentID, divControlsMask_VIDEO) {
+
+    var ok = false;
+
+    if (getIsFirefoxOrIE()) {
+        screenRecording_segmentID = tapeID;
+
+        SetAudioPlaylistURL(1, "");
+
+        // Enable/Disable functions
+        if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
+            $("#btnFullscreen").removeClass("disabled");
+            $("#aBtnFullscreen").removeClass("disabled");
+            $("#lnkElementDownload").removeClass("disabled");
+            divControlsMask_VIDEO.removeClass("disabled");
+        } else {
+            $("#btnFullscreen").addClass("disabled");
+            $("#aBtnFullscreen").addClass("disabled");
+            $("#lnkElementDownload").addClass("disabled");
+            divControlsMask_VIDEO.addClass("disabled");
+        }
+
+        /************************ Events START ************************/
+        // Click over progress bar 
+        // Video player
+        $("#sm2-progress-track_VIDEO").on("click", { _duration: duration, _d: $(this) }, setVideoCurrent);
+
+        // Bottom progress track
+
+        $("#sm2-progress-track").on("click", { _duration: duration }, setVideoCurrent);
+
+        // Click over play/pause button 
+        divControlsMask_AUDIO.on("click", { _tapeID: tapeID }, playAudioElement);
+        /************************ Events END ************************/
+
+        // Clear Audio and Video player
+        emptyAudioPlayer();
+        emptyVideoPlayer();
+
+        // Play/Pause actions button
+        ActionVideoPlay(tapeID, duration, false);
+
+        /************************ Styles START ************************/
+        // Show Video Player
+        if (divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
+            divPlayer_VIDEO.show();
+        }
+        // Disable audio player
+        if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length) {
+            divControlsMask_AUDIO.addClass("disabled");
+        }
+        /************************ Styles END ************************/
+
+        videoPlayerINIT(fileName, duration, segmentID);
+
+        // Enable video player
+        if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
+
+            divControlsMask_VIDEO.removeClass("disabled");
+
+            // Set playing
+            divControlsMask_VIDEO.addClass("playing");
+            divControlsMask_VIDEO.removeClass("paused");
+            TimeRefreshLoop(duration);
+
+            // Coloca los controles en top = 0, por si antes fue usado el Video player (webchimera player)
+            divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top });
+
+        }
+
+        // Set duration
+        setVideoLength(duration);
+
+        $("#aBtnFullscreen").removeClass("disabled");
+        $("#aBtnFullscreen").show();
+        $("#btnFullscreen").hide();
+
+        // Hide masked controls - Quitar? 
+        divPlayer_VIDEO.css("visibility", "visible");
+        $("#divControlsMask_VIDEO").hide();
+
+        ok = true;
+    }
+
+    return ok;
+}
+
+// Webchimera Plugin Player or else:
+function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divControlsMask_VIDEO, duration) {
+
+    var ok = false;
+
+    // INIT webchimera
+    if (getIsFirefoxOrIE()) {
+
+        // Create video player
+        var width = parseInt(divPlayer_VIDEO.css("width"), 10);
+        var height = parseInt(divPlayer_VIDEO.css("height"), 10);
+
+        var applet = "<object id='webchimera1' type='application/x-chimera-plugin' width='" + width + "' height='" + height + "'>";
+        applet += "<param name='windowless' value='true' />";
+        applet += "</object>";
+        applet += "<div id='interface'></div>";
+
+        $("#divPlayer_VIDEO object").remove();
+        divPlayer_VIDEO.append(applet);
+
+        // If it does not fail to load webchimera plugin
+        var ok = true;
+
+        try {
+            wjs("#webchimera1").clearPlaylist();
+            wjs("#webchimera1").addPlaylist(file_url);
+        } catch (err) {
+            console.log("Error loading webchimera");
+            console.log(err);
+
+            // Show alert message
+            $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
+            $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
+            $("#dialog_WebChimera a").text("aquí.")
+            $("#dialog_WebChimera").dialog({
+                buttons: {
+                    "OK": function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+            // Disable player
+            ok = false;
+        }
+
+
+        // Clear previous onclick events
+        aPlayPause_VIDEO.attr('onclick', '');
+        aPlayPause_VIDEO.off("click");
+        //$("#aPlayPause_VIDEO").off("click");
+
+        //setTimeout(function () {
+        // Source: http://wiki.webchimera.org/Player_JavaScript_API
+
+        // Click on Play icon VIDEO
+        aPlayPause_VIDEO.bind("click", function () {
+
+            if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
+
+                if (divControlsMask_VIDEO.hasClass("paused")) {
+                    divControlsMask_VIDEO.addClass("playing");
+                    divControlsMask_VIDEO.removeClass("paused");
+                    wjs("#webchimera1").play();
+
+                } else {
+                    divControlsMask_VIDEO.addClass("paused");
+                    divControlsMask_VIDEO.removeClass("playing");
+                    wjs("#webchimera1").pause();
+                }
+            }
+        });
+
+        // Event: While playing
+        var previousSecsAVI = 0;
+        wjs("#webchimera1").onTime(function () {
+            var timer_VIDEO = $('#sm2-inline-time_VIDEO');
+            var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
+            var currentSecs = wjs("#webchimera1").time() / 1000;
+
+            if (currentSecs < duration && /* currentSecs >= previousSecs && */ currentSecs != 0) {
+                previousSecsAVI = currentSecs;
+                var left = (wjs("#webchimera1").position() * 100) + "%";
+                var secs_int = parseInt(currentSecs, 10);
+                timer_VIDEO.text(getTime(wjs("#webchimera1").time(), true).toString());
+
+                // Pointers progress
+                pointer_VIDEO.css("left", left);
+            }
+        });
+
+
+        // }, 1000); // SetTimeout
+
+        // Bottom progress track
+        $("#sm2-progress-track").on("click", {
+            _duration: duration
+        }, setVideoCurrent);
+
+        /************************ Events END ************************/
+
+        ok = true;
+    }
+
+    return ok;
+}
+
+// HTML5 support:
+function loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divControlsMask_VIDEO) {
+
+    // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
+
+    // Create video player
+    var width = parseInt(divPlayer_VIDEO.css("width"), 10);
+    var height = parseInt(divPlayer_VIDEO.css("height"), 10);
+
+    var js_player = '<video id="html_video" preload="none" style="width: ' + width + 'px; height: ' + height + 'px;">';
+    js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
+    js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
+    js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
+    js_player += '</video>';
+
+    divPlayer_VIDEO.append(js_player);
+
+    /************************ Events START ************************/
+    // Clear previous onclick events
+    aPlayPause_VIDEO.attr('onclick', '');
+    aPlayPause_VIDEO.off("click");
+    //$("#aPlayPause_VIDEO").off("click");
+
+    // Click on Play icon VIDEO
+    aPlayPause_VIDEO.bind("click", function () {
+        if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
+
+            if (divControlsMask_VIDEO.hasClass("paused")) {
+                divControlsMask_VIDEO.addClass("playing");
+                divControlsMask_VIDEO.removeClass("paused");
+                $("#html_video")[0].play()
+
+            } else {
+                divControlsMask_VIDEO.addClass("paused");
+                divControlsMask_VIDEO.removeClass("playing");
+                $("#html_video")[0].pause();
+            }
+        }
+    });
+
+    // Event: While Playing
+    $("#html_video").on("timeupdate", function (event) {
+        onTrackedVideoFrame(this.currentTime, this.duration, timer_VIDEO, divControlsMask_VIDEO);
+    });
+    /************************ Events END ************************/
+
+    var timer_VIDEO = $('#sm2-inline-time_VIDEO');
+
+    return true;
 }
 
 // Event: While Playing of HTML5 Video tag (webm, mp4, ogg)
