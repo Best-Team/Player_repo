@@ -1,5 +1,5 @@
 ﻿.ui-dialog {
-    z-index: 2500;
+    z-index: 10000; /*2500*/
 }
 
 .divTimeline {
@@ -136,6 +136,7 @@ hr.style-one:after {
 .row-short {
 	margin-left: 0;
 	margin-right: 0;
+    margin-bottom: 10px;
 }
 
 /* ---- */

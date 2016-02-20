@@ -141,7 +141,7 @@
 						</asp:UpdatePanel>
 
 						</div>
-						<asp:RegularExpressionValidator ID="RegularExpressionValidator1" ControlToValidate="txbSearchBox1" runat="server" ErrorMessage="Número de folio inválido" ValidationExpression="\d+"></asp:RegularExpressionValidator>
+						<asp:RegularExpressionValidator ID="RegularExpressionValidator1" ControlToValidate="txbSearchBox1" runat="server" ErrorMessage="Número inválido" ValidationExpression="\d+"></asp:RegularExpressionValidator>
 						<!-- /input-group -->
 					 </div>
 				  </div>
@@ -605,8 +605,8 @@
 				   <label id="lblGlobalplay_timer_total_longFormat" class="label" style="font-size:100%; color:black;">00:00:00</label>
 				   <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label>
 				   <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label>
-					Cantidad: <label id="lblGlobalplay_element_count" class="label" style="font-size:100%; color:black;">0</label>: IDs: <label id="lblGlobalplay_element_ids" class="label" style="font-size:100%; color:black;">0</label>
 				   -->
+					Cantidad: <label id="lblGlobalplay_element_count" class="label" style="font-size:100%; color:black;">0</label>: IDs: <label id="lblGlobalplay_element_ids" class="label" style="font-size:100%; color:black;">0</label>
 
 				   <span class="special-title label label-primary" style="font-weight: normal;">Timeline</span>
 

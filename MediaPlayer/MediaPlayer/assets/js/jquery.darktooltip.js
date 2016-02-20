@@ -14,7 +14,7 @@
 		this.mouseOverMode=(this.options.trigger == "hover" || this.options.trigger == "mouseover" || this.options.trigger == "onmouseover");
 	}
 
-	var script_button = '<a href="#" id="btnMuteSound" class="open btn btn-default" style="margin-right: 6px;" onclick="globalplay_muteSound();">' +
+	var script_button = '<a href="#" id="btnMuteSound" class="open btn btn-default btnMuteSound">' + //onclick="globalplay_muteSound();"
 						'<span class="glyphicon glyphicon-volume-off"></span>' +
 					    '</a>';
 
@@ -200,11 +200,25 @@
 		},
 
 		setConfirmEvents: function(){
-			var dt = this;
-			this.tooltip.find('li.darktooltip-yes').click( function(e){
+		    var dt = this; 
+		    //this.tooltip.find('li.darktooltip-yes').click( function(e){
+		    this.tooltip.find('a.btnMuteSound').click(function (e) {
 				dt.onYes();
 				e.stopPropagation();
-			});
+		    });
+
+            /*
+            this.tooltip.onclick = (function(dt) {
+                return function() {
+                    dt.onYes();
+                    //e.stopPropagation();
+                };
+            })(dt);
+            */
+
+
+
+
 			this.tooltip.find('li.darktooltip-no').click( function(e){
 				dt.onNo();
 				e.stopPropagation();

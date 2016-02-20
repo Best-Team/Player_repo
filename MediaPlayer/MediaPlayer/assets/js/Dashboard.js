@@ -18,7 +18,9 @@ var GLOBALPLAY_DEFAULT_DURATION = 30000; // 30 s // 5000 = 5 seg
 var SVG_Height = 170;
 var addComment_active = false;
 var addFile_active = false;
-var elementType_active = "";
+var oldPlayer_activeElement_type = "";
+var oldPlayer_activeElement_extension = "";
+var oldPlayer_activeElement_duration = "";
 var comment_popup_timestamp = "";
 var initial_size = 0;
 var elementsInMemory = [];
@@ -627,6 +629,8 @@ function LoadAlertMessagesBackup() {
     hashMessages["ConfirmarBorrarElementos1"] = "¿Desea borrar TODOS los elementos seleccionados?";
     hashMessages["ConfirmarBorrarElementos2"] = "¿Está seguro?";
     hashMessages["SeleccioneFolio"] = "Por favor, ingrese un folio válido.";
+    hashMessages["InstallWebchimera_Aux"] = "Por favor, instale el plugin WebChimera para reproducir el elemento. ";
+
 
 }
 
@@ -771,118 +775,128 @@ function checkRolesAndTypesFilters() {
 
 function openFullscreen() {
 
-    if (elementType_active === "S") {
+    if (oldPlayer_activeElement_type != null && oldPlayer_activeElement_type.length > 0) {
+        switch (oldPlayer_activeElement_type) {
+            case "S": {
 
-        /* ------------------  SCREEN RECORDING CASE ------------------ */
-        // http://stackoverflow.com/questions/22248670/html-object-tag-data-attribute-wont-update-with-jquery-change
+                break;
+            }
 
-        var light = $("#light");
-        var fade = $("#fade");
-        var divPlayer_VIDEO = $("#divPlayer_VIDEO");
-        var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
+            case "I": {
 
-        if (light != null && light.length && fade != null && fade.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length) {
+                /* ------------------  IMAGE CASE ------------------ */
+                $("#imgPlayer").photobox();
+                $("#imgPlayer").click();
 
-            /*
-            // -------------------------------------------------------------
-            var w = MONITOR_WIDTH - (MONITOR_WIDTH * 40 / 100);
-            var h = MONITOR_HEIGHT - (MONITOR_HEIGHT * 40 / 100);
+                // Remove all images but first
+                $("#photobox-container img").not(":first").remove();
+                $("#photobox-container").css("z-index", "2000");
 
-            $("#fbsviewer").attr('width', w);
-            $("#fbsviewer").attr('height', h);
+                break;
+            }
 
-            light.css('width', '80%');
-            light.css('height', '80%');
+            case "V": {
 
-            //light.css('top', '10%');
-            //light.css('left', '10%');
+                if (oldPlayer_activeElement_extension != null && oldPlayer_activeElement_extension.length > 0) {
+                    switch (oldPlayer_activeElement_extension) {
 
-            ///
-            light.css('position', 'fixed');
-            light.css('top', '50%');
-            light.css('left', '50%');
+                        // HTML5 support:
+                        case "mp4":
+                        case "webm":
+                        case "ogg": {
 
-            var t1 = parseInt(light.css('top'), 10);
-            light.css('top', t1 + 'px');
+                            openFullscreen_video(true);
 
-            light.css('margin', '0 auto');
-            light.css('left', '0');
-            light.css('right', '0');
+                            break;
+                        }
 
-            // -------------------------------------------------------------
+                            // Oreka Player:
+                        case "fbs": {
 
-            // Move player and banner to modal box
-            divPlayer_VIDEO.prependTo($("#light_row"));
-            divControlsMask_VIDEO.prependTo($("#light_row"));
+                            // Oreka Player:
 
-            // Styles
-            divControlsMask_VIDEO.css('height', '71px');
+                            break;
+                        }
 
-            // Show effect
-            // Source: https://jqueryui.com/show/
-            fade.show();
-            light.show("blind", 500);
-            */
+                            // Webchimera Plugin Player or else:
+                        case "avi":
+                        case "crypt":
+                        case "bin":
+                        default: {
 
-            //$("#aOpenWindow_fullscreen").attr("href", "")
-        }
+                            openFullscreen_video(false);
 
-    } else if (elementType_active === "I") {
+                            break;
+                        }
+                    }
+                }
 
-        /* ------------------  IMAGE CASE ------------------ */
-        $("#imgPlayer").photobox();
-        $("#imgPlayer").click();
-        // Remove all images but first
-        $("#photobox-container img").not(":first").remove();
-        $("#photobox-container").css("z-index", "2000");
-
-    } else if (elementType_active === "V") {
-
-        /* ------------------  VIDEO CASE ------------------ */
-        var light = $("#light");
-        var fade = $("#fade");
-        var divPlayer_VIDEO = $("#divPlayer_VIDEO");
-        var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
-
-        if (light != null && light.length && fade != null && fade.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length) {
-
-            var w = MONITOR_WIDTH - (MONITOR_WIDTH * 40 / 100);
-            var h = MONITOR_HEIGHT - (MONITOR_HEIGHT * 40 / 100);
-
-            document.getElementById("webchimera1").width = w;
-            document.getElementById("webchimera1").height = h;
-
-            light.css('width', '70%');
-            light.css('height', '80%');
-
-            ///
-            light.css('position', 'fixed');
-            light.css('top', '50%');
-            light.css('left', '50%');
-
-            var t1 = parseInt(light.css('top'), 10);
-            light.css('top', t1 + 'px');
-
-            light.css('margin', '0 auto');
-            light.css('left', '0');
-            light.css('right', '0');
-
-            // -------------------------------------------------------------
-
-            // Move player and banner to modal box
-            divPlayer_VIDEO.prependTo($("#light_row"));
-            divControlsMask_VIDEO.prependTo($("#light_row"));
-
-            // Styles
-            divControlsMask_VIDEO.css('height', '71px');
-
-            // Show effect
-            // Source: https://jqueryui.com/show/
-            fade.show();
-            light.show("blind", 500);
-
+                break;
+            }
         }
     }
+
+}
+
+function openFullscreen_video(isHTML5) {
+
+    var light = $("#light");
+    var fade = $("#fade");
+    var divPlayer_VIDEO = $("#divPlayer_VIDEO");
+    var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
+
+    if (light != null && light.length && fade != null && fade.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length) {
+
+        var width = MONITOR_WIDTH - (MONITOR_WIDTH * 40 / 100);
+        var height = MONITOR_HEIGHT - (MONITOR_HEIGHT * 40 / 100);
+
+        if (isHTML5) {
+            $("#html_video").css("width", width);
+            $("#html_video").css("height", height);
+        } else {
+            document.getElementById("webchimera1").width = width;
+            document.getElementById("webchimera1").height = height;
+
+            var player_top = parseInt(divPlayer_VIDEO.css('top'), 10);
+            divPlayer_VIDEO.css('top', (player_top + 6) + "px");
+
+            var duration = oldPlayer_activeElement_duration;
+
+            
+        }
+
+        light.css('width', '70%');
+        light.css('height', '80%');
+
+        ///
+        light.css('position', 'fixed');
+        light.css('top', '50%');
+        light.css('left', '50%');
+
+        var top1 = light.css('top');
+        var top2 = parseInt(top1, 10);
+        light.css('top', top2 + 'px');
+
+        light.css('margin', '0 auto');
+        light.css('left', '0');
+        light.css('right', '0');
+
+        // -------------------------------------------------------------
+
+        // Move player and banner to modal box
+        divPlayer_VIDEO.prependTo($("#light_row"));
+        divControlsMask_VIDEO.prependTo($("#light_row"));
+
+        // Styles
+        divControlsMask_VIDEO.css('height', '71px');
+
+        // Show effect
+        // Source: https://jqueryui.com/show/
+        fade.show();
+        light.show("blind", 500);
+
+    }
+
 }
 
 function closeFullscreen() {
@@ -891,68 +905,104 @@ function closeFullscreen() {
     var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
     var divPlayer_VIDEO = $("#divPlayer_VIDEO");
 
-    if (elementType_active === "A" || elementType_active === "I") {
+    if (oldPlayer_activeElement_type != null && oldPlayer_activeElement_type.length > 0) {
+        switch (oldPlayer_activeElement_type) {
+            case "I": {
 
-        if (light != null && light.length && fade != null && fade.length && PLAYER_BOX != null && PLAYER_BOX.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
+                if (light != null && light.length && fade != null && fade.length && PLAYER_BOX != null && PLAYER_BOX.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
 
-            // Move player and banner to div container
-            divControlsMask_VIDEO.appendTo(PLAYER_BOX);
-            divPlayer_VIDEO.appendTo(PLAYER_BOX);
+                    // Move player and banner to div container
+                    divControlsMask_VIDEO.appendTo(PLAYER_BOX);
+                    divPlayer_VIDEO.appendTo(PLAYER_BOX);
 
-            // styles
-            light.css('display', 'none');
-            fade.css('display', 'none');
-            divControlsMask_VIDEO.css('height', '54px');
+                    // styles
+                    light.css('display', 'none');
+                    fade.css('display', 'none');
+                    divControlsMask_VIDEO.css('height', '54px');
+                }
+                break;
+            }
+
+            case "S": {
+
+                break;
+            }
+
+            case "V": {
+
+                if (oldPlayer_activeElement_extension != null && oldPlayer_activeElement_extension.length > 0) {
+                    switch (oldPlayer_activeElement_extension) {
+
+                        // HTML5 support:
+                        case "mp4":
+                        case "webm":
+                        case "ogg": {
+
+                            closeFullscreen_video(true, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade);
+
+                            break;
+                        }
+
+                            // Oreka Player:
+                        case "fbs": {
+
+                            // Oreka Player:
+
+                            break;
+                        }
+
+                            // Webchimera Plugin Player or else:
+                        case "avi":
+                        case "crypt":
+                        case "bin":
+                        default: {
+
+                            closeFullscreen_video(false, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade);
+
+                            break;
+                        }
+                    }
+                }               
+
+                break;
+            }
+
         }
     }
-    else if (elementType_active === "S") {
+}
 
-        if (light != null && light.length && fade != null && fade.length && PLAYER_BOX != null && PLAYER_BOX.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
+function closeFullscreen_video(isHTML5, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade) {
 
-            // -------------------------------------------------------------
-            $("#fbsviewer").attr('width', FBS_DEFAULT_Width);
-            $("#fbsviewer").attr('height', FBS_DEFAULT_Height);
-				   
-            // -------------------------------------------------------------
+    // Move player and banner to div container
+    divControlsMask_VIDEO.appendTo(PLAYER_BOX);
+    divPlayer_VIDEO.appendTo(PLAYER_BOX);
 
-            // Move player and banner to div container
-            divControlsMask_VIDEO.appendTo(PLAYER_BOX);
-            divPlayer_VIDEO.appendTo(PLAYER_BOX);
-
-            // styles
-            light.css('display', 'none');
-            fade.css('display', 'none');
-            divControlsMask_VIDEO.css('height', '54px');
-
-        }
-    }
-    else if (elementType_active === "V") {
-
-        // Move player and banner to div container
-        divControlsMask_VIDEO.appendTo(PLAYER_BOX);
-        divPlayer_VIDEO.appendTo(PLAYER_BOX);
-
-        // styles
-        light.css('display', 'none');
-        fade.css('display', 'none');
-        divControlsMask_VIDEO.css('height', '54px');
+    // styles
+    light.css('display', 'none');
+    fade.css('display', 'none');
+    divControlsMask_VIDEO.css('height', '54px');
 
 
-        // -------------------------------------------------------------
+    // -------------------------------------------------------------
 
-        var manual_offset = 52;
-        var extra = 2;
-        var playerBox_h = parseInt(PLAYER_BOX.css("height"), 10);
-        var height_final = playerBox_h - manual_offset - extra;
+    var manual_offset = 52;
+    var extra = 2;
+    var playerBox_h = parseInt(PLAYER_BOX.css("height"), 10);
+    var height_final = playerBox_h - manual_offset - extra;
 
-        // divPlayer_VIDEO size
-        divPlayer_VIDEO.css("height", height_final + "px");
-        divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top + manual_offset });
-			   
-        // Webchimera player size
-        var divPlayer_VIDEO_w = parseInt(divPlayer_VIDEO.css("width"), 10);
-        var divPlayer_VIDEO_h = parseInt(divPlayer_VIDEO.css("height"), 10);
+    // divPlayer_VIDEO size
+    divPlayer_VIDEO.css("height", height_final + "px");
+    divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top + manual_offset });
 
+    // Webchimera player size
+    var divPlayer_VIDEO_w = parseInt(divPlayer_VIDEO.css("width"), 10);
+    var divPlayer_VIDEO_h = parseInt(divPlayer_VIDEO.css("height"), 10);
+
+    if (isHTML5) {
+        $("#html_video").css("width", divPlayer_VIDEO_w);
+        $("#html_video").css("height", divPlayer_VIDEO_h);
+
+    } else {
         document.getElementById("webchimera1").width = divPlayer_VIDEO_w;
         document.getElementById("webchimera1").height = divPlayer_VIDEO_h;
     }
@@ -1475,8 +1525,7 @@ function timeframe_draw(timeline_data, start, end) {
                                 color_str = rectColor_values.video;
 
                                 // Border rounded
-                                if (ELEMENT_rect != null && ELEMENT_rect
-                                    .length) {
+                                if (ELEMENT_rect != null && ELEMENT_rect.length) {
                                     ELEMENT_rect.attr("rx", 4);
                                     ELEMENT_rect.attr("ry", 4);
                                 }
@@ -1489,8 +1538,7 @@ function timeframe_draw(timeline_data, start, end) {
                                 color_str = rectColor_values.audio;
 
                                 // Border rounded
-                                if (ELEMENT_rect != null && ELEMENT_rect
-                                    .length) {
+                                if (ELEMENT_rect != null && ELEMENT_rect.length) {
                                     ELEMENT_rect.attr("rx", 4);
                                     ELEMENT_rect.attr("ry", 4);
                                 }
@@ -1996,8 +2044,10 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     /************************ General variables END ************************/
 
     /************************ General events START ************************/
-    elementType_active = "";
-
+    oldPlayer_activeElement_type = "";
+    oldPlayer_activeElement_extension = "";
+    oldPlayer_activeElement_duration = "";
+    
     // Remove click event
     aPlayPause_VIDEO.attr('onclick', '');
     aPlayPause_VIDEO.off("click");
@@ -2124,6 +2174,7 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     // Remove all images if exist
     $("#photobox-container img").remove();
 
+    // Remove all objects if exist (including wav_object activeX audio)
     $("#audioContainer object").remove();
 
 
@@ -2181,50 +2232,40 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
 
     /************************ LOAD ELEMENT on Player BEGIN ************************/
 
-    elementType_active = tapeType;
+    oldPlayer_activeElement_type = tapeType;
+    oldPlayer_activeElement_extension = file_extension[0];
+    oldPlayer_activeElement_duration = duration;
 
     switch (tapeType) {
         case "S":
         case "P":
         case "V": {
-            elementType_active = tapeType == "P" ? "S" : tapeType;
+            oldPlayer_activeElement_type = tapeType == "P" ? "S" : tapeType;
 
-            //loadElement_screenRecording(file_url, tapeID, fileStatus, divControlsMask_AUDIO, duration, divPlayer_VIDEO, fileName, segmentID, divControlsMask_VIDEO);
             loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration, fileStatus, tapeID, segmentID);
             break;
         }
 
         case "A": {
-            elementType_active = "A";
-            loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_AUDIO, file_extension, tapeID);
+            loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_AUDIO, file_extension, tapeID, aPlayPause_AUDIO, duration);
             break;
         }
 
         case "C": {
-            elementType_active = "C";
             loadElement_comment(divControlsMask_VIDEO, timestamp, fileName);
             break;
         }
 
         case "I": {
-            elementType_active = "I";
             loadElement_image(file_url, divControlsMask_VIDEO, divControlsMask_AUDIO, fileStatus);
             break;
         }
 
         case "D": {
-            elementType_active = "D";
             loadElement_document(divControlsMask_VIDEO, divControlsMask_VIDEO);
             break;
         }
 
-            /*
-        case "V": {
-            elementType_active = "V";
-            loadElement_video(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration);
-            break;
-        }
-            */
     }
 
     /************************ Load element on Player END ************************/
@@ -2243,7 +2284,6 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
     var ok = true;
 
     if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
-
         switch (file_extension[0]) {
 
             // HTML5 support:
@@ -2272,6 +2312,7 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
 
                 // Webchimera Plugin Player or else:
             case "avi":
+            case "crypt":
             case "bin":
             default: {
 
@@ -2311,7 +2352,7 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
 }
 
 //************************************** 2. AUDIO Element ***************************************
-function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_AUDIO, file_extension, tapeID) {
+function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_AUDIO, file_extension, tapeID, aPlayPause_AUDIO, duration) {
 
     /************************ Local audio variables ************************/
 
@@ -2322,6 +2363,21 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
     // Remove previous error messages from the audio player
     $(".load-error").remove();
 
+    ////////////////////////////////////
+
+    // Clear previous onclick events
+    aPlayPause_AUDIO.attr('onclick', '');
+    aPlayPause_AUDIO.off("click");
+
+    // Clear player control settings
+    $("#lnkSound_AUDIO").attr("href", "");
+    $("#sm2-inline-time_AUDIO").text("0:00");
+    $("#sm2-inline-duration_AUDIO").text("0:00");
+
+    // Clear SoundManager previous playlist
+    SetAudioPlaylistURL(0, "xx");
+    SetAudioPlaylistURL(1, "xx");
+
     // Show sound player
     if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length) {
         divControlsMask_AUDIO.show("blind", 200);
@@ -2329,10 +2385,6 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
 
     // Set title
     $("#lblSoundTitle1_AUDIO, #lblSoundTitle2_AUDIO").text(fileName);
-
-    // Prepare audio player
-    lnkSound_AUDIO.attr("href", file_url);
-    SetAudioPlaylistURL(0, file_url);
 
     // Set Stop icon
     if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length > 0) {
@@ -2345,29 +2397,105 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
     // Set background image
     loadPlayerBoxImage("url(assets/images/audio.png)");
 
+    ////////////////////////////////////
 
-    /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
-    if ((file_extension != null && file_extension.length > 0 && file_extension[0] === "wav" || file_extension[0] === "crypt") && getIsIE()) {
 
-        // Create avi player
-        var w = parseInt($("#divControlsMask_AUDIO").css("width"), 10);
-        var h = parseInt($("#divControlsMask_AUDIO").css("height"), 10);
+    if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
 
-        // Source: http://joliclic.free.fr/html/object-tag/en/
+        /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
+        if (getIsIE() && file_extension[0] == "wav") {
 
-        // ActiveX object
-        var wav_object = "<object data='" + file_url + "' type='audio/x-wav' width='" + w + "' height='" + h + "'>";
-        wav_object += " <param name='src' value='" + file_url + "'>";
-        wav_object += " <param name='autoplay' value='false'>";
-        wav_object += " <param name='autoStart' value='0'>";
-        wav_object += " <a href='" + file_url + "'>Play</a>";
-        wav_object += " </object>";
+            // Create avi player
+            var w = parseInt($("#divControlsMask_AUDIO").css("width"), 10);
+            var h = parseInt($("#divControlsMask_AUDIO").css("height"), 10);
 
-        $("#audioContainer object").remove();
-        $("#audioContainer").append(wav_object);
-        divControlsMask_AUDIO.hide();
+            // Source: http://joliclic.free.fr/html/object-tag/en/
+
+            // Get duration format: m:ss
+            var currentTime_final = getFormatDuration_short(duration);
+            $("#sm2-inline-duration_AUDIO").text(currentTime_final);
+
+            // ActiveX object
+            //var wav_object = "<object id='wav_object1' data='" + file_url + "' type='audio/x-wav' width='" + w + "' height='" + h + "' style='visibility: hidden;'>";
+            var wav_object = "<object id='wav_object1' data='" + file_url + "' type='audio/x-wav' width='" + w + "' height='" + h + "'>";
+            wav_object += " <param name='src' value='" + file_url + "'>";
+            wav_object += " <param name='autoplay' value='false'>";
+            wav_object += " <param name='autoStart' value='0'>";
+            wav_object += " <a href='" + file_url + "'>Play</a>";
+            wav_object += " </object>";
+           
+            $("#audioContainer object").remove();
+            $("#audioContainer").append(wav_object);            
+
+            divControlsMask_AUDIO.hide(); //
+
+            /*
+
+            // Click on Play icon VIDEO
+            aPlayPause_AUDIO.bind("click", function () {
+                if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length > 0) {
+
+                    if (divControlsMask_AUDIO.hasClass("paused")) {
+                        divControlsMask_AUDIO.addClass("playing");
+                        divControlsMask_AUDIO.removeClass("paused");
+                        if ($("#wav_object1")[0] != null) {
+                            $("#wav_object1")[0].play()
+
+                            // Remove previous error messages from the audio player
+                            $(".load-error").remove();
+                        }
+
+                    } else {
+                        divControlsMask_AUDIO.addClass("paused");
+                        divControlsMask_AUDIO.removeClass("playing");
+                        if ($("#wav_object1")[0] != null) {
+                            $("#wav_object1")[0].pause()
+
+                            // Remove previous error messages from the audio player
+                            $(".load-error").remove();
+                        }
+                    }
+                }
+            });
+            */
+
+            // TODO TESTING 
+            /*
+            if ($("#wav_object1")[0] != null) {
+
+                // Event: While Playing
+                $("#wav_object1").on("timeupdate", function () {
+                    //onTrackedVideoFrame(this.currentTime, this.duration, timer_VIDEO, divControlsMask_AUDIO);
+                    alert("asdasd1");
+                });
+
+                $('#wav_object1').bind('canplay', function () {
+                    //this.currentTime = 29; // jumps to 29th secs
+                    alert("asdasd1");
+                });
+
+                /*
+                $('#wav_object1').on('timeupdate', function () {
+                    $('#seekbar').attr("value", this.currentTime / this.duration);
+                });
+
+        }
+        */
+
+            // $("#wav_object1")[0].play()
+            /*
+            $("#audioContainer object").remove();
+            $("#audioContainer").append(wav_object);
+            divControlsMask_AUDIO.hide();
+            */
+        } else {
+
+            // Prepare audio player
+            lnkSound_AUDIO.attr("href", file_url);
+            SetAudioPlaylistURL(0, file_url);
+        }
     }
-    /* Important: ----------- PCM WAVE - Case ----------- */
+
 }
 
 //************************************* 3. COMMENT Element **************************************
@@ -2490,7 +2618,8 @@ function loadPlayer_OrekaPlayer(tapeID, fileStatus, duration, divControlsMask_AU
     if (getIsFirefoxOrIE()) {
         screenRecording_segmentID = tapeID;
 
-        SetAudioPlaylistURL(1, "");
+        SetAudioPlaylistURL(0, "xx");
+        SetAudioPlaylistURL(1, "xx");
 
         // Enable/Disable functions
         if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
@@ -2620,9 +2749,7 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
         // Clear previous onclick events
         aPlayPause_VIDEO.attr('onclick', '');
         aPlayPause_VIDEO.off("click");
-        //$("#aPlayPause_VIDEO").off("click");
 
-        //setTimeout(function () {
         // Source: http://wiki.webchimera.org/Player_JavaScript_API
 
         // Click on Play icon VIDEO
@@ -2634,6 +2761,25 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
                     divControlsMask_VIDEO.addClass("playing");
                     divControlsMask_VIDEO.removeClass("paused");
                     wjs("#webchimera1").play();
+
+                    // Event: While playing
+                    var previousSecsAVI = 0;
+                    wjs("#webchimera1").onTime(function () {
+                        var timer_VIDEO = $('#sm2-inline-time_VIDEO');
+                        var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
+                        var currentSecs = wjs("#webchimera1").time() / 1000;
+
+                        if (currentSecs < duration && /* currentSecs >= previousSecs && */ currentSecs != 0) {
+                            previousSecsAVI = currentSecs;
+                            var left = (wjs("#webchimera1").position() * 100) + "%";
+                            var secs_int = parseInt(currentSecs, 10);
+                            timer_VIDEO.text(getTime(wjs("#webchimera1").time(), true).toString());
+
+                            // Pointers progress
+                            pointer_VIDEO.css("left", left);
+                        }
+                    });
+
 
                 } else {
                     divControlsMask_VIDEO.addClass("paused");
@@ -2661,8 +2807,6 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
             }
         });
 
-
-        // }, 1000); // SetTimeout
 
         // Bottom progress track
         $("#sm2-progress-track").on("click", {
@@ -2698,7 +2842,6 @@ function loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divContro
     // Clear previous onclick events
     aPlayPause_VIDEO.attr('onclick', '');
     aPlayPause_VIDEO.off("click");
-    //$("#aPlayPause_VIDEO").off("click");
 
     // Click on Play icon VIDEO
     aPlayPause_VIDEO.bind("click", function () {
@@ -2882,11 +3025,12 @@ function loadClickConfirmRemoveButton_event(tapeID, isExtra) {
     });
 }
 
-function SetAudioPlaylistURL(number, vURL){
+function SetAudioPlaylistURL(number, vURL) {
+
     var player = window.sm2BarPlayers[number]; // Collection priority
     if (player != null && player.playlistController && player.playlistController.getSoundObject()) {
 
-        // ToDo: Research this.
+        // TODO: Research this.
         /* Workaround: sometimes SoundManager.js uses ._iO object to reproduce the audio, and other times uses the object returned by getSoundObject() directly */
         if (player.playlistController.getSoundObject()._iO != null && player.playlistController.getSoundObject()._iO &&
             player.playlistController.getSoundObject()._iO.url != null){
@@ -2925,14 +3069,14 @@ function getClickPosition(e, duration) {
     if (sm2_progress_track_VIDEO != null && sm2_progress_track_VIDEO.length) {
         var left_percentage = parseInt(xPosition / parseInt(sm2_progress_track_VIDEO.css("width"), 10) * 100, 10);
         var currentSecs = left_percentage * duration / 100;
-        if (elementType_active === "S") {
+        if (oldPlayer_activeElement_type === "S") {
             if (document.fbsviewer != null) {
                 document.fbsviewer.seekViewerSeconds(currentSecs);
             }
         } else {
             // TODO: adapt to html5 video - flowplayer
 
-            if (elementType_active === "V") {
+            if (oldPlayer_activeElement_type === "V") {
                 if (wjs("#webchimera1") != null) {
                     wjs("#webchimera1").time(currentSecs);
                 }
@@ -4036,8 +4180,8 @@ function globalplay_init() {
     var divPlayer_VIDEO = $("#divPlayer_VIDEO");
     divPlayer_VIDEO.css("visibility", "hidden");
 
-    if ($("#globalplay_play").hasClass("play")) {
-        
+    if ($("#globalplay_play").hasClass("play")) {      
+
 
         globalplay_initEvents(); ////////////
         //$('#darktooltip-example').css('z-index', 3000);
@@ -4093,7 +4237,7 @@ function globalplay_init() {
         globalplay_abort();
 
         // Pause all media current playing elements
-        globalplay_pauseAllCurrentMedia();
+        globalplay_pauseAllCurrentMedia(false);
 
     }
     return false;
@@ -4102,15 +4246,6 @@ function globalplay_init() {
 function globalplay_initEvents() {
 
     // Darktooltip Source: https://github.com/rubentd/darktooltip
-
-
-    //audio_element.darkTooltip({
-    //$("#globalplay_stop").darkTooltip({
-        //example
-    //globalplay_stop
-   
-
-    //$('#darktooltip-globalplay_stop').css('z-index', 3000);
 
     // Search only audio elements 
     var elementsCandidate = getElementInMemoryByType("A");
@@ -4124,7 +4259,13 @@ function globalplay_initEvents() {
                 var id = audio_element.attr('id');
                 audio_element.attr("data-tooltip", " ");
                 //audio_element.attr("data-tooltip", element.fileName);
-                
+
+                // Clean previous Tooltip
+                //audio_element.qtip = null;
+                //audio_element.removeAttr("data-tooltip");
+                //audio_element.removeAttr("title");
+
+                // Add new Tooltip
                 audio_element.darkTooltip({
                     trigger: 'hover',
                     animation: 'flipIn',
@@ -4132,64 +4273,168 @@ function globalplay_initEvents() {
                     theme: 'light',
                     confirm: true,
                     yes: 'Silenciar',
-                    onYes: function () {
-                        //alert("Silenciaste!");
+                    onYes: function (event) {
+
+                        globalplay_muteAudio(event);
                     }
                 });
 
                 $('#darktooltip-' + id).css('z-index', 3000);
+            }
+        }
+    } // for
+}
 
+function globalplay_muteAudio(event) {
+    if (event != null && event[0] != null && event[0].id != null && event[0].id.length) {
+        var id_complete = event[0].id;
+        var id = id_complete.replace('tlTape_', '');
+
+        if (id != null) {
+            var dynamic_object = globalplay_getQueueElementByID(id);
+            if (dynamic_object != null && dynamic_object.muted != null) {
+                dynamic_object.muted = !dynamic_object.muted;
+            }
+        }
+
+    }
+}
+
+function globalplay_getQueueElementByID(elementID) {
+    if (queue_elements != null && queue_elements.length > 0) {
+        for (var i = 0; i < queue_elements.length; i++) {
+
+            var element = queue_elements[i];
+            if (element != null && element.length > 1 && element[0] != null && element[0].tapeID != null && element[2] != null) {
+                if (element[0].tapeID == elementID) {
+                    var dynamic_object = element[2];
+                    if (dynamic_object != null) {
+                        return dynamic_object;
+                    }
+                }
             }
         } // for
     }
 }
 
+
 // Pause all media current playing elements
-function globalplay_pauseAllCurrentMedia() {
+function globalplay_pauseAllCurrentMedia(isStop) {
     // queue_elements:
 
     // element[0] = Element
     // element[1] = Dynamic ID
     // element[2] = Dynamic Object
-    for (var i = 0; i < queue_elements.length; i++) {
-        var element = queue_elements[i];
-        if (element != null && element[0] != null && element[0].tapeType != null) {
-            var tapeType = element[0].tapeType;
-            var fileName = element[0].fileName;
-            var playID = element[1];
-            var dynamic_object = element[2];
+    if (queue_elements != null && queue_elements.length > 0) {
+        for (var i = 0; i < queue_elements.length; i++) {
+            var element = queue_elements[i];
+            if (element != null && element[0] != null && element[0].tapeType != null) {
+                var tapeType = element[0].tapeType;
+                var fileName = element[0].fileName;
+                var playID = element[1];
+                var dynamic_object = element[2];
 
-            // Get file extension
-            var file_extension = getFileExtension(fileName);
+                // Get file extension
+                var file_extension = getFileExtension(fileName);
 
-            switch (tapeType) {
-                case "A": {
-                    dynamic_object.pause();
-                    break;
-                }
+                switch (tapeType) {
+                    case "A": {
 
-                case "V": {
-
-                    // HTML5 video supported formats
-                    if (file_extension != null && file_extension.length > 0 && file_extension[0] === "mp4" ||
-                        file_extension[0] === "webm" || file_extension[0] === "ogg") {
-                        $("#" + playID)[0].pause();
-                    } else {
-                        wjs("#webchimera2").pause();
-
+                        /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
+                        if (getIsIE() && file_extension[0] == "wav") {
+                            if ($("#wav_object2")[0] != null) {
+                                if (isStop) {
+                                    $("#wav_object2")[0].stop();
+                                } else {
+                                    $("#wav_object2")[0].pause();
+                                }
+                            }
+                        }
+                        else {
+                            if (isStop) {
+                                dynamic_object.pause();
+                                dynamic_object.currentTime = 0;
+                            } else {
+                                dynamic_object.pause();
+                            }
+                        }
+                        
+                        break;
                     }
 
-                    break;
-                }
+                    case "S":
+                    case "V": {
 
-                case "S": {
-                    $("#fbsviewer2")[0].pause();
-                    break;
-                }
+                        // Get file extension
+                        var file_extension = getFileExtension(fileName);
 
+                        if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
+                            switch (file_extension[0]) {
+
+                                // HTML5 support:
+                                case "mp4":
+                                case "webm":
+                                case "ogg": {
+
+                                    $("#" + playID)[0].pause();
+                                    $("#" + playID)[0].currentTime = 0;
+
+                                    break;
+                                }
+
+                                case "fbs": {
+
+                                    // Oreka Player:
+                                    if (isStop) {
+                                        $("#fbsviewer2")[0].stop();
+                                    } else {
+                                        $("#fbsviewer2")[0].pause();
+                                    }
+
+                                    break;
+                                }
+
+                                case "avi":
+                                case "crypt":
+                                case "bin":
+                                default: {
+
+                                    // Webchimera Plugin Player or else:
+                                    try {
+                                        if (isStop) {
+                                            wjs("#webchimera2").stop();
+                                        } else {
+                                            wjs("#webchimera2").pause();
+                                        }
+                                    } catch (err) {
+                                        console.log("Error loading webchimera");
+                                        console.log(err);
+
+                                        // Show alert message
+                                        $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
+                                        $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
+                                        $("#dialog_WebChimera a").text("aquí.")
+                                        $("#dialog_WebChimera").dialog({
+                                            buttons: {
+                                                "OK": function () {
+                                                    $(this).dialog("close");
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+
+                }
             }
-        }
-    } //for
+        } //for
+    }
 }
 
 function globalplay_resumeAllCurrentMedia() {
@@ -4198,45 +4443,98 @@ function globalplay_resumeAllCurrentMedia() {
     // element[0] = Element
     // element[1] = Dynamic ID
     // element[2] = Dynamic Object
-    for (var i = 0; i < queue_elements.length; i++) {
-        var element = queue_elements[i];
-        if (element != null && element[0] != null && element[0].tapeType != null) {
-            var tapeType = element[0].tapeType;
-            var fileName = element[0].fileName;
-            var playID = element[1];
-            var dynamic_object = element[2];
+    if (queue_elements != null && queue_elements.length > 0) {
+        for (var i = 0; i < queue_elements.length; i++) {
+            var element = queue_elements[i];
 
-            // Get file extension
-            var file_extension = getFileExtension(fileName);
+            if (element != null && element[0] != null && element[0].tapeType != null) {
+                var tapeType = element[0].tapeType;
+                var fileName = element[0].fileName;
+                var playID = element[1];
+                var dynamic_object = element[2];
 
-            switch (tapeType) {
-                case "A": {
-                    dynamic_object.play();
-                    break;
-                }
+                // Get file extension
+                var file_extension = getFileExtension(fileName);
 
-                case "V": {
+                switch (tapeType) {
+                    case "A": {
 
-                    // HTML5 video supported formats
-                    if (file_extension != null && file_extension.length > 0 && file_extension[0] === "mp4" ||
-                        file_extension[0] === "webm" || file_extension[0] === "ogg") {
-                        $("#" + playID)[0].play();
-                    } else {
-                        wjs("#webchimera2").play();
+                        /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
+                        if (getIsIE() && file_extension[0] == "wav") {
+                            if ($("#wav_object2")[0] != null) {
+                                $("#wav_object2")[0].play();
+                            }
+                        }
+                        else {
+                            dynamic_object.play();
+                        }
+                        break;
                     }
 
-                    break;
-                }
+                    case "S":
+                    case "V": {
 
-                case "S": {
-                    $("#fbsviewer2")[0].play();
-                    break;
-                }
+                        if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
+                            switch (file_extension[0]) {
 
+                                // HTML5 support:
+                                case "mp4":
+                                case "webm":
+                                case "ogg": {
+
+                                    $("#" + playID)[0].play();
+
+                                    break;
+                                }
+
+                                case "fbs": {
+
+                                    // Oreka Player:
+                                    $("#fbsviewer2")[0].play();
+
+                                    break;
+                                }
+
+                                case "avi":
+                                case "crypt":
+                                case "bin":
+                                default: {
+
+                                    try {
+
+                                        // Webchimera Plugin Player or else:
+                                        wjs("#webchimera2").play();
+
+                                    } catch (err) {
+                                        console.log("Error loading webchimera");
+                                        console.log(err);
+
+                                        // Show alert message
+                                        $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
+                                        $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
+                                        $("#dialog_WebChimera a").text("aquí.")
+                                        $("#dialog_WebChimera").dialog({
+                                            buttons: {
+                                                "OK": function () {
+                                                    $(this).dialog("close");
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+
+                }
             }
-        }
-    } //for
+        } //for
+    }
 }
+
 
 // Stopeable timer
 var timer_globalplay; 
@@ -4291,8 +4589,6 @@ function globalplay_whilePlaying() {
             $("#lblGlobalplay_timer_current_longFormat").text(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
         }
 
-		       
-
     } else {
         // Pointer arrived to the end
 
@@ -4301,7 +4597,7 @@ function globalplay_whilePlaying() {
     }
 }
 
-// Load elements in this pointer position
+// Load elements in this current pointer position
 function globalplay_loadElements() {
 
     // Search elements in current playtime
@@ -4320,8 +4616,11 @@ function globalplay_loadElements() {
         var visual_size_h = 300;
 
         // Get visual elements already added in globalplay player
-        var visual_alreadyAdded = $(".flex").find('*').not('.info-label, .info-label *').length;
+        //var visual_alreadyAdded = $(".flex").find('*').not('.info-label, .info-label *').length;
+        var visual_alreadyAdded = $(".flex").find('#webchimera2, #fbsviewer2, video[name=visual_element], a[name=visual_element]').length;
         var visual_count = visual_queue.length + visual_alreadyAdded;
+
+        var float_left = false;
 
         // Element distinct types 
         switch (visual_count) {
@@ -4333,6 +4632,8 @@ function globalplay_loadElements() {
                 }
             case 2:
                 {
+                    float_left = true;
+
                     visual_size_w = flex_width_int / 2 - 80;
                     visual_size_h = flex_width_int / 2 - 80;
                     break;
@@ -4346,7 +4647,12 @@ function globalplay_loadElements() {
             $(".flex").find('*').not('.info-label, .info-label *').each(function (index, el) {
                 $(this).css("width", visual_size_w);
                 $(this).css("height", visual_size_h);
+                
             });
+
+            if (float_left) {
+                $(".flex").css("display", "inline");
+            }
         }
 
         // Set label elements on play
@@ -4412,17 +4718,13 @@ function globalplay_loadElements() {
 
                     switch (tapeType) {
                         case "A": {
-                            audio_object = globalplay_audio(file_url, element, dynamic_number);
+                            audio_object = globalplay_audio(file_url, element, dynamic_number, flex_div);
                             break;
                         }
 
+                        case "S":
                         case "V": {
-                            dynamic_id = globalplay_video(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
-                            break;
-                        }
-
-                        case "S": {
-                            dynamic_id = globalplay_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
+                            dynamic_id = globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
                             break;
                         }
 
@@ -4469,31 +4771,66 @@ function globalplay_loadElements() {
 
 /********* Individual elements section *********/
 
-function globalplay_audio(file_url, element, dynamic_number) {
+function globalplay_audio(file_url, element, dynamic_number, flex_div) {
     var global_elementID = "audio_" + dynamic_number;
     var fileName = element[0].fileName;
     var tapeID = element[0].tapeID;
     var duration = element[0].duration;
+    var fileName = element[0].fileName;
     var duration_timeout = getDurationInMS(duration);// * 1.3;
 		  
+    var object = new Array();
+    object[0] = global_elementID;
+
     var label = $(".flex #globalplay_divAudioName h2");
     label.text(fileName);
 
-    var audio = new Audio(file_url);
-    audio.play();
+    // Get file extension
+    var file_extension = getFileExtension(fileName);
 
-    var object = new Array();
-    object[0] = global_elementID;
-    object[1] = audio;
+    if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
 
+        /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
+        if (getIsIE() && file_extension[0] == "wav") {
 
+            // Create avi player
+            var w = parseInt($("#divControlsMask_AUDIO").css("width"), 10);
+            var h = parseInt($("#divControlsMask_AUDIO").css("height"), 10);
 
-    setTimeout(function () { globalplay_removeElement(global_elementID, element); globalplay_clearLabel(label); }, duration_timeout);
+            // Source: http://joliclic.free.fr/html/object-tag/en/
+
+            var width = flex_div.css("width");
+
+            global_elementID = "wav_object2";
+
+            // ActiveX object
+            var wav_object = "<object id='" + global_elementID + "' data='" + file_url + "' type='audio/x-wav' width='" + width + "' height='50px' style='visibility: hidden;'>";
+            wav_object += " <param name='src' value='" + file_url + "'>";
+            wav_object += " <param name='autoplay' value='true'>";
+            wav_object += " <param name='autoStart' value='1'>";
+            wav_object += " <a href='" + file_url + "'>Play</a>";
+            wav_object += " </object>";
+
+            flex_div.append(wav_object);
+
+            object[1] = wav_object;
+
+            setTimeout(function () { globalplay_removeElement(global_elementID, element); globalplay_clearLabel(label); }, duration_timeout);
+        } else {
+
+            var audio = new Audio(file_url);
+            audio.play();
+
+            object[1] = audio;
+
+            setTimeout(function () { globalplay_removeElement(global_elementID, element); globalplay_clearLabel(label); }, duration_timeout);
+        }
+    }
 
     return object;
 }
 
-function globalplay_video(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number) {
+function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number) {
     var global_elementID = "";
     var duration = element[0].duration;
     var fileName = element[0].fileName;
@@ -4502,115 +4839,142 @@ function globalplay_video(file_url, visual_size_w, visual_size_h, flex_div, elem
     var duration_final = duration <= 7 ? duration * 1000 * 1.5 : duration * 1000;
     var ok = false;
 
-
     // Get file extension
     var file_extension = getFileExtension(fileName);
 
-    // HTML5 video supported formats
-    if (file_extension != null && file_extension.length > 0 && file_extension[0] === "mp4" ||
-        file_extension[0] === "webm" || file_extension[0] === "ogg") {
+    if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
+        switch (file_extension[0]) {
 
-        // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
+            // HTML5 support:
+            case "mp4":
+            case "webm":
+            case "ogg": {
 
-        global_elementID = "video_" + dynamic_number;
+                // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
 
-        var js_player = '<video id="' + global_elementID + '" preload="none" style="width: ' + visual_size_w + 'px; height: ' + visual_size_h + 'px; margin-top:30px;" name="visual_element" autoplay>';
-        js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
-        js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
-        js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
-        js_player += '</video>';
+                global_elementID = "video_" + dynamic_number;
 
-        flex_div.append(js_player);
-        ok = true;
+                var js_player = '<video id="' + global_elementID + '" preload="none" style="width: ' + visual_size_w + 'px; height: ' + visual_size_h + 'px; margin-top:30px;" name="visual_element" autoplay>';
+                js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
+                js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
+                js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
+                js_player += '</video>';
 
-    } else {
-        // Is wav audio ==> Webchimera plugin
+                flex_div.append(js_player);
+                ok = true;
 
-        if (getIsFirefoxOrIE()) {
-            global_elementID = "webchimera2";
-
-            var applet = "<div id='" + global_elementID + "'><object type='application/x-chimera-plugin' width='" + visual_size_w + "' " +
-                         "height='" + visual_size_h + "' name='visual_element' style='position:relative; float:left; margin: 10px;'>";
-            applet += "<param name='windowless' value='true' />";
-            applet += "</object>";
-            applet += "<div id='interface'></div></div>";
-
-            flex_div.append(applet);
-
-            // Play webchimera
-            try {
-                wjs("#" + global_elementID).clearPlaylist();
-                wjs("#" + global_elementID).addPlaylist(file_url);
-                wjs("#" + global_elementID).play();
-            } catch (err) {
-                console.log("Error loading webchimera");
-                console.log(err);
-
-                // Show alert message
-                $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
-                $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
-                $("#dialog_WebChimera a").text("aquí.")
-                $("#dialog_WebChimera").dialog({
-                    buttons: {
-                        "OK": function () {
-                            $(this).dialog("close");
-                        }
-                    }
-                });
+                break;
             }
 
-            ok = true;
-        }
-        else {
-            var label = $(".flex #globalplay_divSpecialMessages h2");
-            label.text(hashMessages["UtilizarNavegador2"]);
-            setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_final);
+            case "fbs": {
+
+                var duration_timeout = getDurationInMS(duration);
+
+                if (getIsFirefoxOrIE()) {
+                    if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
+
+                        global_elementID = "fbsviewer2";
+                        var fileStatus = element[0].fileStatus;
+
+                        var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' " +
+                            "height='" + visual_size_h + "px' name='fbsviewer' id='" + global_elementID + "' title='undefined'>";
+
+                        applet += "<param name='HOST' value=''>";
+                        applet += "<param name='PORT' value='5901'>";
+                        applet += "<param name='FBSURL' value='" + file_url + "'>";
+                        applet += "<param name='AUDIOURL' value=''>";
+                        applet += "<param name='SHOWPLAYERCONTROLS' value='YES'>"; // YES
+                        applet += "<param name='SHOWPLAYERTAGCONTROLS' value='YES'>";
+                        applet += "<param name='TIMECOUNTDOWN' value='NO'>";
+                        applet += "<param name='CACHE' value='NO'>";
+                        applet += "<param name='RESIZABLE' value='NO'>";
+                        applet += "<param name='TAGS' value=''>";
+                        applet += "<param name='QUICK_REWIND_SECS' value='-5'>";
+                        applet += "<param name='QUICK_ADVANCE_SECS' value='5'>";
+                        applet += "<param name='NOREC_TAGTYPE_NAME' value='Pause'>";
+                        applet += "</applet>";
+
+                        flex_div.append(applet);
+
+                        ok = true;
+
+                        setTimeout(function () { globalplay_removeElement(global_elementID, element) }, duration_timeout);
+                    }
+                } else {
+                    var label = $(".flex #globalplay_divSpecialMessages h2");
+                    label.text(hashMessages["UtilizarNavegador2"]);
+                    setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_timeout);
+                }
+
+                break;
+            }
+
+            case "avi":
+            case "crypt":
+            case "bin":
+            default: {
+
+                if (getIsFirefoxOrIE()) {
+                    global_elementID = "webchimera2";
+
+                    var applet = "<div id='" + global_elementID + "'><object type='application/x-chimera-plugin' width='" + visual_size_w + "' " +
+                                 "height='" + visual_size_h + "' name='visual_element' style='position:relative; float:left; margin: 10px;'>";
+                    applet += "<param name='windowless' value='true' />";
+                    applet += "</object>";
+                    applet += "<div id='interface'></div></div>";
+
+                    flex_div.append(applet);
+
+                    var webchimera_loaded = true;
+
+                    // Play webchimera
+                    try {
+                        wjs("#" + global_elementID).clearPlaylist();
+                        wjs("#" + global_elementID).addPlaylist(file_url);
+                        wjs("#" + global_elementID).play();
+                    } catch (err) {
+                        console.log("Error loading webchimera");
+                        console.log(err);
+
+                        // Show alert message
+                        $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
+                        $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
+                        $("#dialog_WebChimera a").text("aquí.")
+                        $("#dialog_WebChimera").dialog({
+                            buttons: {
+                                "OK": function () {
+                                    $(this).dialog("close");
+                                }
+                            }
+                        });
+
+                        webchimera_loaded = false;
+                    }
+
+                    // Webchimera Plugin not installed
+                    if (!webchimera_loaded) {
+                        setTimeout(function () { globalplay_removeElement(global_elementID, element); }, 2000);
+
+                        var label = $(".flex #globalplay_divSpecialMessages h2");
+                        label.text(hashMessages["InstallWebchimera_Aux"]);
+                        setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_final);
+                    }
+
+                    ok = true;
+                }
+                else {
+                    var label = $(".flex #globalplay_divSpecialMessages h2");
+                    label.text(hashMessages["UtilizarNavegador2"]);
+                    setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_final);
+                }
+
+                break;
+            }
         }
     }
 
     if (ok) {
         setTimeout(function () { globalplay_removeElement(global_elementID, element) }, duration_final);
-    }
-    return global_elementID;
-}
-
-function globalplay_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number) {
-    var global_elementID = "";
-    var duration = element[0].duration;
-    var duration_timeout = getDurationInMS(duration);
-
-    if (getIsFirefoxOrIE()) {
-        if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
-
-            global_elementID = "fbsviewer2";
-            var fileStatus = element[0].fileStatus;
-
-            var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' " +
-                "height='" + visual_size_h + "px' name='fbsviewer' id='" + global_elementID + "' title='undefined'>";
-
-            applet += "<param name='HOST' value=''>";
-            applet += "<param name='PORT' value='5901'>";
-            applet += "<param name='FBSURL' value='" + file_url + "'>";
-            applet += "<param name='AUDIOURL' value=''>";
-            applet += "<param name='SHOWPLAYERCONTROLS' value='YES'>"; // YES
-            applet += "<param name='SHOWPLAYERTAGCONTROLS' value='YES'>";
-            applet += "<param name='TIMECOUNTDOWN' value='NO'>";
-            applet += "<param name='CACHE' value='NO'>";
-            applet += "<param name='RESIZABLE' value='NO'>";
-            applet += "<param name='TAGS' value=''>";
-            applet += "<param name='QUICK_REWIND_SECS' value='-5'>";
-            applet += "<param name='QUICK_ADVANCE_SECS' value='5'>";
-            applet += "<param name='NOREC_TAGTYPE_NAME' value='Pause'>";
-            applet += "</applet>";
-
-            flex_div.append(applet);
-
-            setTimeout(function () { globalplay_removeElement(global_elementID, element) }, duration_timeout);
-        }
-    } else {
-        var label = $(".flex #globalplay_divSpecialMessages h2");
-        label.text(hashMessages["UtilizarNavegador2"]);
-        setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_timeout);
     }
     return global_elementID;
 }
@@ -4626,10 +4990,7 @@ function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, elem
 
     // Salvattore Source: http://webdesign.tutsplus.com/tutorials/build-a-dynamic-grid-with-salvattore-and-bootstrap-in-10-minutes--cms-20410
 
-
-    // DURATION TEST
-
-    setTimeout(function () { globalplay_removeElement(global_elementID, element) }, GLOBALPLAY_DEFAULT_DURATION);
+    //setTimeout(function () { globalplay_removeElement(global_elementID, element) }, GLOBALPLAY_DEFAULT_DURATION);
     return global_elementID;
 }
 
@@ -4670,10 +5031,6 @@ function globalplay_abort() {
 
 function globalplay_stop() {
 
-
-    // Queue of current elements playing
-    queue_elements = [[], [], []];
-
     // DO PAUSE
     $("#globalplay_play").removeClass("pauseAudio");
     $("#globalplay_play").addClass("play");
@@ -4682,6 +5039,9 @@ function globalplay_stop() {
     $.fancybox.close();
 
     TIMELINE_POINTER.css("left", "0%");
+
+    // Stop all elements currently playing
+    globalplay_pauseAllCurrentMedia(true);
 
     // Set ready elements already taken
     prepareElementsAlreadyTaken();
@@ -4700,6 +5060,9 @@ function globalplay_stop() {
 
     // Clear global timer
     $('#divGlobalplay_timer').timer('remove');
+
+    // Queue of current elements playing
+    queue_elements = [[], [], []];
 }
 
 // Clean info labels

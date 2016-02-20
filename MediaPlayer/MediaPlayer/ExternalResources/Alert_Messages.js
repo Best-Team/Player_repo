@@ -16,3 +16,4 @@ hashMessages["ConfirmarDesgargaElementos"] = "¿Desea descargar TODOS los elemen
 hashMessages["ConfirmarBorrarElementos1"] = "¿Desea borrar TODOS los elementos seleccionados?";
 hashMessages["ConfirmarBorrarElementos2"] = "¿Está seguro?";
 hashMessages["SeleccioneFolio"] = "Por favor, ingrese un folio válido.";
+hashMessages["InstallWebchimera_Aux"] = "Por favor, instale el plugin WebChimera para reproducir el elemento. ";
