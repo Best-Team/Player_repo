@@ -65,9 +65,9 @@ var TYPES = {
 /**** On page init ****/
 
 $(document).ready(function () {
-		   
+
     // Check JS Message file loaded OK, if not load default values
-    try{
+    try {
         if (!hashMessages) {
             console.log("Importante: Alert_Messages.js ==> hashMessages no encontrado.")
             LoadAlertMessagesBackup();
@@ -88,13 +88,13 @@ $(document).ready(function () {
     getElementsInMemory();
     loadHiddenFields();
     initVariables();
-		  
+
     initial_size = $('#divPanel_Busqueda').css('width');
     var pnlTagTypes = $("#divPanel_Busqueda div[id$='pnlTagTypes']");
     if (pnlTagTypes != null && pnlTagTypes.length) {
         pnlTagTypes.css("margin-top", "-13px");
     }
-		   
+
     // Initial focus
     $("#divPanel_Busqueda input[id*='_txbSearchBox1']").focus();
 
@@ -139,7 +139,7 @@ $(document).ready(function () {
     loadClickRemoveElementSelected_event();
 
     /**** Event: OnClick Load on click event fullscreen button for Screen recording elements ****/
-    loadClickFullscreen_event();         
+    loadClickFullscreen_event();
 
     /**** Slider control: comment duration ****/
     $("#sliderSingle1").slider({
@@ -182,7 +182,7 @@ $(document).ready(function () {
     if (TIMELINE_POINTER != null) {
         TIMELINE_POINTER.draggable({
             containment: '#divTimelineProgress',
-            axis: "x", 
+            axis: "x",
             scroll: false,
             cursor: 'move',
             stop: handleDragStop,
@@ -206,7 +206,20 @@ $(document).ready(function () {
 
         closeEffect: 'elastic',
         closeSpeed: 150,
-			   
+
+        beforeShow: function() {
+            $("#divGlobalplay_screen").show();
+        },
+        afterClose: function() {
+            $("#divGlobalplay_screen").hide();         
+            $("#globalPlayer_popup").show();
+        },
+
+        //autoSize: false,
+        //fitToView: false,
+        //width: "100%",
+        //height: "100%",
+
         helpers: {
             overlay: null
         }
@@ -263,11 +276,10 @@ function loadClickFullscreen_event() {
 
         var timer = 0;
         if (document.fbsviewer != null) {
-            try{
+            try {
                 timer = (document.fbsviewer.getCurrTimeOffsetInMSec() / 1000).toString();
                 document.fbsviewer.pause();
-            }catch(err)
-            {
+            } catch (err) {
                 console.log(err);
             }
         }
@@ -585,11 +597,11 @@ function handleDragStop(event, ui) {
 function handleDragging(event, ui) {
     var posX = ui.offset.left - $("#svg_timeframe").offset().left;
     var posY = ui.offset.top;
-    var posXfinal = posX + 80; 
+    var posXfinal = posX + 80;
     var posYfinal = posY - 78;
     var pop4_width = parseInt($(".box4.popbox4").css("width"), 10);
     if (posXfinal + pop4_width > $(window).width()) {
-        posXfinal = $(window).width() - pop4_width; 
+        posXfinal = $(window).width() - pop4_width;
     }
     $(".box4.popbox4").show("scale", 300);
     $(".box4.popbox4").offset({
@@ -753,7 +765,7 @@ function loadHiddenFields() {
 
 }
 
-	   
+
 
 function getFormattedDate(date) {
     var day = date.getDate();
@@ -862,7 +874,7 @@ function openFullscreen_video(isHTML5) {
 
             var duration = oldPlayer_activeElement_duration;
 
-            
+
         }
 
         light.css('width', '70%');
@@ -962,7 +974,7 @@ function closeFullscreen() {
                             break;
                         }
                     }
-                }               
+                }
 
                 break;
             }
@@ -1041,7 +1053,7 @@ function addCommentClick() {
             var btn_w = parseInt($("#btnAddComment").css("width"), 10);
 
             //$(".box.popbox").offset({ left: posXoff });
-            $(".box.popbox").offset({ left: posXoff - pop_w + (btn_w / 2) + (arrow_w/2) });
+            $(".box.popbox").offset({ left: posXoff - pop_w + (btn_w / 2) + (arrow_w / 2) });
             $(".box.popbox .arrow").css("left", (pop_w - arrow_w - 3) + "px");
             $(".box.popbox .arrow-border").css("left", (pop_w - arrow_w - 3) + "px");
 
@@ -1282,7 +1294,7 @@ function events_line_click(event) {
 
         // Set current pointer date, to the add-comment & upload-file functions
         setCurrentPointerPositionDate(event);
-			   
+
         // TODO: Check in Chrome 
 
         // Locate pointer in new position
@@ -1336,7 +1348,7 @@ function clear_timeline() {
     TIMELINE_POINTER.hide();
 }
 
-function pre_timeframe_prepare() { 
+function pre_timeframe_prepare() {
     var hdnJSonList = $("input[id*='_hdnJSonList']").val();
     var hdnJSonStart = $("input[id*='_hdnJSonStart']").val();
     var hdnJSonEnd = $("input[id*='_hdnJSonEnd']").val();
@@ -1505,7 +1517,7 @@ function timeframe_draw(timeline_data, start, end) {
                     }
                     var toolTip_title = "";
                     switch (tapeType) {
-                        case "S": 
+                        case "S":
                             {
                                 tapeType_longStr = rectTitle_values.grabacion;
                                 color_str = rectColor_values.grabacion;
@@ -1965,7 +1977,7 @@ function timeline_pointer_setLocation(tapeID) {
                 sm2_inline_element.css('width', _width);
 
                 sm2_inline_element.offset({ left: divTimelineProgress.offset().left });
-					   
+
                 sm2_progress_bd.css('width', _width);
 
                 sm2_progress_bd.css('left', _width);
@@ -2047,7 +2059,7 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     oldPlayer_activeElement_type = "";
     oldPlayer_activeElement_extension = "";
     oldPlayer_activeElement_duration = "";
-    
+
     // Remove click event
     aPlayPause_VIDEO.attr('onclick', '');
     aPlayPause_VIDEO.off("click");
@@ -2423,9 +2435,9 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
             wav_object += " <param name='autoStart' value='0'>";
             wav_object += " <a href='" + file_url + "'>Play</a>";
             wav_object += " </object>";
-           
+
             $("#audioContainer object").remove();
-            $("#audioContainer").append(wav_object);            
+            $("#audioContainer").append(wav_object);
 
             divControlsMask_AUDIO.hide(); //
 
@@ -2905,7 +2917,7 @@ function onTrackedVideoFrame(currentTime, duration, timer_VIDEO, divControlsMask
 }
 
 /**** Event: OnClick Load on click event remove button (btnRemoveElement) ****/
-function loadClickRemoveButton_event(){
+function loadClickRemoveButton_event() {
     var btnRemoveElement = $("#btnRemoveElement");
     btnRemoveElement.bind("click", function () {
         if (!$('#btnRemoveElement').hasClass("opened")) {
@@ -3033,7 +3045,7 @@ function SetAudioPlaylistURL(number, vURL) {
         // TODO: Research this.
         /* Workaround: sometimes SoundManager.js uses ._iO object to reproduce the audio, and other times uses the object returned by getSoundObject() directly */
         if (player.playlistController.getSoundObject()._iO != null && player.playlistController.getSoundObject()._iO &&
-            player.playlistController.getSoundObject()._iO.url != null){
+            player.playlistController.getSoundObject()._iO.url != null) {
             player.playlistController.getSoundObject()._iO.url = vURL;
         }
         if (player.playlistController.getSoundObject().url != null && player.playlistController.getSoundObject().url) {
@@ -3237,7 +3249,7 @@ function ActionVideoPlay(tapeID, duration, isAudioPlaying) {
                         playVideo_ok = true;
 
                         // Set div visible
-                        divPlayer_VIDEO.css("visibility", "visible"); 
+                        divPlayer_VIDEO.css("visibility", "visible");
 
                         TimeRefreshLoop(duration);
                     }
@@ -3259,7 +3271,7 @@ function emptyAudioPlayer() {
             divControlsMask_AUDIO.addClass("paused");
             divControlsMask_AUDIO.removeClass("playing");
         }
-    }         
+    }
 }
 
 function emptyVideoPlayer() {
@@ -3516,7 +3528,7 @@ function TimeRefreshLoop(totalDurationSecs) {
             var currentSecs = document.fbsviewer.getCurrTimeOffsetInMSec() / 1000;
 
             //Si supero los segundos totales, o detecto que el tiempo fue para atras, asumo que termino y dejo de refrecar
-            if (currentSecs < totalDurationSecs && currentSecs >= previousSecs){ // && currentSecs != 0) {
+            if (currentSecs < totalDurationSecs && currentSecs >= previousSecs) { // && currentSecs != 0) {
 
                 //if (currentSecs <= totalDurationSecs && currentSecs >= previousSecs && currentSecs !=0) {
                 previousSecs = currentSecs;
@@ -3578,7 +3590,7 @@ function addFileClick() {
         folioID = _hdnFolioID.val();
     }
     var folioID_int = parseInt(folioID, 10);
-		
+
     if (folioID_int != null && !isNaN(folioID_int) && folioID_int > 0) {
 
         if (!$('#btnUploadElement').hasClass("opened")) {
@@ -3759,7 +3771,7 @@ function downloadAll() {
     }
 }
 /******** Auxiliar Functions ********/
-   
+
 // Get duration format in ms for timeouts
 function getDurationInMS(duration) {
     return duration * 1000;
@@ -3851,7 +3863,7 @@ function getTime(msec, useString) {
             'min': min,
             'sec': sec
         });
-}    
+}
 
 // Load elements from folio selected - Get data from server
 function getElementsInMemory() {
@@ -3961,7 +3973,7 @@ function getElementInMemoryByTimeRange(originalID, timeStart, timeCurrent) {
 function getElementInMemoryByTimeRange_onlyVisibleInTimeline(originalID, timeStart, timeCurrent) {
     if (elementsInMemory != null && elementsInMemory.length > 0) {
         var element_caller = getElementInMemoryByID(originalID);
-        if(element_caller != null){
+        if (element_caller != null) {
             var array = elementsInMemory.filter(function (el) {
                 return (el.tapeType === 'S' || el.tapeType === 'A' || el.tapeType === 'V') && el.tapeType != element_caller.tapeType && el.tapeID != originalID && el.isPlaying === "false" &&
                     moment(el.timestamp, "DD-MM-YYYY HH:mm:ss").toDate() >= timeStart &&
@@ -3996,7 +4008,7 @@ function getElementInMemoryByType(elementType) {
     }
 }
 
-	
+
 
 // Hidden Field hdnIsUpdateNeeded: alerts if is needed a data refresh from code behind
 // A: Normal file upload
@@ -4046,7 +4058,7 @@ function prepareFileUpload_b(e) {
 
 function confirmAddComment() {
     var userID = globalUserID;
-		 
+
     // Check if folio is selected
     var folioID = 0;
     var _hdnFolioID = $("input[id*='_hdnFolioID']");
@@ -4108,24 +4120,24 @@ function confirmAddComment() {
 
                     // Create new row to HTML table
                     var tr = "<tr id='tape_" + object.tapeID + "'>";
-                    tr +="<td>";
-                    tr +="<input type='checkbox' name='timeline_elements' class='button' value='" + object.tapeID + "#true#C' checked>";//onclick='manageElement(this, " + object.tapeID + ", " + (index - 1).toString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>";
-                    tr +="<td>";
-                    tr +="<h5>" + object.count + "</h5>";
-                    tr +="<td>";
+                    tr += "<td>";
+                    tr += "<input type='checkbox' name='timeline_elements' class='button' value='" + object.tapeID + "#true#C' checked>";//onclick='manageElement(this, " + object.tapeID + ", " + (index - 1).toString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>";
+                    tr += "<td>";
+                    tr += "<h5>" + object.count + "</h5>";
+                    tr += "<td>";
                     tr += "<h5>" + username + "</h5>";
-                    tr +="<td>";
-                    tr +="<h5>" + "" + "</h5>";
-                    tr +="<td>";
-                    tr +="<h5>" + "" + "</h5>";
-                    tr +="<td>";
+                    tr += "<td>";
+                    tr += "<h5>" + "" + "</h5>";
+                    tr += "<td>";
+                    tr += "<h5>" + "" + "</h5>";
+                    tr += "<td>";
                     tr += "<button type='button' class='btn btn-default btn-sm' style='color:orange; opacity: 0.9; background-color: beige; border: 1px solid black; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' ";
                     tr += "title='C' onclick='clickTimelineElement2(\"" + object.tapeID + "\", \"" + object.count + "\", \"" + object.duration + "\", \"" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "\", \"Comentario\", \"" + object.tapeID + "\", \"true\", \"" + object.fileName + "\", \"" + object.filePath + "\", \"" + object.duration_formatStr + "\", \"C\", \"OK\"" + ")' ><span class='glyphicon glyphicon-comment' aria-hidden='true'></span></button>";
-                    tr +="<td>";
-                    tr +="<h5 id='timestamp'>" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "</h5>";
-                    tr +="<td>";
-                    tr +="<h5>" + object.duration_formatStr + "</h5>";
-                    tr +="</tr>";
+                    tr += "<td>";
+                    tr += "<h5 id='timestamp'>" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "</h5>";
+                    tr += "<td>";
+                    tr += "<h5>" + object.duration_formatStr + "</h5>";
+                    tr += "</tr>";
 
                     // Add object to Html Table
                     $("#tblLeftGridElements tbody").append(tr);
@@ -4180,7 +4192,7 @@ function globalplay_init() {
     var divPlayer_VIDEO = $("#divPlayer_VIDEO");
     divPlayer_VIDEO.css("visibility", "hidden");
 
-    if ($("#globalplay_play").hasClass("play")) {      
+    if ($("#globalplay_play").hasClass("play")) {
 
 
         globalplay_initEvents(); ////////////
@@ -4358,7 +4370,7 @@ function globalplay_pauseAllCurrentMedia(isStop) {
                                 dynamic_object.pause();
                             }
                         }
-                        
+
                         break;
                     }
 
@@ -4537,7 +4549,7 @@ function globalplay_resumeAllCurrentMedia() {
 
 
 // Stopeable timer
-var timer_globalplay; 
+var timer_globalplay;
 function globalplay_start() {
 
     var w = $("#divTimelineProgress").css("width");
@@ -4647,7 +4659,7 @@ function globalplay_loadElements() {
             $(".flex").find('*').not('.info-label, .info-label *').each(function (index, el) {
                 $(this).css("width", visual_size_w);
                 $(this).css("height", visual_size_h);
-                
+
             });
 
             if (float_left) {
@@ -4778,7 +4790,7 @@ function globalplay_audio(file_url, element, dynamic_number, flex_div) {
     var duration = element[0].duration;
     var fileName = element[0].fileName;
     var duration_timeout = getDurationInMS(duration);// * 1.3;
-		  
+
     var object = new Array();
     object[0] = global_elementID;
 
@@ -4985,7 +4997,7 @@ function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, elem
     var fileName = element[0].fileName;
 
     $('<a name="visual_element" id="' + global_elementID + '" style="width:' + visual_size_w + 'px; height:' + visual_size_h + 'px;' +
-       'background-image:url(' + file_url + '); float:left; position:relative; margin:10px; background-size: auto 100%;"' +
+       'background-image:url(' + file_url + '); float:left; position:relative; margin:8px 12px; background-size: auto 100%;"' +
        'width="' + visual_size_w + '" height="' + visual_size_h + '">' + fileName + '</a>').appendTo(flex_div).fadeIn(2000);
 
     // Salvattore Source: http://webdesign.tutsplus.com/tutorials/build-a-dynamic-grid-with-salvattore-and-bootstrap-in-10-minutes--cms-20410
@@ -5120,7 +5132,7 @@ function getElementInMemoryByCurrentPlayingTime() {
                 element_end.add(el[0].duration, "seconds");
             }
 
-            return element_start != null && element_end != null && el[1] === false && 
+            return element_start != null && element_end != null && el[1] === false &&
                 element_start.toDate() <= timeCurrent.toDate() &&
                 timeCurrent.toDate() <= element_end.toDate();
         });
