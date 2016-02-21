@@ -654,6 +654,13 @@ namespace MediaPlayer
                 Globalplay_defaultDuration = ConfigurationManager.AppSettings["Globalplay_defaultDuration"].ToString();
             }
             _hdnGlobalplay_defaultDuration.Value = Globalplay_defaultDuration;
+
+            string Globalplay_simultaneousElements = "6";
+            if (ConfigurationManager.AppSettings != null)
+            {
+                Globalplay_simultaneousElements = ConfigurationManager.AppSettings["Globalplay_simultaneousElements"].ToString();
+            }
+            _hdnGlobalplay_simultaneousElements.Value = Globalplay_simultaneousElements;
         }
 
         private void Logout()

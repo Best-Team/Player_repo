@@ -1,4 +1,12 @@
-﻿.ui-dialog {
+﻿.globalplay_controls {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+}
+
+.ui-dialog {
     z-index: 10000; /*2500*/
 }
 
@@ -21,12 +29,16 @@
 }
 
 .playerContainer {
+    margin-left: 8px;
     width: 55px;
     height: 140px;
-    padding-right: 55px;
+    padding-right: 60px;
     margin-top: 10px;
     background-color: #446e9b;
-    background-image: linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 45%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.1) 51%, rgba(0,0,0,0.1) 95%);
+    /*background-image: linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 45%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.1) 51%, rgba(0,0,0,0.1) 95%);*/
+    /*background-image: linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 35%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.1) 95%);*/
+ background-image: linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 35%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.1) 75%);
+
 }
 
 /* ---------------------------------- */

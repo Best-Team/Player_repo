@@ -47,7 +47,6 @@
 	<link href="assets/css/jquery.fancybox.css" type="text/css" rel="stylesheet"/> 
 	<link href="assets/css/Dashboard.css" type="text/css" rel="stylesheet"/> 
 
-
 	<!--<script src="assets/js/bootstrap-confirmation.js"></script>-->
 	<script src="assets/js/jquery.darktooltip.js"></script>
 	<link href="assets/css/darktooltip.css" type="text/css" rel="stylesheet"/> 
@@ -614,22 +613,17 @@
 
 				<div class="row" style="display:inline">
 
-
                      <!-- -->
                             
-					 <div id="playerContainer" class="playerContainer col-md-2"> <!-- img-rounded -->
+					 <div id="playerContainer" class="playerContainer col-md-2 img-rounded"> <!-- img-rounded -->
 						<div id="controlContainer">
-							<ul class="controls"> <!-- Controls mask Source: http://www.jqueryrain.com/?vXjX8BEk -->
-								<li>
-									<a href="#" class="mute" data-attr="mute"></a>
+							<ul class="globalplay_controls controls"> <!-- Controls mask Source: http://www.jqueryrain.com/?vXjX8BEk -->
+								<li id="globalplay_play_li" class="img-rounded globalplay_play_li">
+									<a href="#divGlobalplay_screen" id="globalplay_play" class="globalplay_play" data-attr="playPauseAudio" onclick="return globalplay_init()"></a> <!-- Play/Pause button -->
+                                    <a href="#divGlobalplay_screen" id="btnOpenFancybox" style="display:none;"></a>
 								</li>
-								<li>
-									<a href="#divGlobalplay_screen" id="globalplay_play" class="play" data-attr="playPauseAudio" onclick="return globalplay_init()"></a> <!-- Play/Pause button -->
-								   <a href="#divGlobalplay_screen" id="btnOpenFancybox" style="display:none;"></a>
-								</li>
-								<li>
-									<a href="#divGlobalplay_screen" id="globalplay_stop" class="" data-attr="nextAudio" onclick="return globalplay_stop()"> <!-- Stop button -->
-										<span class="fa fa-stop-circle fa-2x" aria-hidden="true" style="color:white"></span>
+								<li id="globalplay_stop_li" class="img-rounded">
+									<a href="#divGlobalplay_screen" id="globalplay_stop" class="globalplay_stop" data-attr="nextAudio" onclick="return globalplay_stop()"> <!-- Stop button -->
 									</a>
 								</li>
 							</ul>
@@ -637,7 +631,6 @@
 					</div>
 
                         <!-- -->
-
 
 					<div id="divTimelineProgress" style="height:8px; position:absolute; margin-top: 10px;"></div> <!-- Contenedor draggable para el Progress Pointer -margin-top: -5px -->
 					<div id="timeframe" class="timeframe col-md-10">
@@ -702,7 +695,6 @@
    <script src="assets/js/highlight.js"></script>
    <script src="assets/js/jquery.photobox.js" type="text/javascript"></script>
 
-<!-- From Server to Client -->      
 <asp:HiddenField ID="_hdnIsUpdateNeeded" runat="server" Value="false" ClientIDMode="Static" />
 <asp:HiddenField ID="_hdnLocalRepository" runat="server" ClientIDMode="Static" />
 <asp:HiddenField ID="_hdnWS_Oreka_Server" runat="server" ClientIDMode="Static" />
@@ -720,8 +712,8 @@
 <asp:HiddenField ID="_hdnWebchimera_Install_URL" runat="server" ClientIDMode="Static" />
 <asp:HiddenField ID="_hdnMaxElementsDownload" runat="server" ClientIDMode="Static" />
 <asp:HiddenField ID="_hdnGlobalplay_defaultDuration" runat="server" ClientIDMode="Static" />
+<asp:HiddenField ID="_hdnGlobalplay_simultaneousElements" runat="server" ClientIDMode="Static" />
+        
 
-
-<!-- From Client to Server -->      
 </form>
 </asp:content>

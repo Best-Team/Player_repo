@@ -1,4 +1,77 @@
-﻿/**
+﻿
+
+.globalplay_play_li {
+    padding: 5px;
+    border: 2px solid rgba(0,0,0,0.1);
+    margin: 0 auto;
+}
+
+.globalplay_play_li:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.globalplay_play:hover {
+    background-image: url(../image/icomoon/entypo-25px-ffffff/PNG/play.png);
+    background-image: none, url(../image/icomoon/entypo-25px-ffffff/SVG/play.svg);
+}
+
+.globalplay_play {
+    background-image: url(../image/icomoon/entypo-25px-ffffff/PNG/play.png);
+    background-image: none, url(../image/icomoon/entypo-25px-ffffff/SVG/play.svg);
+    min-width: 2.8em;
+    min-height: 2.8em;
+    background-size: 120%;
+    background-position: 40% 53%;
+}
+
+
+/**/
+
+
+.globalplay_pause:hover {
+    background-image: url(../image/icomoon/entypo-25px-ffffff/PNG/pause.png);
+    background-image: none, url(../image/icomoon/entypo-25px-ffffff/SVG/pause.svg);
+}
+
+.globalplay_pause {
+    background-image: url(../image/icomoon/entypo-25px-ffffff/PNG/pause.png);
+    background-image: none, url(../image/icomoon/entypo-25px-ffffff/SVG/pause.svg);
+    min-width: 2.8em;
+    min-height: 2.8em;
+    background-size: 120%;
+    background-position: 40% 53%;
+}
+
+/**/
+
+#globalplay_stop_li {
+    margin-top: 15px !important;
+    padding: 3px;
+    border: 2px solid rgba(0,0,0,0.1);
+    margin: 0 auto;
+}
+
+#globalplay_stop_li:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+
+#globalplay_stop:hover {
+    background-image: url(../image/icomoon/entypo-25px-ffffff/PNG/list2.png);
+    background-image: none, url(../image/icomoon/entypo-25px-ffffff/SVG/list2.svg);
+}
+
+#globalplay_stop {
+    background-image: url(../image/icomoon/entypo-25px-ffffff/PNG/list2.png);
+    background-image: none, url(../image/icomoon/entypo-25px-ffffff/SVG/list2.svg);
+    min-width: 1.8em;
+    min-height: 1.8em;
+    background-size: 120%;
+    background-position: 40% 53%;
+}
+
+
+
+/**
  * SoundManager 2: "Bar UI" player - CSS
  * Copyright (c) 2014, Scott Schiller. All rights reserved.
  * http://www.schillmania.com/projects/soundmanager2/
@@ -112,7 +185,8 @@
  width: 100%;
  height: 100%;
  background-image: -moz-linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 45%, rgba(255,255,255,0.15) 52%, rgba(0,0,0,0.01) 51%, rgba(0,0,0,0.1) 95%); /* W3C */
- background-image: linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 45%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.1) 51%, rgba(0,0,0,0.1) 95%); /* W3C */
+ /*background-image: linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 45%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.1) 51%, rgba(0,0,0,0.1) 95%); /* W3C */
+ background-image: linear-gradient(to bottom, rgba(255,255,255,0.125) 5%, rgba(255,255,255,0.125) 35%, rgba(255,255,255,0.15) 50%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.1) 75%);
 }
 
 .sm2-bar-ui.flat .sm2-inline-gradient {
