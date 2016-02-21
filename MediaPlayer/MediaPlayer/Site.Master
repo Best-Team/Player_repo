@@ -68,7 +68,7 @@
                     <div class="navbar-header">
                         <div style="text-align: center;">
                             <a class="navbar-brand" href="#" style="padding: 0px;">
-                                <img src="assets/images/logo.png" class="img-responsive" style="width: 30px; display: inline-block; margin-bottom: 5px; margin-right: 5px;" /><label class="title" style="padding-top: 10px; padding-bottom: 19.5px;">inConcert </label>
+                                <img src="assets/images/logo.png" class="img-responsive" style="width: 30px; display: inline-block; margin-bottom: 5px; margin-right: 5px;" /><label class="title" style="padding: 10px 0px;">inConcert </label>
                             </a>
                         </div>
                     </div>

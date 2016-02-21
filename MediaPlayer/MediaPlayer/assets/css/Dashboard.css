@@ -83,11 +83,12 @@ div#playerBox {
 
 .globalplayBox {
     min-width: 1000px;
-    min-height: 650px;
+    height: 660px;
     border: solid 0.17em;
     background: linear-gradient(to bottom, #9EA7B1, #9EA7B1);
-    top: 10px;
-    padding: 30px 40px;
+    position: relative;
+    margin-bottom: 10px;   
+    padding: 15px 40px;
 }
 
 .fancybox-wrap {
@@ -310,20 +311,37 @@ div.disabled, button.disabled, a.disabled {
 }
 
 .info-label {
-    width:100%;
-    z-index:1001;
-    position:absolute;
+    width: 100%;
+    z-index: 1001;
+    position: absolute;
 }
+
+.fancybox-inner {
+    overflow: hidden !important;
+}
+
+#timer-labels {
+    background: linen;
+    border-radius: 4px;
+    z-index: 200;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 6px;
+}
+
 
 /************* Flex js  *************/
 
 .flex {
     position: relative;
-    width: 50%;
+    max-width: 990px;
+    max-height: 630px;
     min-height: 593px;
     margin: 0 auto;
     border: 0px solid red;
-    
+    display: inline-block;
+    overflow-y: auto;
 }
 
     .flex a {

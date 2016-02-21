@@ -209,16 +209,14 @@ $(document).ready(function () {
 
         beforeShow: function() {
             $("#divGlobalplay_screen").show();
-        },
-        afterClose: function() {
-            $("#divGlobalplay_screen").hide();         
-            $("#globalPlayer_popup").show();
+            $('<div id="timer-labels"><label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label> / <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label></div>').appendTo("#divGlobalplay_screen");
         },
 
-        //autoSize: false,
-        //fitToView: false,
-        //width: "100%",
-        //height: "100%",
+        afterClose: function() {
+            $("#divGlobalplay_screen").hide();
+            $("#divGlobalplay_screen #timer-labels").remove();
+            $("#globalPlayer_popup").show();
+        },
 
         helpers: {
             overlay: null
@@ -4662,9 +4660,9 @@ function globalplay_loadElements() {
 
             });
 
-            if (float_left) {
-                $(".flex").css("display", "inline");
-            }
+            //if (float_left) {
+            //    $(".flex").css("display", "inline");
+            //}
         }
 
         // Set label elements on play
@@ -4794,7 +4792,7 @@ function globalplay_audio(file_url, element, dynamic_number, flex_div) {
     var object = new Array();
     object[0] = global_elementID;
 
-    var label = $(".flex #globalplay_divAudioName h2");
+    var label = $("#globalplay_divAudioName h2");
     label.text(fileName);
 
     // Get file extension
@@ -4913,7 +4911,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         setTimeout(function () { globalplay_removeElement(global_elementID, element) }, duration_timeout);
                     }
                 } else {
-                    var label = $(".flex #globalplay_divSpecialMessages h2");
+                    var label = $("#globalplay_divSpecialMessages h2");
                     label.text(hashMessages["UtilizarNavegador2"]);
                     setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_timeout);
                 }
@@ -4967,7 +4965,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                     if (!webchimera_loaded) {
                         setTimeout(function () { globalplay_removeElement(global_elementID, element); }, 2000);
 
-                        var label = $(".flex #globalplay_divSpecialMessages h2");
+                        var label = $("#globalplay_divSpecialMessages h2");
                         label.text(hashMessages["InstallWebchimera_Aux"]);
                         setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_final);
                     }
@@ -4975,7 +4973,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                     ok = true;
                 }
                 else {
-                    var label = $(".flex #globalplay_divSpecialMessages h2");
+                    var label = $("#globalplay_divSpecialMessages h2");
                     label.text(hashMessages["UtilizarNavegador2"]);
                     setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_final);
                 }
@@ -5011,7 +5009,7 @@ function globalplay_document(file_url, element, dynamic_number) {
     var duration = element[0].duration;
     var fileName = element[0].fileName;
     var duration_final = duration <= 1 ? 5000 : duration * 1000;
-    var label = $(".flex #globalplay_divDocumentsName h2");
+    var label = $("#globalplay_divDocumentsName h2");
 
     label.text("Documento: " + fileName);
     setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_final);
@@ -5025,7 +5023,7 @@ function globalplay_comment(element, dynamic_number) {
     var fileName = element[0].fileName;
     var duration_final = duration <= 1 ? 5000 : duration * 1000;
 
-    var label = $(".flex #globalplay_divComments h2");
+    var label = $("#globalplay_divComments h2");
     label.text(fileName);
     setTimeout(function () { globalplay_clearLabel(label) }, duration_final);
 
@@ -5087,10 +5085,10 @@ function globalplay_cleanLabels() {
 
 // Remove elements from globalplay player
 function globalplay_removeAllElements() {
-    $(".flex").find('*').not('.info-label, .info-label *').remove();
+    $(".flex").find('*').remove();
 
     // Clean all label elements
-    $(".flex div h2").text("");
+    $("flex_messages div h2").text("");
 }
 
 function globalplay_removeElement(global_elementID, element) {

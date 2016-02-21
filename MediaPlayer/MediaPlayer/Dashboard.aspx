@@ -88,9 +88,9 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentBody" runat="server">
     <form id="form1" runat="server" enctype="multipart/form-data">
         <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
-        <div style="width: 100%; padding-bottom: 20px;">
-            <div id="divMessages" role="alert" style="padding: 6px;"></div>
-            <div style="width: 98%; min-height: 360px; height: 100%; margin: 0 auto;">
+        <div style="width: 100%; margin-top: 11px; margin-bottom: 15px;">
+            <div id="divMessages" role="alert" style="padding: 6px; display: none;"></div>
+            <div style="width: 98%; min-height: 360px; height: 100%; margin: 8px auto;">
                 <div class="row no-gutter" style="height: 100%; min-height: 600px; max-height: 600px;">
 
                     <!-- PANEL BÚSQUEDA -->
@@ -586,43 +586,35 @@
                     </div>
                 </div>
 
-
-
                 <div class="row no-gutter">
-
 
                     <!-- PANEL TIMELINE -->
                     <div id="globalPlayer_popup">
 
                         <!-- GLOBALPLAY SCREEN -->
-                        <div id="divGlobalplay_screen" class="globalplayBox img-rounded" style="display: block; margin-bottom: 10px;">
+                        <div id="divGlobalplay_screen" class="globalplayBox img-rounded" style="display: none;">
                             <!-- min-height:100%;"> -->
-                            <div style="position: relative;">
-                                <div id="globalplay_divSpecialMessages" class="info-label" style="top: -25px;">
+                            <div id="flex_messages">
+                                <div id="globalplay_divSpecialMessages" class="info-label">
                                     <h2 class="label label-danger" style="z-index: 1001; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
                                 </div>
 
-                                <div id="globalplay_divDocumentsName" class="info-label" style="top: -25px;"">
+                                <div id="globalplay_divDocumentsName" class="info-label">
                                     <h2 class="label label-success" style="z-index: 1001; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
                                 </div>
 
-                                <div id="globalplay_divAudioName" class="info-label" style="top: -25px;"">
+                                <div id="globalplay_divAudioName" class="info-label">
                                     <h2 class="label label-danger" style="z-index: 1001; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
                                 </div>
 
-                                <div id="globalplay_divComments" class="info-label" style="bottom: -15px">
+                                <div id="globalplay_divComments" class="info-label" style="bottom: 25px;">
                                     <h2 class="label label-warning" style="z-index: 1001; background-color: orange; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
                                 </div>
-                                <div class="flex">
-                                    <!--min-height:100%;">-->
-                                    <%--<div style="position: relative;">--%>
-
-                                    <div style="clear: both;"></div>
-                                    <%--</div>--%>
-                                </div>
+                            </div>
+                            <div class="flex">
+                                <!--min-height:100%;">-->
                             </div>
                         </div>
-
 
                         <div id="divGlobalplay_timer" style="display: none;"></div>
                         <div id="divTimeline" class="divTimeline div-panel2 col-md-12 col-xs-12 img-rounded">
@@ -712,7 +704,7 @@
                                     <label id="lblPopbox4" class="label" style="font-size: 100%; color: black;"></label>
                                 </div>
                             </div>
-                            
+
                         </div>
                         <div style="clear: both;"></div>
                     </div>

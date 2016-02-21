@@ -48,9 +48,6 @@
 			return getScalar(value, dim) + 'px';
 		};
 
-	//var extra_wrap = '<div id="timer-labels" class="pull-left" style="background: linen; border-radius: 4px;"> <label id="lblGlobalplay_timer_current_longFormat" class="label" style="font-size:100%; color:black;">00:00:00</label> / <label id="lblGlobalplay_timer_total_longFormat" class="label" style="font-size:100%; color:black;">00:00:00</label> <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label> / <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label></div>';
-	var extra_wrap = '<div id="timer-labels" class="pull-left" style="background: linen; border-radius: 4px; z-index: 200; position: absolute; bottom: 0; margin: 6px;"> <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label> / <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label></div>';
-
 
 	$.extend(F, {
 		// The current version of fancyBox
@@ -142,7 +139,7 @@
 
 			// HTML templates
 			tpl: {
-			    wrap: '<div class="fancybox-wrap" tabIndex="-1"><div class="fancybox-skin" style="background-color: transparent !important;"><div class="fancybox-outer"><div class="fancybox-inner">' + extra_wrap + '</div></div></div></div>',
+			    wrap: '<div class="fancybox-wrap" tabIndex="-1"><div class="fancybox-skin" style="background-color: transparent !important;"><div class="fancybox-outer"><div class="fancybox-inner"></div></div></div></div>',			    
 				image    : '<img class="fancybox-image" src="{href}" alt="" />',
 				iframe   : '<iframe id="fancybox-frame{rnd}" name="fancybox-frame{rnd}" class="fancybox-iframe" frameborder="0" vspace="0" hspace="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen' + (IE ? ' allowtransparency="true"' : '') + '></iframe>',
 				error    : '<p class="fancybox-error">The requested content cannot be loaded.<br/>Please try again later.</p>',
