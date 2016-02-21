@@ -66,7 +66,7 @@ var TYPES = {
 /**** On page init ****/
 
 $(document).ready(function () {
-		   
+
     // Check JS Message file loaded OK, if not load default values
     try {
         if (!hashMessages) {
@@ -89,13 +89,13 @@ $(document).ready(function () {
     getElementsInMemory();
     loadHiddenFields();
     initVariables();
-		  
+
     initial_size = $('#divPanel_Busqueda').css('width');
     var pnlTagTypes = $("#divPanel_Busqueda div[id$='pnlTagTypes']");
     if (pnlTagTypes != null && pnlTagTypes.length) {
         pnlTagTypes.css("margin-top", "-13px");
     }
-		   
+
     // Initial focus
     $("#divPanel_Busqueda input[id*='_txbSearchBox1']").focus();
 
@@ -140,7 +140,7 @@ $(document).ready(function () {
     loadClickRemoveElementSelected_event();
 
     /**** Event: OnClick Load on click event fullscreen button for Screen recording elements ****/
-    loadClickFullscreen_event();         
+    loadClickFullscreen_event();
 
     /**** Slider control: comment duration ****/
     $("#sliderSingle1").slider({
@@ -183,7 +183,7 @@ $(document).ready(function () {
     if (TIMELINE_POINTER != null) {
         TIMELINE_POINTER.draggable({
             containment: '#divTimelineProgress',
-            axis: "x", 
+            axis: "x",
             scroll: false,
             cursor: 'move',
             stop: handleDragStop,
@@ -207,13 +207,13 @@ $(document).ready(function () {
 
         closeEffect: 'elastic',
         closeSpeed: 150,
-			   
-        beforeShow: function() {
+
+        beforeShow: function () {
             $("#divGlobalplay_screen").show();
             $('<div id="timer-labels"><label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label> / <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label></div>').appendTo("#divGlobalplay_screen");
         },
 
-        afterClose: function() {
+        afterClose: function () {
             $("#divGlobalplay_screen").hide();
             $("#divGlobalplay_screen #timer-labels").remove();
             $("#globalPlayer_popup").show();
@@ -484,42 +484,42 @@ function loadGridCheckboxAll_event() {
             // Loop into types
             for (obj in objects) {
                 if (elementsInMemory != null && elementsInMemory.length > 0) {
-                        for (var i = 0; i < elementsInMemory.length; i++) {
-                            var element = elementsInMemory[i];
-                            if (element != null) {
-                                var tapeID = element.tapeID;
+                    for (var i = 0; i < elementsInMemory.length; i++) {
+                        var element = elementsInMemory[i];
+                        if (element != null) {
+                            var tapeID = element.tapeID;
 
-                                if (objects[obj] == tapeID) {
-                                    var groupName = element.groupName;
-                                    var tapeType = element.tapeType;
-                                    var duration = element.duration;
-                                    var timestamp = element.timestamp;
-                                    var segmentID = element.segmentID;
-                                    var count = element.count;
-                                    var fileName = element.fileName;
-                                    var endDate = element.endDate;
-                                    var filePath = element.filePath;
-                                    var duration_formatStr = element.duration_formatStr;
-                                    var fileStatus = element.fileStatus;
+                            if (objects[obj] == tapeID) {
+                                var groupName = element.groupName;
+                                var tapeType = element.tapeType;
+                                var duration = element.duration;
+                                var timestamp = element.timestamp;
+                                var segmentID = element.segmentID;
+                                var count = element.count;
+                                var fileName = element.fileName;
+                                var endDate = element.endDate;
+                                var filePath = element.filePath;
+                                var duration_formatStr = element.duration_formatStr;
+                                var fileStatus = element.fileStatus;
 
-                                    var tapeType_str = tapeType;
-                                    if (tapeType == "S") {
-                                        tapeType_str = "P";
-                                    }
-
-                                    // Create object
-                                    var object_group = {};
-                                    object_group.name = tapeType_str; //
-                                    object_group.start = timestamp;
-                                    object_group.end = endDate;
-                                    object_group.id = tapeID;
-                                    object_group.role = groupName;
-                                    object_group.type = tapeType;
-                                    element_checks.push(object_group);
+                                var tapeType_str = tapeType;
+                                if (tapeType == "S") {
+                                    tapeType_str = "P";
                                 }
+
+                                // Create object
+                                var object_group = {};
+                                object_group.name = tapeType_str; //
+                                object_group.start = timestamp;
+                                object_group.end = endDate;
+                                object_group.id = tapeID;
+                                object_group.role = groupName;
+                                object_group.type = tapeType;
+                                element_checks.push(object_group);
                             }
-                        } //for
-                    }
+                        }
+                    } //for
+                }
             } //for
 
             // Append role elements to original elements
@@ -601,11 +601,11 @@ function handleDragStop(event, ui) {
 function handleDragging(event, ui) {
     var posX = ui.offset.left - $("#svg_timeframe").offset().left;
     var posY = ui.offset.top;
-    var posXfinal = posX + 80; 
+    var posXfinal = posX + 80;
     var posYfinal = posY - 78;
     var pop4_width = parseInt($(".box4.popbox4").css("width"), 10);
     if (posXfinal + pop4_width > $(window).width()) {
-        posXfinal = $(window).width() - pop4_width; 
+        posXfinal = $(window).width() - pop4_width;
     }
     $(".box4.popbox4").show("scale", 300);
     $(".box4.popbox4").offset({
@@ -694,9 +694,9 @@ function initVariables() {
     var _hdnGlobalplay_simultaneousElements = $("#_hdnGlobalplay_simultaneousElements");
     if (_hdnGlobalplay_simultaneousElements != null && _hdnGlobalplay_simultaneousElements.val() != null && _hdnGlobalplay_simultaneousElements.val().length > 0) {
         GLOBALPLAY_SIMULTANEOUS_ELEMENTS = _hdnGlobalplay_simultaneousElements.val();
-}
+    }
 
-    
+
 }
 
 function loadHiddenFields() {
@@ -779,7 +779,7 @@ function loadHiddenFields() {
 
 }
 
-	   
+
 
 function getFormattedDate(date) {
     var day = date.getDate();
@@ -887,7 +887,7 @@ function openFullscreen_video(isHTML5) {
 
             var duration = oldPlayer_activeElement_duration;
 
-            
+
         }
 
         light.css('width', '70%');
@@ -987,7 +987,7 @@ function closeFullscreen() {
                             break;
                         }
                     }
-                }               
+                }
 
                 break;
             }
@@ -1307,7 +1307,7 @@ function events_line_click(event) {
 
         // Set current pointer date, to the add-comment & upload-file functions
         setCurrentPointerPositionDate(event);
-			   
+
         // TODO: Check in Chrome 
 
         // Locate pointer in new position
@@ -1361,7 +1361,7 @@ function clear_timeline() {
     TIMELINE_POINTER.hide();
 }
 
-function pre_timeframe_prepare() { 
+function pre_timeframe_prepare() {
     var hdnJSonList = $("input[id*='_hdnJSonList']").val();
     var hdnJSonStart = $("input[id*='_hdnJSonStart']").val();
     var hdnJSonEnd = $("input[id*='_hdnJSonEnd']").val();
@@ -1530,7 +1530,7 @@ function timeframe_draw(timeline_data, start, end) {
                     }
                     var toolTip_title = "";
                     switch (tapeType) {
-                        case "S": 
+                        case "S":
                             {
                                 tapeType_longStr = rectTitle_values.grabacion;
                                 color_str = rectColor_values.grabacion;
@@ -1990,7 +1990,7 @@ function timeline_pointer_setLocation(tapeID) {
                 sm2_inline_element.css('width', _width);
 
                 sm2_inline_element.offset({ left: divTimelineProgress.offset().left });
-					   
+
                 sm2_progress_bd.css('width', _width);
 
                 sm2_progress_bd.css('left', _width);
@@ -2072,7 +2072,7 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     oldPlayer_activeElement_type = "";
     oldPlayer_activeElement_extension = "";
     oldPlayer_activeElement_duration = "";
-    
+
     // Remove click event
     aPlayPause_VIDEO.attr('onclick', '');
     aPlayPause_VIDEO.off("click");
@@ -2448,9 +2448,9 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
             wav_object += " <param name='autoStart' value='0'>";
             wav_object += " <a href='" + file_url + "'>Play</a>";
             wav_object += " </object>";
-           
+
             $("#audioContainer object").remove();
-            $("#audioContainer").append(wav_object);            
+            $("#audioContainer").append(wav_object);
 
             divControlsMask_AUDIO.hide(); //
 
@@ -3262,7 +3262,7 @@ function ActionVideoPlay(tapeID, duration, isAudioPlaying) {
                         playVideo_ok = true;
 
                         // Set div visible
-                        divPlayer_VIDEO.css("visibility", "visible"); 
+                        divPlayer_VIDEO.css("visibility", "visible");
 
                         TimeRefreshLoop(duration);
                     }
@@ -3284,7 +3284,7 @@ function emptyAudioPlayer() {
             divControlsMask_AUDIO.addClass("paused");
             divControlsMask_AUDIO.removeClass("playing");
         }
-    }         
+    }
 }
 
 function emptyVideoPlayer() {
@@ -3603,7 +3603,7 @@ function addFileClick() {
         folioID = _hdnFolioID.val();
     }
     var folioID_int = parseInt(folioID, 10);
-		
+
     if (folioID_int != null && !isNaN(folioID_int) && folioID_int > 0) {
 
         if (!$('#btnUploadElement').hasClass("opened")) {
@@ -3784,7 +3784,7 @@ function downloadAll() {
     }
 }
 /******** Auxiliar Functions ********/
-   
+
 // Get duration format in ms for timeouts
 function getDurationInMS(duration) {
     return duration * 1000;
@@ -3876,7 +3876,7 @@ function getTime(msec, useString) {
             'min': min,
             'sec': sec
         });
-}    
+}
 
 // Load elements from folio selected - Get data from server
 function getElementsInMemory() {
@@ -4021,7 +4021,7 @@ function getElementInMemoryByType(elementType) {
     }
 }
 
-	
+
 
 // Hidden Field hdnIsUpdateNeeded: alerts if is needed a data refresh from code behind
 // A: Normal file upload
@@ -4071,7 +4071,7 @@ function prepareFileUpload_b(e) {
 
 function confirmAddComment() {
     var userID = globalUserID;
-		 
+
     // Check if folio is selected
     var folioID = 0;
     var _hdnFolioID = $("input[id*='_hdnFolioID']");
@@ -4283,42 +4283,42 @@ function globalplay_initEvents() {
 
                         // Darktooltip Source: https://github.com/rubentd/darktooltip
 
-                var audio_element = $("#tlTape_" + element.tapeID);
-                var id = audio_element.attr('id');
-                audio_element.attr("data-tooltip", " ");
-                //audio_element.attr("data-tooltip", element.fileName);
+                        var audio_element = $("#tlTape_" + element.tapeID);
+                        var id = audio_element.attr('id');
+                        audio_element.attr("data-tooltip", " ");
+                        //audio_element.attr("data-tooltip", element.fileName);
 
-                // Clean previous Tooltip
-                //audio_element.qtip = null;
-                //audio_element.removeAttr("data-tooltip");
-                //audio_element.removeAttr("title");
+                        // Clean previous Tooltip
+                        //audio_element.qtip = null;
+                        //audio_element.removeAttr("data-tooltip");
+                        //audio_element.removeAttr("title");
 
-                // Add new Tooltip
-                audio_element.darkTooltip({
-                    trigger: 'hover',
-                    animation: 'flipIn',
-                    gravity: 'west',
-                    theme: 'light',
-                    confirm: true,
-                    yes: 'Silenciar',
-                    onYes: function (event) {
+                        // Add new Tooltip
+                        audio_element.darkTooltip({
+                            trigger: 'hover',
+                            animation: 'flipIn',
+                            gravity: 'west',
+                            theme: 'light',
+                            confirm: true,
+                            yes: 'Silenciar',
+                            onYes: function (event) {
 
-                        globalplay_muteAudio(event);
-                    }
-                });
+                                globalplay_muteAudio(event);
+                            }
+                        });
 
-                $('#darktooltip-' + id).css('z-index', 3000);
+                        $('#darktooltip-' + id).css('z-index', 3000);
 
                         break;
                     }
 
-               
+
 
 
                 }
             }
-            }
         }
+    }
 
 
 
@@ -4397,7 +4397,7 @@ function globalplay_pauseAllCurrentMedia(isStop) {
                                 dynamic_object.pause();
                             }
                         }
-                        
+
                         break;
                     }
 
@@ -4576,7 +4576,7 @@ function globalplay_resumeAllCurrentMedia() {
 
 
 // Stopeable timer
-var timer_globalplay; 
+var timer_globalplay;
 function globalplay_start() {
 
     var w = $("#divTimelineProgress").css("width");
@@ -4666,146 +4666,146 @@ function globalplay_loadElements() {
         // MAX Amount of simultaneous elements 
         if (visual_count <= GLOBALPLAY_SIMULTANEOUS_ELEMENTS) {
 
-        // Element distinct types 
-        switch (visual_count) {
-            case 1:
-                {
-                    visual_size_w = flex_width_int - 80;
-                    visual_size_h = flex_height_int - 80;
-                    break;
-                }
-            case 2:
-                {
-                    visual_size_w = flex_width_int / 2 - 80;
-                    visual_size_h = flex_width_int / 2 - 80;
-                    break;
-                }
-        }
-
-        // Resize elements already added 
-        if (visual_alreadyAdded > 0) {
-
-            //$(".flex a[name='visual_element']").each(function (index, el) {
-            $(".flex").find('*').not('.info-label, .info-label *').each(function (index, el) {
-                $(this).css("width", visual_size_w);
-                $(this).css("height", visual_size_h);
-                
-            });
-        }
-
-        // Set label elements on play
-        $("#lblGlobalplay_element_count").text(elementsCandidate.length);
-
-        // Prepare URL elements to reproduce
-        var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download;
-        var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
-
-        // globalplay box container
-        var flex_div = $("#divGlobalplay_screen .flex");
-
-        // Location variables
-        var visual_count = visual_alreadyAdded; // = 0
-        var visual_new = 0;
-
-
-        var id_list = "";
-        for (var i = 0; i < elementsCandidate.length; i++) {
-            var element = elementsCandidate[i];
-            if (element != null) {
-
-                dynamic_number++;
-
-                // Set id_list label
-                id_list = id_list + element[0].tapeID + "(" + element[0].tapeType + "), ";
-                $("#lblGlobalplay_element_ids").text(id_list);
-
-                var current_duration = GLOBALPLAY_seconds_current;
-                var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
-                timeCurrent.add(current_duration, "seconds");
-
-                var element_end = moment(element[0].timestamp, "DD-MM-YYYY HH:mm:ss");
-                element_end.add(element[0].duration, "seconds");
-
-                // Si el elemento no fue procesado, hacerlo
-                if (element[1] == false) {
-                    element[1] = true;
-
-                    var tapeType = element[0].tapeType;
-                    var isVisual = (tapeType == "V" || tapeType == "S" || tapeType == "I") ? true : false;
-                    /*
-                    A: Audio
-                    V: Video
-                    S: Screen recording
-                    I: Image
-                    D: Document
-                    C: Comment
-                    */
-
-                    // IsExtra = If filePath is NOT empty, then is extra from incextras table
-                    var isExtra = element[0].filePath.length == 0 ? false : true;
-
-                    // Prepare URL elements
-                    var path_extra = filePath_EXTRA + "?id=" + element[0].segmentID + "&isExtra=1";
-                    var path_oreka = filePath_OREKA + "?segid=" + element[0].segmentID;
-
-                    // SET Element file path
-                    var file_url = isExtra ? path_extra : path_oreka;
-
-                    var dynamic_id = "";
-                    var audio_object = null;
-
-                    switch (tapeType) {
-                        case "A": {
-                            audio_object = globalplay_audio(file_url, element, dynamic_number, flex_div);
-                            break;
-                        }
-
-                        case "S":
-                        case "V": {
-                            dynamic_id = globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
-                            break;
-                        }
-
-                        case "I": {
-                            dynamic_id = globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
-                            break;
-                        }
-
-                        case "D": {
-                            dynamic_id = globalplay_document(file_url, element, dynamic_number);
-                            break;
-                        }
-
-                        case "C": {
-                            dynamic_id = globalplay_comment(element, dynamic_number);
-                            break;
-                        }
+            // Element distinct types 
+            switch (visual_count) {
+                case 1:
+                    {
+                        visual_size_w = flex_width_int - 80;
+                        visual_size_h = flex_height_int - 80;
+                        break;
                     }
-
-                    var dynamic_object = null;
-                    if (audio_object != null) {
-                        dynamic_id = audio_object[0];
-                        dynamic_object = audio_object[1];
+                case 2:
+                    {
+                        visual_size_w = flex_width_int / 2 - 80;
+                        visual_size_h = flex_width_int / 2 - 80;
+                        break;
                     }
-
-                    // element[0] = Element
-                    // element[1] = Dynamic ID
-                    // element[2] = Dynamic Object
-                    if (dynamic_id != "") {
-                        var array = new Array();
-                        array[0] = element[0];
-                        array[1] = dynamic_id;
-                        array[2] = dynamic_object;
-                        queue_elements.push(array);
-                    }
-
-                } // else: elemento ya procesado
-
             }
-        } // for
+
+            // Resize elements already added 
+            if (visual_alreadyAdded > 0) {
+
+                //$(".flex a[name='visual_element']").each(function (index, el) {
+                $(".flex").find('*').not('.info-label, .info-label *').each(function (index, el) {
+                    $(this).css("width", visual_size_w);
+                    $(this).css("height", visual_size_h);
+
+                });
+            }
+
+            // Set label elements on play
+            $("#lblGlobalplay_element_count").text(elementsCandidate.length);
+
+            // Prepare URL elements to reproduce
+            var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download;
+            var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
+
+            // globalplay box container
+            var flex_div = $("#divGlobalplay_screen .flex");
+
+            // Location variables
+            var visual_count = visual_alreadyAdded; // = 0
+            var visual_new = 0;
+
+
+            var id_list = "";
+            for (var i = 0; i < elementsCandidate.length; i++) {
+                var element = elementsCandidate[i];
+                if (element != null) {
+
+                    dynamic_number++;
+
+                    // Set id_list label
+                    id_list = id_list + element[0].tapeID + "(" + element[0].tapeType + "), ";
+                    $("#lblGlobalplay_element_ids").text(id_list);
+
+                    var current_duration = GLOBALPLAY_seconds_current;
+                    var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
+                    timeCurrent.add(current_duration, "seconds");
+
+                    var element_end = moment(element[0].timestamp, "DD-MM-YYYY HH:mm:ss");
+                    element_end.add(element[0].duration, "seconds");
+
+                    // Si el elemento no fue procesado, hacerlo
+                    if (element[1] == false) {
+                        element[1] = true;
+
+                        var tapeType = element[0].tapeType;
+                        var isVisual = (tapeType == "V" || tapeType == "S" || tapeType == "I") ? true : false;
+                        /*
+                        A: Audio
+                        V: Video
+                        S: Screen recording
+                        I: Image
+                        D: Document
+                        C: Comment
+                        */
+
+                        // IsExtra = If filePath is NOT empty, then is extra from incextras table
+                        var isExtra = element[0].filePath.length == 0 ? false : true;
+
+                        // Prepare URL elements
+                        var path_extra = filePath_EXTRA + "?id=" + element[0].segmentID + "&isExtra=1";
+                        var path_oreka = filePath_OREKA + "?segid=" + element[0].segmentID;
+
+                        // SET Element file path
+                        var file_url = isExtra ? path_extra : path_oreka;
+
+                        var dynamic_id = "";
+                        var audio_object = null;
+
+                        switch (tapeType) {
+                            case "A": {
+                                audio_object = globalplay_audio(file_url, element, dynamic_number, flex_div);
+                                break;
+                            }
+
+                            case "S":
+                            case "V": {
+                                dynamic_id = globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
+                                break;
+                            }
+
+                            case "I": {
+                                dynamic_id = globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
+                                break;
+                            }
+
+                            case "D": {
+                                dynamic_id = globalplay_document(file_url, element, dynamic_number);
+                                break;
+                            }
+
+                            case "C": {
+                                dynamic_id = globalplay_comment(element, dynamic_number);
+                                break;
+                            }
+                        }
+
+                        var dynamic_object = null;
+                        if (audio_object != null) {
+                            dynamic_id = audio_object[0];
+                            dynamic_object = audio_object[1];
+                        }
+
+                        // element[0] = Element
+                        // element[1] = Dynamic ID
+                        // element[2] = Dynamic Object
+                        if (dynamic_id != "") {
+                            var array = new Array();
+                            array[0] = element[0];
+                            array[1] = dynamic_id;
+                            array[2] = dynamic_object;
+                            queue_elements.push(array);
+                        }
+
+                    } // else: elemento ya procesado
+
+                }
+            } // for
 
         } // GLOBALPLAY_SIMULTANEOUS_ELEMENTS
-        else{
+        else {
             var label = $(".flex #globalplay_divSpecialMessages h2");
             label.text(hashMessages["MaxElementsSimultaneous"]);
             label.show();
@@ -4823,7 +4823,7 @@ function globalplay_audio(file_url, element, dynamic_number, flex_div) {
     var duration = element[0].duration;
     var fileName = element[0].fileName;
     var duration_timeout = getDurationInMS(duration);// * 1.3;
-		  
+
     var object = new Array();
     object[0] = global_elementID;
 
@@ -5172,7 +5172,7 @@ function getElementInMemoryByCurrentPlayingTime() {
                 element_end.add(el[0].duration, "seconds");
             }
 
-            return element_start != null && element_end != null && el[1] === false && 
+            return element_start != null && element_end != null && el[1] === false &&
                 element_start.toDate() <= timeCurrent.toDate() &&
                 timeCurrent.toDate() <= element_end.toDate();
         });
