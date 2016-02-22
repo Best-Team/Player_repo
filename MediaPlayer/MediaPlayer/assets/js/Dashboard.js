@@ -14,7 +14,8 @@ var previousSecs = 0;
 /**** General global variables ****/
 
 var MAX_DOWNLOAD_FILES = 6;
-var GLOBALPLAY_DEFAULT_DURATION = 30000; // 30 s // 5000 = 5 seg
+var GLOBALPLAY_DEFAULT_DURATION = 6; 
+var GLOBALPLAY_LABEL_DEFAULT_DURATION = 10; 
 var GLOBALPLAY_SIMULTANEOUS_ELEMENTS = 6;
 var SVG_Height = 170;
 var addComment_active = false;
@@ -24,14 +25,15 @@ var oldPlayer_activeElement_extension = "";
 var oldPlayer_activeElement_duration = "";
 var comment_popup_timestamp = "";
 var initial_size = 0;
-var elementsInMemory = [];
-var stack_elements = [[], []]; // [object, already_taken: bool]
 var selectedElementID = 0;
 var currentPointerPositionDate;
+var elementsInMemory = [];
+var globalplay_remove_elements = [];
+var globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
 
 // Timeline Global Pointer
 var TIMELINE_POINTER = $("#sm2-progress-ball_TIMELINE");
-var PLAYER_BOX = $("#divPanel_PlayerControl div[id*='playerBox");
+var PLAYER_BOX = $("#divPanel_PlayerControl div[id*='playerBox']");
 
 
 // Get screen resolution
@@ -200,7 +202,7 @@ $(document).ready(function () {
     // Remove padding, set opening and closing animations, close if clicked and disable overlay
     $("#btnOpenFancybox").fancybox({
         padding: 0,
-        closeClick: true,
+        closeClick: false,
 
         openEffect: 'elastic',
         openSpeed: 150,
@@ -246,9 +248,8 @@ $(document).ready(function () {
         $(this).effect("scale", {}, 10);
     });
 
+
 }); // END On Ready
-
-
 
 
 function loadGlobalplay_settings() {
@@ -609,7 +610,7 @@ function handleDragging(event, ui) {
     }
     $(".box4.popbox4").show("scale", 300);
     $(".box4.popbox4").offset({
-        left: posXfinal - 28, // 28 Quitar?
+        left: posXfinal - 6, // 28 Quitar?
         top: posYfinal
     });
     var date = window.timeframe_live.getTickDate(posX); // Datetime position - Formato: AÑO DIA MES
@@ -648,13 +649,12 @@ function LoadAlertMessagesBackup() {
     hashMessages["InstallWebchimera_Aux"] = "Por favor, instale el plugin WebChimera para reproducir el elemento. ";
     hashMessages["MaxElementsSimultaneous"] = "Atención, máxima cantidad de elementos en simultáneo alcanzadainstale el plugin WebChimera para reproducir el elemento. ";
 
-
 }
 
 function initVariables() {
 
     TIMELINE_POINTER = $("#sm2-progress-ball_TIMELINE");
-    PLAYER_BOX = $("#divPanel_PlayerControl div[id*='playerBox");
+    PLAYER_BOX = $("#divPanel_PlayerControl div[id*='playerBox']");
 
     // Set Username and Date info
     currentDateToday = new Date();
@@ -676,24 +676,24 @@ function initVariables() {
     $('.usernameInfo').html(text);
 
     // Load alert message: Get Max Elements download from web.config
-    MaxElementsDownload = "6";
+    MAX_DOWNLOAD_FILES = 6;
     var _hdnMaxElementsDownload = $("#_hdnMaxElementsDownload");
     if (_hdnMaxElementsDownload != null && _hdnMaxElementsDownload.val() != null && _hdnMaxElementsDownload.val().length > 0) {
-        MaxElementsDownload = _hdnMaxElementsDownload.val();
+        MAX_DOWNLOAD_FILES = parseInt(_hdnMaxElementsDownload.val(), 10);
     }
 
     // Load Globalplay default duration on elements 
-    GLOBALPLAY_DEFAULT_DURATION = "6000";
+    GLOBALPLAY_DEFAULT_DURATION = 6;
     var _hdnGlobalplay_defaultDuration = $("#_hdnGlobalplay_defaultDuration");
     if (_hdnGlobalplay_defaultDuration != null && _hdnGlobalplay_defaultDuration.val() != null && _hdnGlobalplay_defaultDuration.val().length > 0) {
-        GLOBALPLAY_DEFAULT_DURATION = _hdnGlobalplay_defaultDuration.val();
+        GLOBALPLAY_DEFAULT_DURATION = parseInt(_hdnGlobalplay_defaultDuration.val(), 10);
     }
 
     // Load Globalplay default duration on elements 
-    GLOBALPLAY_SIMULTANEOUS_ELEMENTS = "6";
+    GLOBALPLAY_SIMULTANEOUS_ELEMENTS = 8;
     var _hdnGlobalplay_simultaneousElements = $("#_hdnGlobalplay_simultaneousElements");
     if (_hdnGlobalplay_simultaneousElements != null && _hdnGlobalplay_simultaneousElements.val() != null && _hdnGlobalplay_simultaneousElements.val().length > 0) {
-        GLOBALPLAY_SIMULTANEOUS_ELEMENTS = _hdnGlobalplay_simultaneousElements.val();
+        GLOBALPLAY_SIMULTANEOUS_ELEMENTS = parseInt(_hdnGlobalplay_simultaneousElements.val(), 10);
     }
 
 
@@ -2056,8 +2056,8 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     var divPanel_PlayerControl = $("#divPanel_PlayerControl");
     var lnkElementDownload = $("#lnkElementDownload");
     var btnRemoveElement = $("#btnRemoveElement");
-    var btnConfirmRemoveElement = $("button[id*='btnConfirmRemoveElement");
-    var divRemoveElementMessage = $("div[id*='divRemoveElementMessage");
+    var btnConfirmRemoveElement = $("button[id*='btnConfirmRemoveElement']");
+    var divRemoveElementMessage = $("div[id*='divRemoveElementMessage']");
     var aPlayPause_AUDIO = $("#aPlayPause_AUDIO");
     var aPlayPause_VIDEO = $("#aPlayPause_VIDEO");
     var lnkSound_AUDIO = $("#lnkSound_AUDIO");
@@ -2948,7 +2948,7 @@ function loadClickRemoveButton_event() {
 /**** Event: OnClick Load on click event confirm remove button (btnConfirmRemoveElement) ****/
 function loadClickConfirmRemoveButton_event(tapeID, isExtra) {
 
-    var btnConfirmRemoveElement = $("#popbox_footer3 button[id*='btnConfirmRemoveElement");
+    var btnConfirmRemoveElement = $("#popbox_footer3 button[id*='btnConfirmRemoveElement']");
     var divPanel_PlayerControl = $("#divPanel_PlayerControl");
     var divRemoveElementMessage = $("#divRemoveElementMessage");
 
@@ -3728,7 +3728,7 @@ function downloadAll() {
         });
         if (list_elements.length > MAX_DOWNLOAD_FILES) {
 
-            var msj = hashMessages["MaximoElementosDescarga1"] + " " + MaxElementsDownload + " " + hashMessages["MaximoElementosDescarga2"];
+            var msj = hashMessages["MaximoElementosDescarga1"] + " " + MAX_DOWNLOAD_FILES + " " + hashMessages["MaximoElementosDescarga2"];
             $("#dialog p").text(msj);
             $("#dialog").dialog({
                 buttons: {
@@ -3886,7 +3886,7 @@ function getElementsInMemory() {
         if (tapes_array.length > 0) {
 
             elementsInMemory = [];
-            stack_elements = [[], []]; // [object, already_taken: bool]
+            globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
 
             for (var i = 0; i < tapes_array.length; i++) {
                 if (tapes_array[i] != null) {
@@ -3925,7 +3925,7 @@ function getElementsInMemory() {
                         var array = new Array();
                         array[0] = element;
                         array[1] = false;
-                        stack_elements.push(array);
+                        globalplay_stack_elements.push(array);
                     }
                 }
             }
@@ -4020,8 +4020,6 @@ function getElementInMemoryByType(elementType) {
         return array;
     }
 }
-
-
 
 // Hidden Field hdnIsUpdateNeeded: alerts if is needed a data refresh from code behind
 // A: Normal file upload
@@ -4196,9 +4194,10 @@ function confirmAddComment() {
 
 /******** START: Media Player 2.0: Nuevo Requerimiento: Global Play ********/
 
-var queue_elements = [[], [], []];
+var globalplay_queue_elements = [[], [], []];
 var dynamic_number = 0;
 
+// Globalplay initialize
 function globalplay_init() {
 
     // Hide Video player box
@@ -4208,11 +4207,10 @@ function globalplay_init() {
     if ($("#globalplay_play").hasClass("globalplay_play")) {
 
 
+        // Load globalplay initial events
         globalplay_initEvents(); ////////////
-        //$('#darktooltip-example').css('z-index', 3000);
-
-        // ID dynamic
-        //dynamic_number = 0;
+        
+        globalplay_remove_elements = [];
 
         // DO PLAY
         $("#globalplay_play").removeClass("globalplay_play");
@@ -4230,6 +4228,7 @@ function globalplay_init() {
             // Resume timer
             $('#divGlobalplay_timer').timer('resume');
 
+            // Resume globalplay current paused elements
             globalplay_resumeAllCurrentMedia();
         }
 
@@ -4268,7 +4267,28 @@ function globalplay_init() {
     return false;
 }
 
-// Load initial events
+
+// Remove mute buttons on audio elements
+function globalplay_removeMuteButtons() {
+
+    $("#svg_timeframe g[id*='tlTape_']").each(function () { $(this).unbind("DarkTooltip").removeData(); })
+
+    /*
+        var elementsCandidate = getElementInMemoryByType("A");
+        if (elementsCandidate != null && elementsCandidate.length > 0) {
+            for (var i = 0; i < elementsCandidate.length; i++) {
+                var element = elementsCandidate[i];
+                if (element != null) {
+    
+                    // Remove Tooltip
+                    $("#tlTape_" + element.tapeID).unbind("DarkTooltip").removeData();
+                }
+            }
+        } // for
+    */
+}
+
+// Load globalplay initial events
 function globalplay_initEvents() {
 
     if (elementsInMemory != null && elementsInMemory.length > 0) {
@@ -4279,19 +4299,15 @@ function globalplay_initEvents() {
                 var tapeID = element.tapeID;
                 var tapeType = element.tapeType;
                 switch (tapeType) {
+
                     case "A": {
+                        // Event: Button mute function on audio elements
 
                         // Darktooltip Source: https://github.com/rubentd/darktooltip
 
                         var audio_element = $("#tlTape_" + element.tapeID);
                         var id = audio_element.attr('id');
-                        audio_element.attr("data-tooltip", " ");
-                        //audio_element.attr("data-tooltip", element.fileName);
-
-                        // Clean previous Tooltip
-                        //audio_element.qtip = null;
-                        //audio_element.removeAttr("data-tooltip");
-                        //audio_element.removeAttr("title");
+                        //audio_element.attr("data-tooltip", " ");
 
                         // Add new Tooltip
                         audio_element.darkTooltip({
@@ -4300,27 +4316,24 @@ function globalplay_initEvents() {
                             gravity: 'west',
                             theme: 'light',
                             confirm: true,
-                            yes: 'Silenciar',
+                            yes: '-',
                             onYes: function (event) {
 
                                 globalplay_muteAudio(event);
                             }
                         });
 
-                        $('#darktooltip-' + id).css('z-index', 3000);
+                        // locate mute button over fancybox screen
+                        $('#darktooltip-' + id).css('z-index', 8031);
 
                         break;
                     }
 
 
-
-
-                }
+                } // switch tapeType
             }
         }
-    }
-
-
+    } // for
 
 }
 
@@ -4335,15 +4348,14 @@ function globalplay_muteAudio(event) {
                 dynamic_object.muted = !dynamic_object.muted;
             }
         }
-
     }
 }
 
 function globalplay_getQueueElementByID(elementID) {
-    if (queue_elements != null && queue_elements.length > 0) {
-        for (var i = 0; i < queue_elements.length; i++) {
+    if (globalplay_queue_elements != null && globalplay_queue_elements.length > 0) {
+        for (var i = 0; i < globalplay_queue_elements.length; i++) {
 
-            var element = queue_elements[i];
+            var element = globalplay_queue_elements[i];
             if (element != null && element.length > 1 && element[0] != null && element[0].tapeID != null && element[2] != null) {
                 if (element[0].tapeID == elementID) {
                     var dynamic_object = element[2];
@@ -4359,14 +4371,14 @@ function globalplay_getQueueElementByID(elementID) {
 
 // Pause all media current playing elements
 function globalplay_pauseAllCurrentMedia(isStop) {
-    // queue_elements:
+    // globalplay_queue_elements:
 
     // element[0] = Element
     // element[1] = Dynamic ID
     // element[2] = Dynamic Object
-    if (queue_elements != null && queue_elements.length > 0) {
-        for (var i = 0; i < queue_elements.length; i++) {
-            var element = queue_elements[i];
+    if (globalplay_queue_elements != null && globalplay_queue_elements.length > 0) {
+        for (var i = 0; i < globalplay_queue_elements.length; i++) {
+            var element = globalplay_queue_elements[i];
             if (element != null && element[0] != null && element[0].tapeType != null) {
                 var tapeType = element[0].tapeType;
                 var fileName = element[0].fileName;
@@ -4476,15 +4488,15 @@ function globalplay_pauseAllCurrentMedia(isStop) {
     }
 }
 
+// Resume globalplay current paused elements
 function globalplay_resumeAllCurrentMedia() {
-    // queue_elements:
 
     // element[0] = Element
     // element[1] = Dynamic ID
     // element[2] = Dynamic Object
-    if (queue_elements != null && queue_elements.length > 0) {
-        for (var i = 0; i < queue_elements.length; i++) {
-            var element = queue_elements[i];
+    if (globalplay_queue_elements != null && globalplay_queue_elements.length > 0) {
+        for (var i = 0; i < globalplay_queue_elements.length; i++) {
+            var element = globalplay_queue_elements[i];
 
             if (element != null && element[0] != null && element[0].tapeType != null) {
                 var tapeType = element[0].tapeType;
@@ -4563,14 +4575,14 @@ function globalplay_resumeAllCurrentMedia() {
 
                                     break;
                                 }
-                            }
+                            } // switch extension
                         }
                         break;
                     }
 
-                }
+                } // switch type
             }
-        } //for
+        } // for
     }
 }
 
@@ -4594,10 +4606,11 @@ function globalplay_start() {
 }
 
 
-// EVENT: Whileplaying Globalplay timeline
+// EVENT: Whileplaying globalplay timeline
 function globalplay_whilePlaying() {
 
-    // TODO: Timeout con funcion !!
+    // Remove elements from DOM on globalplay screen
+    removeElementsFromPlayback();
 
     // Load elements in this pointer position
     globalplay_loadElements();
@@ -4652,32 +4665,31 @@ function globalplay_loadElements() {
             return el[0].tapeType == "V" || el[0].tapeType == "S" || el[0].tapeType == "I";
         });
 
-        var flex_width_int = parseInt($(".flex").css("width"), 10);
-        var flex_height_int = parseInt($(".flex").css("height"), 10);
-
-        var visual_size_w = 300;
-        var visual_size_h = 300;
+        // Case >= 4: elements to resize
+        var visual_size_w = 275;
+        var visual_size_h = 275;
 
         // Get visual elements already added in globalplay player
-        //var visual_alreadyAdded = $(".flex").find('*').not('.info-label, .info-label *').length;
-        var visual_alreadyAdded = $(".flex").find('#webchimera2, #fbsviewer2, video[name=visual_element], a[name=visual_element]').length;
+        var visual_alreadyAdded = $(".flex").find('#webchimera2, #fbsviewer2, [name="visual_element"]').length;
         var visual_count = visual_queue.length + visual_alreadyAdded;
 
         // MAX Amount of simultaneous elements 
-        if (visual_count <= GLOBALPLAY_SIMULTANEOUS_ELEMENTS) {
+        var max_amount = GLOBALPLAY_SIMULTANEOUS_ELEMENTS;
+        if (visual_count <= max_amount) {
 
             // Element distinct types 
             switch (visual_count) {
                 case 1:
-                    {
-                        visual_size_w = flex_width_int - 80;
-                        visual_size_h = flex_height_int - 80;
-                        break;
-                    }
                 case 2:
                     {
-                        visual_size_w = flex_width_int / 2 - 80;
-                        visual_size_h = flex_width_int / 2 - 80;
+                        visual_size_w = 600;
+                        visual_size_h = 600;
+                        break;
+                    }
+                case 3:
+                    {
+                        visual_size_w = 400;
+                        visual_size_h = 400;
                         break;
                     }
             }
@@ -4796,7 +4808,7 @@ function globalplay_loadElements() {
                             array[0] = element[0];
                             array[1] = dynamic_id;
                             array[2] = dynamic_object;
-                            queue_elements.push(array);
+                            globalplay_queue_elements.push(array);
                         }
 
                     } // else: elemento ya procesado
@@ -4809,13 +4821,17 @@ function globalplay_loadElements() {
             var label = $(".flex #globalplay_divSpecialMessages h2");
             label.text(hashMessages["MaxElementsSimultaneous"]);
             label.show();
-            setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, 10000);
+                        
+            // Remove to element list
+            var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
+            globalplay_remove_elements.push([null, null, label, duration_final]);
         }
     }
 }
 
 /********* Individual elements section *********/
 
+// Play audio
 function globalplay_audio(file_url, element, dynamic_number, flex_div) {
     var global_elementID = "audio_" + dynamic_number;
     var fileName = element[0].fileName;
@@ -4857,24 +4873,25 @@ function globalplay_audio(file_url, element, dynamic_number, flex_div) {
             wav_object += " </object>";
 
             flex_div.append(wav_object);
-
             object[1] = wav_object;
 
-            setTimeout(function () { globalplay_removeElement(global_elementID, element); globalplay_clearLabel(label); }, duration_timeout);
         } else {
 
             var audio = new Audio(file_url);
             audio.play();
-
             object[1] = audio;
-
-            setTimeout(function () { globalplay_removeElement(global_elementID, element); globalplay_clearLabel(label); }, duration_timeout);
         }
+
+        // Remove to element list
+        var duration_int = parseInt(duration, 10);
+        var duration_final = GLOBALPLAY_seconds_current + duration_int;
+        globalplay_remove_elements.push([global_elementID, element, label, duration_final]);
     }
 
     return object;
 }
 
+// Play video or screen recording
 function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number) {
     var global_elementID = "";
     var duration = element[0].duration;
@@ -4949,7 +4966,10 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                     var label = $("#globalplay_divSpecialMessages h2");
                     label.text(hashMessages["UtilizarNavegador2"]);
                     label.show();
-                    setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_timeout);
+
+                    // Remove to element list
+                    var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
+                    globalplay_remove_elements.push([null, null, label, duration_final]);
                 }
 
                 break;
@@ -5004,7 +5024,10 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         var label = $("#globalplay_divSpecialMessages h2");
                         label.text(hashMessages["InstallWebchimera_Aux"]);
                         label.show();
-                        setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_final);
+
+                        // Remove to element list
+                        var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
+                        globalplay_remove_elements.push([null, null, label, duration_final]);
                     }
 
                     ok = true;
@@ -5013,7 +5036,10 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                     var label = $("#globalplay_divSpecialMessages h2");
                     label.text(hashMessages["UtilizarNavegador2"]);
                     label.show();
-                    setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_final);
+
+                    // Remove to element list
+                    var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
+                    globalplay_remove_elements.push([null, null, label, duration_final]);
                 }
 
                 break;
@@ -5027,6 +5053,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
     return global_elementID;
 }
 
+// Play image
 function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number) {
     var global_elementID = "image_" + dynamic_number;
     var segmentID = element[0].segmentID;
@@ -5041,39 +5068,84 @@ function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, elem
 
     // Salvattore Source: http://webdesign.tutsplus.com/tutorials/build-a-dynamic-grid-with-salvattore-and-bootstrap-in-10-minutes--cms-20410
 
-    //setTimeout(function () { globalplay_removeElement(global_elementID, element) }, GLOBALPLAY_DEFAULT_DURATION);
+    // Remove to element list
+    var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_DEFAULT_DURATION;
+    globalplay_remove_elements.push([global_elementID, element, null, duration_final]);
+
     return global_elementID;
 }
 
+// Play document
 function globalplay_document(file_url, element, dynamic_number) {
     var global_elementID = "image_" + dynamic_number;
     var duration = element[0].duration;
     var fileName = element[0].fileName;
-    var duration_final = duration <= 1 ? 5000 : duration * 1000;
     var label = $("#globalplay_divDocumentsName h2");
 
     label.text("Documento: " + fileName);
     label.show();
-    setTimeout(function () { globalplay_clearLabel(label); label.hide(); }, duration_final);
+
+    // Remove to element list
+    var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_DEFAULT_DURATION;
+    globalplay_remove_elements.push([null, null, label, duration_final]);
 
     return global_elementID;
 }
 
+// Play comment
 function globalplay_comment(element, dynamic_number) {
     var global_elementID = "image_" + dynamic_number;
     var duration = element[0].duration;
     var fileName = element[0].fileName;
-    var duration_final = duration <= 1 ? 5000 : duration * 1000;
+    var duration_sec = duration <= 1 ? 5 : duration;
 
     var label = $("#globalplay_divComments h2");
     label.text(fileName);
-    setTimeout(function () { globalplay_clearLabel(label) }, duration_final);
+
+    // Remove to element list
+    var duration_final = GLOBALPLAY_seconds_current + duration_sec;
+    globalplay_remove_elements.push([global_elementID, null, label, duration_final]);
 
     return global_elementID;
 }
 
 /********* Individual elements section END *********/
 
+// Remove elements from DOM on globalplay screen
+function removeElementsFromPlayback() {
+
+    /* Object
+     * 0: Element ID
+     * 1: Element (globalplay_stack_elements)
+     * 2: label
+     * 3: Globalplay current = seconds to remove
+     */
+    for (var i = 0; i < globalplay_remove_elements.length; i++) {
+        var object = globalplay_remove_elements[i];
+        if (object != null) {
+            var elementID = object[0];
+            var element = object[1];
+            var label = object[2];
+            var timeToRemove = object[3];
+
+            if (timeToRemove <= GLOBALPLAY_seconds_current) {
+                if (elementID != null && element != null) {
+                    globalplay_removeElement(elementID, element);
+                }
+                if (label != null) {
+                    globalplay_clearLabel(label);
+
+                    if (elementID == null) {
+                        label.hide();
+                    }
+                }
+                globalplay_remove_elements[i] = null;
+            }
+        }
+
+    } // for
+
+}
 
 // Stop timer 
 function globalplay_abort() {
@@ -5088,7 +5160,7 @@ function globalplay_stop() {
     $("#globalplay_play").addClass("globalplay_play");
 
     // Close Fancybox 
-    $.fancybox.close();
+    //$.fancybox.close();
 
     TIMELINE_POINTER.css("left", "0%");
 
@@ -5114,7 +5186,7 @@ function globalplay_stop() {
     $('#divGlobalplay_timer').timer('remove');
 
     // Queue of current elements playing
-    queue_elements = [[], [], []];
+    globalplay_queue_elements = [[], [], []];
 }
 
 // Clean info labels
@@ -5144,7 +5216,7 @@ function globalplay_removeElement(global_elementID, element) {
     // element[0] = Element
     // element[1] = Dynamic ID
     // element[2] = Dynamic Object
-    queue_elements = $.grep(queue_elements, function (el, i) {
+    globalplay_queue_elements = $.grep(globalplay_queue_elements, function (el, i) {
         return el[1] != global_elementID;
     });
 
@@ -5156,13 +5228,13 @@ function globalplay_clearLabel(label) {
 
 // Search elements in current playtime
 function getElementInMemoryByCurrentPlayingTime() {
-    if (stack_elements != null && stack_elements.length > 0) {
+    if (globalplay_stack_elements != null && globalplay_stack_elements.length > 0) {
 
         var current_duration = GLOBALPLAY_seconds_current;
         var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
         timeCurrent.add(current_duration, "seconds");
 
-        var array = stack_elements.filter(function (el) {
+        var array = globalplay_stack_elements.filter(function (el) {
             var element_start = null;
             var element_end = null;
             if (el != null && el[0] != null && el[0].timestamp != null && el[0].duration != null) {
@@ -5182,9 +5254,9 @@ function getElementInMemoryByCurrentPlayingTime() {
 
 // Set ready elements already taken
 function prepareElementsAlreadyTaken() {
-    if (stack_elements != null && stack_elements.length > 0) {
-        for (var i = 0; i < stack_elements.length; i++) {
-            var el = stack_elements[i];
+    if (globalplay_stack_elements != null && globalplay_stack_elements.length > 0) {
+        for (var i = 0; i < globalplay_stack_elements.length; i++) {
+            var el = globalplay_stack_elements[i];
             if (el != null && el[1] == true) {
                 el[1] = false;
             }

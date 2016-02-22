@@ -432,11 +432,13 @@
 				$('#lblGlobalplay_timer_current').timer('pause');
 
 			    // Show Video player box
-				var divPlayer_VIDEO = $("#divPlayer_VIDEO");
-				divPlayer_VIDEO.css("visibility", "visible");
+				var divPlayer_VIDEO = $("#divPlayer_VIDEO").css("visibility", "visible");;
 
 			    // Hide overlay
 				$("#fade").hide();
+
+			    // Remove mute buttons on audio elements
+				globalplay_removeMuteButtons();
 
 			    /************** Globalplay END **************/
 			}
