@@ -21,7 +21,7 @@
     min-width: 2.8em;
     min-height: 2.8em;
     background-size: 120%;
-    background-position: 40% 53%;
+    background-position: 50% 26%;/*40% 53%; */
 }
 
 
@@ -56,17 +56,18 @@
 }
 
 #globalplay_stop:hover {
-    background-image: url(../image/icomoon/entypo-25px-ffffff/PNG/list2.png);
-    background-image: none, url(../image/icomoon/entypo-25px-ffffff/SVG/list2.svg);
+    background-image: url(../image/icomoon/entypo-25px-ffffff/PNG/stop2.png);
+    /*background-image: none, url(../image/icomoon/entypo-25px-ffffff/SVG/stop2.svg);*/
 }
 
 #globalplay_stop {
-    background-image: url(../image/icomoon/entypo-25px-ffffff/PNG/list2.png);
-    background-image: none, url(../image/icomoon/entypo-25px-ffffff/SVG/list2.svg);
+    background-image: url(../image/icomoon/entypo-25px-ffffff/PNG/stop2.png);
+    /*background-image: none, url(../image/icomoon/entypo-25px-ffffff/SVG/stop2.svg);*/
     min-width: 1.8em;
     min-height: 1.8em;
     background-size: 120%;
-    background-position: 40% 53%;
+    background-position: 40% 15%; /*40% 53%; */
+
 }
 
 

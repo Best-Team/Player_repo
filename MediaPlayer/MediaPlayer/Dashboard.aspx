@@ -438,7 +438,7 @@
 
                                     <div class='popbox3' style="margin-top: 15px; margin-right: 6px; display: none;"></div>
                                     <!-- popbox: Remove element -->
-                                    <div class='box3 popbox3' style="width: 300px; height: 240px; right: 10%; margin-top: 10px;">
+                                    <div class='box3 popbox3' id="divPopbox3" style="width: 300px; height: 240px; margin-top: 10px; right: 10%;">
                                         <div class='arrow' style="left: 250px;"></div>
                                         <div class='arrow-border' style="left: 250px;"></div>
                                         <div class="row row-short" style="padding: 10px;">
@@ -454,7 +454,7 @@
                                                 <input type="password" class="form-control" id="txbConfirmRemoveElement" placeholder="Contraseña" name="login-username" required="required" />
                                                 <!--  -->
                                             </div>
-                                            <div id="popbox_footer3" class="row row-short pull-right" style="margin-right: 15px; margin-top: 4px;">
+                                            <div id="popbox_footer3" class="row row-short pull-right" style="margin-right: 15px; margin-top: -7px;">
                                                 <button id="btnConfirmRemoveElement" type="button" class="btn btn-default" title="Confirmar borrar elemento" runat="server">
                                                     <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                                                 </button>
@@ -590,7 +590,7 @@
                     <div id="globalPlayer_popup">
 
                         <!-- GLOBALPLAY SCREEN -->
-                        <div id="divGlobalplay_screen" class="globalplayBox img-rounded" style="display: none;">
+                        <div id="divgp_sc" class="globalplayBox img-rounded" style="display: none;">
                             <!-- min-height:100%;"> -->
                             <div id="flex_messages">
                                 <div id="globalplay_divSpecialMessages" class="info-label">
@@ -603,6 +603,10 @@
 
                                 <div id="globalplay_divAudioName" class="info-label">
                                     <h2 class="label label-danger" style="z-index: 1001; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
+                                </div>
+
+                                <div id="globalplay_divVideoName" class="info-label">
+                                    <h2 class="label label-danger" style="background-color:purple !important; z-index: 1001; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
                                 </div>
 
                                 <div id="globalplay_divComments" class="info-label" style="bottom: 25px;">
@@ -618,15 +622,16 @@
                         <div id="divTimeline" class="divTimeline div-panel2 col-md-12 col-xs-12 img-rounded">
                             <h1 style="margin-top: 5px;">
 
-                                <!--
+                                <!-- TEST CONTROL
 					<label id="lblGlobalplay_timer_current_longFormat" class="label" style="font-size:100%; color:black;">00:00:00</label>
 				   <label id="lblGlobalplay_timer_total_longFormat" class="label" style="font-size:100%; color:black;">00:00:00</label>
 				   <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label>
 				   <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label>
-				   -->
                                 Cantidad:
                         <label id="lblGlobalplay_element_count" class="label" style="font-size: 100%; color: black;">0</label>: IDs:
                         <label id="lblGlobalplay_element_ids" class="label" style="font-size: 100%; color: black;">0</label>
+
+				   -->
 
                                 <span class="special-title label label-primary" style="font-weight: normal;">Timeline</span>
 
@@ -642,12 +647,12 @@
                                         <ul class="globalplay_controls controls">
 
                                             <li id="globalplay_play_li" class="img-rounded globalplay_play_li">
-                                                <a href="#divGlobalplay_screen" id="globalplay_play" class="globalplay_play" data-attr="playPauseAudio" onclick="return globalplay_init()"></a>
+                                                <a href="#divgp_sc" id="globalplay_play" class="globalplay_play" data-attr="playPauseAudio" onclick="return globalplay_init()"></a>
                                                 <!-- Play/Pause button -->
                                                 <a href="#globalPlayer_popup" id="btnOpenFancybox" style="display: none;"></a>
                                             </li>
                                             <li id="globalplay_stop_li" class="img-rounded">
-                                                <a href="#divGlobalplay_screen" id="globalplay_stop" class="globalplay_stop" data-attr="nextAudio" onclick="return globalplay_stop()">
+                                                <a href="#divgp_sc" id="globalplay_stop" class="globalplay_stop" data-attr="nextAudio" onclick="return globalplay_stop()">
                                                     <!-- Stop button -->
                                                 </a>
                                             </li>

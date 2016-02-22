@@ -358,6 +358,10 @@
 
 			F.group = group;
 
+            /* Globalplay settings */
+			globalplay_active = true;
+
+
 			return F._start(F.opts.index);
 		},
 
@@ -439,6 +443,10 @@
 
 			    // Remove mute buttons on audio elements
 				globalplay_removeMuteButtons();
+
+				globalplay_removeAll();
+
+				globalplay_active = false;
 
 			    /************** Globalplay END **************/
 			}
