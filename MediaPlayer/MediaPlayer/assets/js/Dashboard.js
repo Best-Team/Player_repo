@@ -4307,7 +4307,7 @@ function globalplay_initEvents() {
                             }
                         });
 
-                        $('#darktooltip-' + id).css('z-index', 3000);
+                        $('#darktooltip-' + id).css('z-index', 8031);
 
                         break;
                     }
