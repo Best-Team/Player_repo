@@ -340,8 +340,7 @@ function loadClickRemoveElementSelected_event() {
                                     $.ajax({
                                         type: "POST",
                                         url: "Dashboard.aspx/RemoveElementSelected",
-                                        data: '{list_elements: "' +
-                                            list_elements + '"}',
+                                        data: '{list_elements: "' + list_elements + '"}',
                                         contentType: "application/json; charset=utf-8",
                                         dataType: "json",
                                         success: function (response) {
@@ -4206,9 +4205,8 @@ function globalplay_init() {
 
     if ($("#globalplay_play").hasClass("globalplay_play")) {
 
-
         // Load globalplay initial events
-        globalplay_initEvents(); ////////////
+        globalplay_initEvents(); 
         
         globalplay_remove_elements = [];
 
@@ -4597,6 +4595,9 @@ function globalplay_start() {
     // Init event while playing if GLOBALPLAY_seconds_total is already loaded
     if (GLOBALPLAY_seconds_total > 0) {
 
+        // Filter elements checked on left grid
+        globalplay_filterElementsChecked();
+
         // Little delay to begin
         setTimeout(function () { timer_globalplay = setInterval(globalplay_whilePlaying, 1000); }, 800);
     }
@@ -4605,6 +4606,36 @@ function globalplay_start() {
     $("#divPanel_PlayerControl").removeClass("disabled");
 }
 
+function globalplay_filterElementsChecked() {
+
+    // Get only visible and checked checkboxes to remove
+    var list_elements = [];
+    $('tr:visible td input:checked').each(function () {
+        list_elements.push($(this).attr('value'));
+    });
+
+    globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
+    if (list_elements.length > 0) {
+        for (var i = 0; i < list_elements.length; i++) {
+            if (list_elements[i] != null) {
+                var attrs_array = list_elements[i].split("#"); // Element attributes
+                if (attrs_array.length > 1) {
+                    var tapeID = attrs_array[0];
+                    if (tapeID != null && tapeID.length) {
+                        var element = getElementInMemoryByID(tapeID)
+                        if (element != null) {
+
+                            var array = new Array();
+                            array[0] = element;
+                            array[1] = false;
+                            globalplay_stack_elements.push(array);
+                        }
+                    }
+                }
+            }
+        } // for
+    }
+}
 
 // EVENT: Whileplaying globalplay timeline
 function globalplay_whilePlaying() {
