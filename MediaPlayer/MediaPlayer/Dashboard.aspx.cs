@@ -648,14 +648,14 @@ namespace MediaPlayer
             }
             Timer1.Interval = data_time;
 
-            string Globalplay_defaultDuration = "6000";
+            string Globalplay_defaultDuration = "6";
             if (ConfigurationManager.AppSettings != null)
             {
                 Globalplay_defaultDuration = ConfigurationManager.AppSettings["Globalplay_defaultDuration"].ToString();
             }
             _hdnGlobalplay_defaultDuration.Value = Globalplay_defaultDuration;
 
-            string Globalplay_simultaneousElements = "6";
+            string Globalplay_simultaneousElements = "8";
             if (ConfigurationManager.AppSettings != null)
             {
                 Globalplay_simultaneousElements = ConfigurationManager.AppSettings["Globalplay_simultaneousElements"].ToString();
