@@ -5102,9 +5102,6 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         console.log("Error loading webchimera");
                         console.log(err);
 
-                    } // borrar esta linea
-                        
-/*
                         // Show alert message
                         $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
                         $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
@@ -5132,7 +5129,6 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         var duration_label = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
                         globalplay_remove_elements.push([null, null, label, duration_label]);
                     }
-*/
 
                     ok = true;
                 }
