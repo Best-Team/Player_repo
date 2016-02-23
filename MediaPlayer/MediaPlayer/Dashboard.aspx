@@ -591,26 +591,28 @@
 
                         <!-- GLOBALPLAY SCREEN -->
                         <div id="divgp_sc" class="globalplayBox img-rounded" style="display: none;">
-                            <!-- min-height:100%;"> -->
-                            <div id="flex_messages">
-                                <div id="globalplay_divSpecialMessages" class="info-label">
-                                    <h2 class="label label-danger" style="z-index: 1001; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
+                            <div id="flex_messages">                                
+
+                            <div id="flex-messages-top">
+                                <div id="globalplay_divDocumentsName" class="flex-messages-top info-label">
+                                    <h2 class="flex-messages-top-h2 label label-success"></h2>
                                 </div>
 
-                                <div id="globalplay_divDocumentsName" class="info-label">
-                                    <h2 class="label label-success" style="z-index: 1001; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
+                                <div id="globalplay_divAudioName" class="flex-messages-top info-label">
+                                    <h2 class="flex-messages-top-h2 label label-danger"></h2>
                                 </div>
 
-                                <div id="globalplay_divAudioName" class="info-label">
-                                    <h2 class="label label-danger" style="z-index: 1001; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
+                                <div id="globalplay_divVideoName" class="flex-messages-top info-label">
+                                    <h2 class="flex-messages-top-h2 label label-danger" style="background-color: purple;"></h2>
                                 </div>
 
-                                <div id="globalplay_divVideoName" class="info-label">
-                                    <h2 class="label label-danger" style="background-color:purple !important; z-index: 1001; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
+                                <div id="globalplay_divSpecialMessages" class="flex-messages-top info-label">
+                                    <h2 class="flex-messages-top-h2 label label-danger" style="background-color: rgb(55, 51, 51);"></h2>
                                 </div>
+                            </div>
 
-                                <div id="globalplay_divComments" class="info-label" style="bottom: 25px;">
-                                    <h2 class="label label-warning" style="z-index: 1001; background-color: orange; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
+                                <div id="globalplay_divComments" class="info-label" style="bottom: 16px;">
+                                    <h2 class="flex-messages-top-h2 label label-warning" style="z-index: 1001; background-color: orange; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
                                 </div>
                             </div>
                             <div class="flex">
@@ -627,6 +629,7 @@
 				   <label id="lblGlobalplay_timer_total_longFormat" class="label" style="font-size:100%; color:black;">00:00:00</label>
 				   <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label>
 				   <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label>
+
                                 Cantidad:
                         <label id="lblGlobalplay_element_count" class="label" style="font-size: 100%; color: black;">0</label>: IDs:
                         <label id="lblGlobalplay_element_ids" class="label" style="font-size: 100%; color: black;">0</label>
@@ -647,12 +650,14 @@
                                         <ul class="globalplay_controls controls">
 
                                             <li id="globalplay_play_li" class="img-rounded globalplay_play_li">
-                                                <a href="#divgp_sc" id="globalplay_play" class="globalplay_play" data-attr="playPauseAudio" onclick="return globalplay_init()"></a>
+                                                <a href="#divgp_sc" id="globalplay_play" class="globalplay_play" data-attr="playPauseAudio" 
+                                                    onclick="return globalplay_init()" style="padding: 25px;"></a>
                                                 <!-- Play/Pause button -->
                                                 <a href="#globalPlayer_popup" id="btnOpenFancybox" style="display: none;"></a>
                                             </li>
                                             <li id="globalplay_stop_li" class="img-rounded">
-                                                <a href="#divgp_sc" id="globalplay_stop" class="globalplay_stop" data-attr="nextAudio" onclick="return globalplay_stop()">
+                                                <a href="#divgp_sc" id="globalplay_stop" class="globalplay_stop" data-attr="nextAudio" 
+                                                    onclick="return globalplay_stop()" style="padding: 14px;">
                                                     <!-- Stop button -->
                                                 </a>
                                             </li>

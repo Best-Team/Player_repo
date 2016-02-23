@@ -1,4 +1,36 @@
-﻿.globalplay_controls {
+﻿
+.info-label {
+    width: 100%;
+    z-index: 1001;
+    position: absolute;
+}
+
+.flex-messages-top-h2 {
+    z-index: 1001;
+    text-transform: none;
+    font-size: 20px;
+    width: 50%;
+    margin: 0 auto;
+}
+
+#flex-messages-top {
+    max-height: 24px;
+    position: absolute;
+    width: 50%;
+    margin: auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.flex-messages-top {
+    position: relative;
+    width: initial;
+    margin: 0 10px 0 10px;
+    display: inline-block;
+}
+
+.globalplay_controls {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -321,12 +353,6 @@ div.disabled, button.disabled, a.disabled {
     background: #CCC;
 }
 
-.info-label {
-    width: 100%;
-    z-index: 1001;
-    position: absolute;
-}
-
 .fancybox-inner {
     overflow: hidden !important;
 }
@@ -346,7 +372,7 @@ div.disabled, button.disabled, a.disabled {
 
 .flex {
     position: relative;
-    max-width: 1390px;/*1320px;*/
+    max-width: 1400px;/*1320px;*/
     max-height: 630px;
     min-height: 593px;
     margin: 20px auto 0 auto; /*0 auto;*/

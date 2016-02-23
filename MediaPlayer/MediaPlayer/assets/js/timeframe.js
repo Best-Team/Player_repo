@@ -37,6 +37,7 @@
         this.paddingX = 40;
         this.paddingY = 40;
 
+
         this.width = this.outerWidth - (this.paddingX * 2);
         this.height = this.outerHeight - (this.paddingY * 2);
 

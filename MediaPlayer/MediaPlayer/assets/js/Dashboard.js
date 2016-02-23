@@ -3821,7 +3821,21 @@ function downloadAll() {
         });
     }
 }
+
 /******** Auxiliar Functions ********/
+
+function getDatetime_onPointerPosition(){
+    var position_date_str = null;
+    var posX = parseFloat(TIMELINE_POINTER.css("left"), 10);
+
+    // Datetime position 
+    var position_date = window.timeframe_live.getTickDate(posX);
+    if (position_date != null) {
+        position_date_str = moment(position_date, "YYYY-MM-DD HH:mm:ss");
+    }
+    return position_date_str;
+}
+
 
 // Get duration format in ms for timeouts
 function getDurationInMS(duration) {
@@ -4232,81 +4246,6 @@ function confirmAddComment() {
 
 /******** START: Media Player 2.0: Nuevo Requerimiento: Global Play ********/
 
-var globalplay_queue_elements = [[], [], []];
-var dynamic_number = 0;
-
-// Globalplay initialize
-function globalplay_init() {
-
-    // Hide Video player box
-    $("#divPlayer_VIDEO").css("visibility", "hidden");
-
-    if ($("#globalplay_play").hasClass("globalplay_play")) {
-
-        // Load globalplay initial events
-        globalplay_initEvents(); 
-        
-        globalplay_remove_elements = [];
-
-        /***************** DO PLAY *****************/
-        $("#globalplay_play").removeClass("globalplay_play");
-        $("#globalplay_play").addClass("globalplay_pause");
-
-        // IF IS THE START
-        if (GLOBALPLAY_seconds_current == 0) {
-
-            // Start timer
-            $('#divGlobalplay_timer').timer({
-                format: '%H:%M:%S',
-                seconds: 0
-            });
-
-            // Filter elements checked on left grid
-            globalplay_filterElementsChecked();
-        }
-        else {
-            // Resume timer
-            $('#divGlobalplay_timer').timer('resume');
-
-            // Resume globalplay current paused elements
-            globalplay_resumeAllCurrentMedia();
-        }
-
-        globalplay_start();
-
-        // If Fancybox is closed, open it
-        var fancybox = $(".fancybox-wrap")[0];
-        if (fancybox == null) {
-
-            // Open fancybox - DO CLICK
-            $("#btnOpenFancybox").click();
-
-            // Show overlay
-            $("#fade").show();
-
-            // Load info labels
-            loadGlobalplay_settings();
-        }
-
-    } else {
-
-        /***************** DO PAUSE *****************/
-        $("#globalplay_play").removeClass("globalplay_pause");
-        $("#globalplay_play").addClass("globalplay_play");
-
-        // Stop timer
-        $('#divGlobalplay_timer').timer('pause');
-
-        // Stop timer 
-        globalplay_abort();
-
-        // Pause all media current playing elements
-        globalplay_pauseAllCurrentMedia(false);
-
-    }
-    return false;
-}
-
 
 // Remove mute buttons on audio elements
 function globalplay_removeMuteButtons() {
@@ -4407,7 +4346,6 @@ function globalplay_getQueueElementByID(elementID) {
         } // for
     }
 }
-
 
 // Pause all media current playing elements
 function globalplay_pauseAllCurrentMedia(isStop) {
@@ -4644,6 +4582,116 @@ function globalplay_resumeAllCurrentMedia() {
 }
 
 
+var globalplay_queue_elements = [[], [], []];
+var dynamic_number = 0;
+
+// Globalplay initialize
+function globalplay_init() {
+
+    // Hide Video player box
+    $("#divPlayer_VIDEO").css("visibility", "hidden");
+
+    if ($("#globalplay_play").hasClass("globalplay_play")) {
+
+        // Load globalplay initial events
+        globalplay_initEvents();
+
+        globalplay_remove_elements = [];
+
+        /***************** DO PLAY *****************/
+        $("#globalplay_play").removeClass("globalplay_play");
+        $("#globalplay_play").addClass("globalplay_pause");
+
+        // IF IS THE START
+
+        if (GLOBALPLAY_seconds_current == 0) {
+
+
+            // Clean timer
+            $('#divGlobalplay_timer').timer('remove');
+
+            // Datetime position 
+            var lblGlobalplay_timer_current_longFormat = getDatetime_onPointerPosition();
+            if (lblGlobalplay_timer_current_longFormat != null) {
+
+                var date_str1 = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
+                var date_str2 = moment(lblGlobalplay_timer_current_longFormat, "DD-MM-YYYY HH:mm:ss");
+
+                //
+                //date_str2.add(5, "seconds");
+
+
+                var date1 = new Date(date_str1);
+                var date2 = new Date(date_str2);
+
+                var dif = date2.getTime() - date1.getTime();
+
+                var Seconds_from_T1_to_T2 = dif / 1000; // + 22;// + 55; // REVISAR
+                var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
+
+                // Start timer
+                $('#divGlobalplay_timer').timer({
+                    format: '%H:%M:%S',
+                    seconds: 0 // Seconds_Between_Dates // TODO Issue [3]
+                });
+
+
+            } else {
+                // Start timer in 0
+                $('#divGlobalplay_timer').timer({
+                    format: '%H:%M:%S',
+                    seconds: 0
+                });
+            }
+
+
+            // Filter elements checked on left grid
+            globalplay_filterElementsChecked();
+        }
+        else {
+            // Resume timer
+            $('#divGlobalplay_timer').timer('resume');
+
+            // Resume globalplay current paused elements
+            globalplay_resumeAllCurrentMedia();
+        }
+
+        globalplay_start();
+
+        // If Fancybox is closed, open it
+        var fancybox = $(".fancybox-wrap")[0];
+        if (fancybox == null) {
+
+            // Open fancybox - DO CLICK
+            $("#btnOpenFancybox").click();
+
+            // Show overlay
+            $("#fade").show();
+
+            // Load info labels
+            loadGlobalplay_settings();
+        }
+
+    } else {
+
+        /***************** DO PAUSE *****************/
+        $("#globalplay_play").removeClass("globalplay_pause");
+        $("#globalplay_play").addClass("globalplay_play");
+
+        // Stop timer
+        $('#divGlobalplay_timer').timer('pause');
+
+        // Stop timer 
+        globalplay_abort();
+
+        // Pause all media current playing elements
+        globalplay_pauseAllCurrentMedia(false);
+
+    }
+    return false;
+}
+
+
 // Stopeable timer
 var timer_globalplay;
 function globalplay_start() {
@@ -4665,36 +4713,6 @@ function globalplay_start() {
     $("#divPanel_PlayerControl").removeClass("disabled");
 }
 
-function globalplay_filterElementsChecked() {
-
-    // Get only visible and checked checkboxes to remove
-    var list_elements = [];
-    $('tr:visible td input:checked').each(function () {
-        list_elements.push($(this).attr('value'));
-    });
-
-    globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
-    if (list_elements.length > 0) {
-        for (var i = 0; i < list_elements.length; i++) {
-            if (list_elements[i] != null) {
-                var attrs_array = list_elements[i].split("#"); // Element attributes
-                if (attrs_array.length > 1) {
-                    var tapeID = attrs_array[0];
-                    if (tapeID != null && tapeID.length) {
-                        var element = getElementInMemoryByID(tapeID)
-                        if (element != null) {
-
-                            var stack_element = new Array();
-                            stack_element[0] = element;
-                            stack_element[1] = false; // AlreadyTaken false
-                            globalplay_stack_elements.push(stack_element);
-                        }
-                    }
-                }
-            }
-        } // for
-    }
-}
 
 // EVENT: Whileplaying globalplay timeline
 function globalplay_whilePlaying() {
@@ -4726,13 +4744,10 @@ function globalplay_whilePlaying() {
         var date_str2 = moment(_TL_ENDDATE, "DD-MM-YYYY HH:mm:ss");
         $("#lblGlobalplay_timer_total_longFormat").text(date_str2.format('DD-MM-YYYY HH:mm:ss'));
 
-        var posX = parseFloat(TIMELINE_POINTER.css("left"), 10);
-
         // Datetime position 
-        var position_date = window.timeframe_live.getTickDate(posX);
-        if (position_date != null) {
-            var position_date_str = moment(position_date, "YYYY-MM-DD HH:mm:ss");
-            $("#lblGlobalplay_timer_current_longFormat").text(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
+        var lblGlobalplay_timer_current_longFormat = getDatetime_onPointerPosition();
+        if (lblGlobalplay_timer_current_longFormat != null) {
+            $("#lblGlobalplay_timer_current_longFormat").text(lblGlobalplay_timer_current_longFormat.format('DD-MM-YYYY HH:mm:ss'));
         }
 
     } else {
@@ -5099,20 +5114,8 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         wjs("#webchimera2").addPlayer({ hotkeys: 0, toolbar: 0 });
 
                     } catch (err) {
-                        console.log("Error loading webchimera");
+                        console.log("l: 5101 - Error loading webchimera");
                         console.log(err);
-
-                        // Show alert message
-                        $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
-                        $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
-                        $("#dialog_WebChimera a").text("aquí.")
-                        $("#dialog_WebChimera").dialog({
-                            buttons: {
-                                "OK": function () {
-                                    $(this).dialog("close");
-                                }
-                            }
-                        });
 
                         webchimera_loaded = false;
                     }
@@ -5176,7 +5179,7 @@ function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, elem
 
     // Remove to element list
     var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_DEFAULT_DURATION;
-    globalplay_remove_elements.push([global_elementID, element, null, duration_final]);
+    //globalplay_remove_elements.push([global_elementID, element, null, duration_final]); // TEST
 
     return global_elementID;
 }
@@ -5216,6 +5219,38 @@ function globalplay_comment(element, dynamic_number) {
 }
 
 /********* Individual elements section END *********/
+
+function globalplay_filterElementsChecked() {
+
+    // Get only visible and checked checkboxes to remove
+    var list_elements = [];
+    $('tr:visible td input:checked').each(function () {
+        list_elements.push($(this).attr('value'));
+    });
+
+    globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
+    if (list_elements.length > 0) {
+        for (var i = 0; i < list_elements.length; i++) {
+            if (list_elements[i] != null) {
+                var attrs_array = list_elements[i].split("#"); // Element attributes
+                if (attrs_array.length > 1) {
+                    var tapeID = attrs_array[0];
+                    if (tapeID != null && tapeID.length) {
+                        var element = getElementInMemoryByID(tapeID)
+                        if (element != null) {
+
+                            var stack_element = new Array();
+                            stack_element[0] = element;
+                            stack_element[1] = false; // AlreadyTaken false
+                            globalplay_stack_elements.push(stack_element);
+                        }
+                    }
+                }
+            }
+        } // for
+    }
+}
+
 
 // Remove elements from DOM on globalplay screen
 function globalplay_removeElementsFromPlayback() {
