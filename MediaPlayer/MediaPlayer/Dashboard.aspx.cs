@@ -655,12 +655,12 @@ namespace MediaPlayer
             }
             _hdnGlobalplay_defaultDuration.Value = Globalplay_defaultDuration;
 
-            string Globalplay_simultaneousElements = "8";
+            string Globalplay_maxCollisionElements = "8";
             if (ConfigurationManager.AppSettings != null)
             {
-                Globalplay_simultaneousElements = ConfigurationManager.AppSettings["Globalplay_simultaneousElements"].ToString();
+                Globalplay_maxCollisionElements = ConfigurationManager.AppSettings["Globalplay_maxCollisionElements"].ToString();
             }
-            _hdnGlobalplay_simultaneousElements.Value = Globalplay_simultaneousElements;
+            _hdnGlobalplay_maxCollisionElements.Value = Globalplay_maxCollisionElements;
         }
 
         private void Logout()

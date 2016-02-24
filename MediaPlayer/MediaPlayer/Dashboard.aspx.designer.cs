@@ -427,12 +427,12 @@ namespace MediaPlayer {
         protected global::System.Web.UI.WebControls.HiddenField _hdnGlobalplay_defaultDuration;
         
         /// <summary>
-        /// _hdnGlobalplay_simultaneousElements control.
+        /// _hdnGlobalplay_maxCollisionElements control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField _hdnGlobalplay_simultaneousElements;
+        protected global::System.Web.UI.WebControls.HiddenField _hdnGlobalplay_maxCollisionElements;
     }
 }

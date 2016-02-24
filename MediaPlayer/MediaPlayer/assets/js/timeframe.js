@@ -620,6 +620,7 @@
         var end = this.endDate.valueOf();
 
         var x = ((dateValue - start) / (end - start) * this.width) + this.paddingX;
+        //var x = ((dateValue - start) / (end - start) * this.width);// + this.paddingX;
         return isNaN(x) ? this.paddingX : x;
     };
 
@@ -628,8 +629,8 @@
         var start = this.startDate.valueOf();
         var end = this.endDate.valueOf();
 
-        //var x = ((dateValue - start) / (end - start) * this.width) + this.paddingX;
-        var dateValue = ((x - this.paddingX) * (end - start) / this.width) + start;
+        var dateValue = ((x - this.paddingX) * (end - start) / this.width) + start;  //
+        //var dateValue = ((x /*- this.paddingX */) * (end - start) / this.width) + start;  //
         var dateValue2 = new Date(dateValue);
 
         var date_str1 = dateToString(dateValue2);

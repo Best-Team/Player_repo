@@ -16,7 +16,7 @@
 #flex-messages-top {
     max-height: 24px;
     position: absolute;
-    width: 50%;
+    width: 80%; /*50%; */
     margin: auto;
     position: absolute;
     left: 0;
@@ -28,6 +28,17 @@
     width: initial;
     margin: 0 10px 0 10px;
     display: inline-block;
+}
+
+#flex-messages-bottom{
+    max-height: 24px;
+    position: absolute;
+    width: 50%;
+    margin: auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 .globalplay_controls {

@@ -611,9 +611,11 @@
                                 </div>
                             </div>
 
+                            <div id="flex-messages-bottom">
                                 <div id="globalplay_divComments" class="info-label" style="bottom: 16px;">
                                     <h2 class="flex-messages-top-h2 label label-warning" style="z-index: 1001; background-color: orange; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
                                 </div>
+                            </div>
                             </div>
                             <div class="flex">
                                 <!--min-height:100%;">-->
@@ -749,7 +751,7 @@
         <asp:HiddenField ID="_hdnWebchimera_Install_URL" runat="server" ClientIDMode="Static" />
         <asp:HiddenField ID="_hdnMaxElementsDownload" runat="server" ClientIDMode="Static" />
         <asp:HiddenField ID="_hdnGlobalplay_defaultDuration" runat="server" ClientIDMode="Static" />
-        <asp:HiddenField ID="_hdnGlobalplay_simultaneousElements" runat="server" ClientIDMode="Static" />
+        <asp:HiddenField ID="_hdnGlobalplay_maxCollisionElements" runat="server" ClientIDMode="Static" />
 
 
     </form>

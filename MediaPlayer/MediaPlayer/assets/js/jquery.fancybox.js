@@ -433,7 +433,9 @@
 				$("#globalplay_play").addClass("globalplay_play");
 
 			    // Stop timer
-				$('#lblGlobalplay_timer_current').timer('pause');
+				$('#divGlobalplay_timer').timer('remove');
+
+				GLOBALPLAY_seconds_current = 0;
 
 			    // Show Video player box
 				var divPlayer_VIDEO = $("#divPlayer_VIDEO").css("visibility", "visible");;
