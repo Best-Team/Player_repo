@@ -32,6 +32,7 @@ var currentPointerPositionDate;
 var elementsInMemory = [];
 var globalplay_remove_elements = [];
 var globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
+var globalplay_playback_active = false;
 
 // Timeline Global Pointer
 var TIMELINE_POINTER = $("#sm2-progress-ball_TIMELINE");
@@ -220,7 +221,7 @@ $(document).ready(function () {
         afterClose: function () {
             $("#divgp_sc").hide();
             $("#divgp_sc #timer-labels").remove();
-            $("#globalPlayer_popup").show();
+            $("#globalPlayer_popup").show();            
         },
 
         helpers: {
@@ -660,7 +661,8 @@ function handleDragging(event, ui) {
     /******** Globalplay ********/
 
     // Stop timer 
-    globalplay_abort();
+    //globalplay_abort();
+    globalplay_playback_active = false;
 }
 
 
@@ -4629,7 +4631,6 @@ var global_numberID = 0;
 
 // Globalplay initialize
 function globalplay_init() {
-
     // Hide Video player box
     $("#divPlayer_VIDEO").css("visibility", "hidden");
 
@@ -4702,7 +4703,8 @@ function globalplay_init() {
         $('#divGlobalplay_timer').timer('pause');
 
         // Stop timer 
-        globalplay_abort();
+        //globalplay_abort();
+        globalplay_playback_active = false;
 
         // Pause all media current playing elements
         globalplay_pausePlayingElements(false);
@@ -4713,9 +4715,9 @@ function globalplay_init() {
 
 
 // Stopeable timer
-var timer_globalplay;
+var timer_globalplay = 0;
 function globalplay_start() {
-
+    globalplay_playback_active = true;
     var w = $("#divTimelineProgress").css("width");
     $("#sm2-progress-track").css("width", w);
 
@@ -4725,8 +4727,10 @@ function globalplay_start() {
         // Filter elements checked on left grid
         //globalplay_filterElementsChecked();
 
-        // Little delay to begin
-        setTimeout(function () { timer_globalplay = setInterval(globalplay_whilePlaying, 1000); }, 800);
+        if (timer_globalplay === 0) {
+            // Little delay to begin
+            setTimeout(function () { timer_globalplay = setInterval(globalplay_whilePlaying, 1000); }, 800);
+        }
     }
 
     // Enable right side Player box
@@ -4736,6 +4740,10 @@ function globalplay_start() {
 
 // EVENT: Whileplaying globalplay timeline
 function globalplay_whilePlaying() {
+    if (!globalplay_playback_active) return;
+
+    // Update global variable: current timer
+    GLOBALPLAY_seconds_current = $("#divGlobalplay_timer").data('seconds');
 
     // Remove elements from DOM on globalplay screen 
     globalplay_removeElementsFromPlayback();
@@ -4744,9 +4752,6 @@ function globalplay_whilePlaying() {
     globalplay_loadElements();
 
     // Timer Source: http://jquerytimer.com/
-
-    // Update global variable: current timer
-    GLOBALPLAY_seconds_current = $("#divGlobalplay_timer").data('seconds');
 
     // Update current timer label
     $("#lblGlobalplay_timer_current").text($("#divGlobalplay_timer").text());
@@ -4775,6 +4780,7 @@ function globalplay_whilePlaying() {
 
         // Stop timer 
         globalplay_abort();
+        timer_globalplay = 0;
     }
 }
 
@@ -4949,7 +4955,7 @@ function globalplay_loadElements() {
                         
             // Remove to element list
             var duration_label = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
-            globalplay_remove_elements.push([null, null, label, duration_label]);
+            globalplay_remove_elements.push([null, null, label, GLOBALPLAY_seconds_current, duration_label]);
         }
     }
 }
@@ -5013,7 +5019,7 @@ function globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_
         var actual_duration = getDuration_onDatetime(timestamp);
         var duration_final = actual_duration + duration_int + GLOBALPLAY_DEFAULT_DURATION_EXTRA;
 
-        globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, duration_final]);
+        globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, GLOBALPLAY_seconds_current, duration_final]);
     }
 
     return object;
@@ -5101,7 +5107,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                                 var actual_duration = getDuration_onDatetime(timestamp);
                                 var duration_final = actual_duration + duration_int + GLOBALPLAY_DEFAULT_DURATION_EXTRA;
 
-                                globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, duration_final]);
+                                globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, actual_duration, duration_final]);
 
                                 // PLAY
                                 $("#fbsviewer2")[0].play();
@@ -5120,7 +5126,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                                 // Remove to element list
                                 var duration_label = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
-                                globalplay_remove_elements.push([null, null, label, duration_label]);
+                                globalplay_remove_elements.push([null, null, label, GLOBALPLAY_seconds_current, duration_label]);
 
                             }
                         }, 3000);
@@ -5133,7 +5139,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                     // Remove to element list
                     var duration_label = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
-                    globalplay_remove_elements.push([null, null, label, duration_label]);
+                    globalplay_remove_elements.push([null, null, label, GLOBALPLAY_seconds_current, duration_label]);
                 }
 
                 break;
@@ -5185,7 +5191,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                         // Remove to element list
                         var duration_label = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
-                        globalplay_remove_elements.push([null, null, label, duration_label]);
+                        globalplay_remove_elements.push([null, null, label, GLOBALPLAY_seconds_current, duration_label]);
                     }
 
                     ok = true;
@@ -5197,7 +5203,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                     // Remove to element list
                     var duration_label = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
-                    globalplay_remove_elements.push([null, null, label, duration_label]);
+                    globalplay_remove_elements.push([null, null, label, GLOBALPLAY_seconds_current, duration_label]);
                 }
 
                 break;
@@ -5215,7 +5221,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
         var actual_duration = getDuration_onDatetime(timestamp);
         var duration_final = actual_duration + duration_int + GLOBALPLAY_DEFAULT_DURATION_EXTRA;
 
-        globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, duration_final]);
+        globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, actual_duration, duration_final]);
     }
     return global_elementID;
 }
@@ -5237,7 +5243,7 @@ function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, elem
 
     // Remove to element list
     var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_DEFAULT_DURATION;
-    globalplay_remove_elements.push([global_elementID, element_alreadyTaken, null, duration_final]);
+    globalplay_remove_elements.push([global_elementID, element_alreadyTaken, null, GLOBALPLAY_seconds_current, duration_final]);
 
     return global_elementID;
 }
@@ -5253,7 +5259,7 @@ function globalplay_document(file_url, element_alreadyTaken, global_numberID) {
 
     // Remove to element list
     var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_DEFAULT_DURATION;
-    globalplay_remove_elements.push([null, null, label, duration_final]);
+    globalplay_remove_elements.push([null, null, label, GLOBALPLAY_seconds_current, duration_final]);
 
     return global_elementID;
 }
@@ -5275,7 +5281,7 @@ function globalplay_comment(element_alreadyTaken, global_numberID) {
     var actual_duration = getDuration_onDatetime(timestamp);
     var duration_final = actual_duration + duration_sec;
 
-    globalplay_remove_elements.push([global_elementID, null, label, duration_final]);
+    globalplay_remove_elements.push([global_elementID, null, label, actual_duration, duration_final]);
 
     return global_elementID;
 }
@@ -5320,7 +5326,8 @@ function globalplay_removeElementsFromPlayback() {
      * 0: Element ID
      * 1: Element (globalplay_stack_elements)
      * 2: label
-     * 3: Globalplay current = seconds to remove
+     * 3: Element playback start time
+     * 4: Element playback stop time
      */
     if (globalplay_remove_elements.length > 0) {
         for (var i = 0; i < globalplay_remove_elements.length; i++) {
@@ -5329,9 +5336,11 @@ function globalplay_removeElementsFromPlayback() {
                 var elementDOM_ID = object[0];
                 var element = object[1];
                 var label = object[2];
-                var timeToRemove = object[3];
+                var timeToStart = object[3]
+                var timeToRemove = object[4];
 
-                if (timeToRemove <= GLOBALPLAY_seconds_current) {
+                //remove element from queue when current time is outside the playback time range for the element
+                if ( GLOBALPLAY_seconds_current < timeToStart || GLOBALPLAY_seconds_current >= timeToRemove) {
                     if (elementDOM_ID != null && element != null) {
                         globalplay_removeElement(elementDOM_ID, element);
                     }
@@ -5351,6 +5360,12 @@ function globalplay_removeElementsFromPlayback() {
             }
 
         } // for
+
+        //purge array
+        globalplay_remove_elements = globalplay_remove_elements.filter(function (item) {
+            return item !== null;
+        });
+
     } 
 }
 
@@ -5442,7 +5457,8 @@ function globalplay_stop() {
 
     // Empty list of elements to remove
     globalplay_remove_elements = [];
-
+    timer_globalplay = 0;
+    globalplay_playback_active = false;
 }
 
 // Clean info labels
@@ -5475,7 +5491,7 @@ function globalplay_removeElement(global_elementID, element_alreadyTaken) {
         var file_extension = element.file_extension;
 
         // Set available true back:
-        globalplay_setElementAlreadyTaken(tapeID, true);
+        globalplay_setElementAlreadyTaken(tapeID, false);
 
         // If is Audio stop it and remove it
         if (tapeType === "A") {
@@ -5536,8 +5552,7 @@ function getElementInMemoryByCurrentPlayingTime() {
                 var element = element_alreadyTaken[0];
                 if (element != null && element.timestamp != null && element.duration != null) {
                     element_start = moment(element.timestamp, "DD-MM-YYYY HH:mm:ss");
-                    element_end = moment(element.timestamp, "DD-MM-YYYY HH:mm:ss");
-                    element_end.add(element.duration, "seconds");
+                    element_end = element_start.add(element.duration, "seconds");
                 }
             }
             return element_start != null && element_end != null && element_alreadyTaken[1] === false && // AlreadyTaken false
