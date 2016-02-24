@@ -542,10 +542,10 @@
                                 <!--  -->
                             </div>
                             <div class="form-group">
-                                <div class="col-md-8" style="margin-top: 10px;">
+                                <div class="col-md-9" style="margin-top: 10px;">
                                     <input id="uploadDate" class="form-control" data-inputmask="'alias': 'date'" runat="server" />
                                 </div>
-                                <div class="col-md-4" style="margin-top: 10px;">
+                                <div class="col-md-3" style="margin-top: 10px;">
                                     <button id="btnConfirmUploadElement" type="button" class="btn btn-default" title="Subir" runat="server" onclick="prepareFileUpload_a();" onserverclick="btnConfirmUploadElement_ServerClick">
                                         <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
                                     </button>

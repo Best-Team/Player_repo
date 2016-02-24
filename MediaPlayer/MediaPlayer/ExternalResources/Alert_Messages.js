@@ -19,3 +19,4 @@ hashMessages["SeleccioneFolio"] = "Por favor, ingrese un folio válido.";
 hashMessages["InstallWebchimera_Aux"] = "Por favor, instale el plugin WebChimera para reproducir el elemento. ";
 hashMessages["MaxElementsSimultaneous"] = "Atención, máxima cantidad de elementos en simultáneo alcanzada. ";
 hashMessages["OrekaPlayerError"] = "Ocurrió un error cargando el Player Oreka, por favor, verifique Java y su conexión con el servidor de Oreka.";
+hashMessages["ConfirmarBorrarUnElemento"] = "Está a punto de borrar el elemento, confirme su contraseña para continuar.";

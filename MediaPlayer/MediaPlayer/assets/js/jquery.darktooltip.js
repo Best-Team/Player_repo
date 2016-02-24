@@ -21,7 +21,10 @@
 	DarkTooltip.prototype = {
 
 		show: function(){
-			var dt = this;
+		    var dt = this;
+		    if (!this.options.content) {
+		        return;
+		    }
 			if(this.options.modal){
 				this.modalLayer.css('display', 'block');
 			}
@@ -134,8 +137,12 @@
 					topPos += -this.tooltip.outerHeight() - this.tip.outerHeight()/2;
 					break;
 				case 'west':
-					leftPos += this.bearer.outerWidth() + this.tip.outerWidth()/2 + 35; // +35
-					topPos += this.bearer.outerHeight()/2 - (this.tooltip.outerHeight()/2);
+					//leftPos += this.bearer.outerWidth() + this.tip.outerWidth()/2 + 35; // +35
+					//topPos += this.bearer.outerHeight() / 2 - (this.tooltip.outerHeight() / 2);
+
+				    leftPos += this.bearer.outerWidth() / 2;// + this.tip.outerWidth() / 2 + 35; // +35
+				    topPos -= this.bearer.outerHeight() / 2;// - (this.tooltip.outerHeight() / 2);
+
 					break;
 				case 'north':
 					leftPos += this.bearer.outerWidth()/2 - (this.tooltip.outerWidth()/2);

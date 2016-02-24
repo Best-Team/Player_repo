@@ -687,7 +687,8 @@ function LoadAlertMessagesBackup() {
     hashMessages["InstallWebchimera_Aux"] = "Por favor, instale el plugin WebChimera para reproducir el elemento. ";
     hashMessages["MaxElementsSimultaneous"] = "Atención, máxima cantidad de elementos en simultáneo alcanzadainstale el plugin WebChimera para reproducir el elemento. ";
     hashMessages["OrekaPlayerError"] = "Ocurrió un error cargando el Player Oreka, por favor, verifique Java y su conexión con el servidor de Oreka.";
-
+    hashMessages["ConfirmarBorrarUnElemento"] = "Está a punto de borrar el elemento, confirme su contraseña para continuar.";
+    
 }
 
 function initVariables() {
@@ -2120,7 +2121,7 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     lnkElementDownload.off("click");
 
     // Load on click event to download element link
-    if (type_longStr != "Comentario") {
+    if (tapeType != "C") {
         var filePath_str = "";
 
         // If audio is from incextras (isExtra = true) then use localPath, if not use oreka web service
@@ -2128,14 +2129,14 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
         //////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////   DOWNLOAD FILE URL   /////////////////////////////////
         //////////////////////////////////////////////////////////////////////////////////////////
+        if (isExtra != null && isExtra.length > 0) {
+            var isExtra_str = isExtra.toString();
+            if (isExtra_str.toLowerCase() === "true") {
+                filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=1";
 
-        if (isExtra.toLowerCase() === "true") {
-            filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=1";
-
-        } else {
-
-            //filePath_str = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
-            filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0";
+            } else {
+                filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0";
+            }
         }
         lnkElementDownload.attr("href", filePath_str);
     }
@@ -2149,7 +2150,7 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     /**** Event: OnClick Load on click event remove button (btnRemoveElement) ****/
     loadClickRemoveButton_event();
 
-    divRemoveElementMessage.text("Está a punto de borrar el elemento, confirme su contraseña para continuar");
+    divRemoveElementMessage.text(hashMessages["ConfirmarBorrarUnElemento"]);
     divRemoveElementMessage.removeClass("alert-danger");
     divRemoveElementMessage.addClass("alert-warning");
 
@@ -2200,9 +2201,6 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
         $("#btnFullscreen").addClass("disabled");
         $("#aBtnFullscreen").addClass("disabled");
     }
-
-    // Show sound player
-    //       divControlsMask_VIDEO.show("blind", 200); ****
 
     // Empty video and audio progress
     $(".sm2-progress-bar").css("width", 0);
@@ -2261,8 +2259,9 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     $("#lblName").val(fileName);
     $("#lblTimestamp").val(timestamp);
 
-    var duration_str = duration;
-    if (duration == 0) {
+
+    var duration_int = parseInt(duration, 10);
+    if (duration_int == 0) {
         duration_formatStr = "No tiene";
     }
     $("#lblDuration").val(duration_formatStr);
@@ -2287,8 +2286,12 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
 
     // SET Element file path
     var file_url = filePath_OREKA;
-    if (isExtra.toLowerCase() === "true") {
-        file_url = filePath_EXTRA;
+
+    if (isExtra != null && isExtra.length > 0) {
+        var isExtra_str = isExtra.toString();
+        if (isExtra_str.toLowerCase() === "true") {
+            file_url = filePath_EXTRA;
+        }
     }
 
     /************************ Elements path configuration END ************************/
@@ -2736,6 +2739,7 @@ function loadPlayer_OrekaPlayer(tapeID, fileStatus, duration, divControlsMask_AU
         }
         /************************ Styles END ************************/
 
+        // Load FBS Player
         videoPlayerINIT(fileName, duration, segmentID);
 
         // Enable video player
@@ -3145,7 +3149,7 @@ function getClickPosition(e, duration) {
                 document.fbsviewer.seekViewerSeconds(currentSecs);
             }
         } else {
-            // TODO: adapt to html5 video - flowplayer
+            // TODO: adapt to html5 video 
 
             if (oldPlayer_activeElement_type === "V") {
                 if (wjs("#webchimera1") != null) {
@@ -3372,10 +3376,7 @@ function videoPlayerINIT(fileName, duration, segmentID) {
 
     // p = 'http://192.168.20.225:8080/icweb/replay?segid=1'; // TEST !!
 
-    //var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + FBS_DEFAULT_Width + "' height='" + FBS_DEFAULT_Height + "' name='fbsviewer' id='fbsviewer' title='undefined'>";         
-
     // Toma resolución del div contenedor (PLAYER_BOX)
-
     playerBox_w = parseInt(PLAYER_BOX.css("width"), 10);
     playerBox_h = parseInt(PLAYER_BOX.css("height"), 10);
 
@@ -3388,8 +3389,8 @@ function videoPlayerINIT(fileName, duration, segmentID) {
 
     // filePath_OREKA = 'http://192.168.20.225:8080/icweb/replay?segid=1'; // TEST !!
 
-    var applet = "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + divWidth + "px' height='" + divHeight + "px' name='fbsviewer' id='fbsviewer' title='undefined'>";
-
+    var applet = "<div id='fbsviewer1' style='padding-top: 10px;'>";
+    applet += "<applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + divWidth + "px' height='" + divHeight + "px' name='fbsviewer' id='fbsviewer' title='undefined'>";
     applet += "<param name='HOST' value=''>";
     applet += "<param name='PORT' value='5901'>";
     applet += "<param name='FBSURL' value='" + filePath_OREKA + "'>";
@@ -3403,7 +3404,7 @@ function videoPlayerINIT(fileName, duration, segmentID) {
     applet += "<param name='QUICK_REWIND_SECS' value='-5'>";
     applet += "<param name='QUICK_ADVANCE_SECS' value='5'>";
     applet += "<param name='NOREC_TAGTYPE_NAME' value='Pause'>";
-    applet += "</applet>";
+    applet += "</applet></div>";
 
     $("#divPlayer_VIDEO applet").remove();
     $("#divPlayer_VIDEO").append(applet);
@@ -3899,17 +3900,21 @@ function multiDownload(objects) {
                 var mediaType = array[2];
                 if (mediaType != "C") {
                     var filePath_str = "";
-                    if (isExtra.toLowerCase() === "true") {
 
-                        filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=1";
+                    if (isExtra != null && isExtra.length > 0) {
+                        var isExtra_str = isExtra.toString();
+                        if (isExtra_str.toLowerCase() === "true") {
 
-                    } else {
+                            filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=1";
 
-                        filePath_str = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
+                        } else {
+
+                            filePath_str = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
+                        }
+                        $("#aDownloader").attr("href", filePath_str);
+                        $("#aDownloader")[0].click();
+                        sleep(1000);
                     }
-                    $("#aDownloader").attr("href", filePath_str);
-                    $("#aDownloader")[0].click();
-                    sleep(1000);
                 }
             }
         }
@@ -4277,7 +4282,11 @@ function confirmAddComment() {
 // Remove mute buttons on audio elements
 function globalplay_removeMuteButtons() {
 
-    $("#svg_timeframe g[id*='tlTape_']").each(function () { $(this).unbind("DarkTooltip").removeData(); })
+    $("#svg_timeframe g").each(function () { $(this).attr("data-tooltip", ""); });
+    $("#svg_timeframe g").each(function () { $(this).removeAttr("data-tooltip"); });
+
+    //$("#svg_timeframe g").each(function () { $(this).unbind("DarkTooltip").removeData(); })
+    //$("#svg_timeframe g[id*='tlTape_']").each(function () { $(this).unbind("DarkTooltip").removeData(); })
 
     /*
         var elementsCandidate = getElementInMemoryByType("A");
@@ -4312,17 +4321,16 @@ function globalplay_loadEvents() {
                         // Darktooltip Source: https://github.com/rubentd/darktooltip
 
                         var audio_element = $("#tlTape_" + element.tapeID);
-                        var id = audio_element.attr('id');
-                        //audio_element.attr("data-tooltip", " ");
+                        audio_element.attr("data-tooltip", " ");
 
                         // Add new Tooltip
                         audio_element.darkTooltip({
                             trigger: 'hover',
                             animation: 'flipIn',
-                            gravity: 'west',
+                            gravity: 'south',
                             theme: 'light',
                             confirm: true,
-                            yes: '-',
+                            yes: ' ',
                             onYes: function (event) {
 
                                 globalplay_muteAudio(event);
@@ -4330,7 +4338,8 @@ function globalplay_loadEvents() {
                         });
 
                         // locate mute button over fancybox screen
-                        $('#darktooltip-' + id).css('z-index', 8031);
+                        var id = audio_element.attr('id');
+                        $("#darktooltip-" + id).css("z-index", 8031);
 
                         break;
                     }
@@ -4375,7 +4384,7 @@ function globalplay_getQueueElementByID(elementID) {
 }
 
 // Pause all media current playing elements
-function globalplay_pauseAllCurrentMedia(isStop) {
+function globalplay_pausePlayingElements(isStop) {
     // globalplay_queue_elements:
 
     // element[0] = Element
@@ -4414,7 +4423,6 @@ function globalplay_pauseAllCurrentMedia(isStop) {
                                 dynamic_object.pause();
                             }
                         }
-
                         break;
                     }
 
@@ -4465,7 +4473,6 @@ function globalplay_pauseAllCurrentMedia(isStop) {
                                             }
                                         }
                                     }
-
                                     break;
                                 }
 
@@ -4612,7 +4619,7 @@ function globalplay_resumeAllCurrentMedia() {
 
 
 var globalplay_queue_elements = [[], [], []];
-var dynamic_number = 0;
+var global_numberID = 0;
 
 // Globalplay initialize
 function globalplay_init() {
@@ -4625,15 +4632,14 @@ function globalplay_init() {
         // Load globalplay initial events
         globalplay_loadEvents();
 
-        globalplay_remove_elements = [];
-
         /***************** DO PLAY *****************/
         $("#globalplay_play").removeClass("globalplay_play");
         $("#globalplay_play").addClass("globalplay_pause");
 
-        // IF IS THE START
-
         if (GLOBALPLAY_seconds_current == 0) {
+            /********** BEGIN CASE **********/
+
+            //globalplay_remove_elements = [];
 
             // Clean timer
             $('#divGlobalplay_timer').timer('remove');
@@ -4655,6 +4661,8 @@ function globalplay_init() {
             globalplay_filterElementsChecked();
         }
         else {
+            /********** RESUME CASE **********/
+
             // Resume timer
             $('#divGlobalplay_timer').timer('resume');
 
@@ -4691,7 +4699,7 @@ function globalplay_init() {
         globalplay_abort();
 
         // Pause all media current playing elements
-        globalplay_pauseAllCurrentMedia(false);
+        globalplay_pausePlayingElements(false);
 
     }
     return false;
@@ -4836,7 +4844,7 @@ function globalplay_loadElements() {
                 var element = elementsCandidate[i];
                 if (element != null) {
 
-                    dynamic_number++;
+                    global_numberID++;
 
                     // Set id_list label
                     id_list = id_list + element[0].tapeID + "(" + element[0].tapeType + "), ";
@@ -4883,28 +4891,28 @@ function globalplay_loadElements() {
 
                         switch (tapeType) {
                             case "A": {
-                                audio_object = globalplay_audio(file_url, element, dynamic_number, flex_div);
+                                audio_object = globalplay_audio(file_url, element, global_numberID, flex_div);
                                 break;
                             }
 
                             case "S":
                             case "V": {
-                                dynamic_id = globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
+                                dynamic_id = globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, global_numberID);
                                 break;
                             }
 
                             case "I": {
-                                dynamic_id = globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number);
+                                dynamic_id = globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element, global_numberID);
                                 break;
                             }
 
                             case "D": {
-                                dynamic_id = globalplay_document(file_url, element, dynamic_number);
+                                dynamic_id = globalplay_document(file_url, element, global_numberID);
                                 break;
                             }
 
                             case "C": {
-                                dynamic_id = globalplay_comment(element, dynamic_number);
+                                dynamic_id = globalplay_comment(element, global_numberID);
                                 break;
                             }
                         }
@@ -4947,8 +4955,8 @@ function globalplay_loadElements() {
 /********* Individual elements section *********/
 
 // Play audio
-function globalplay_audio(file_url, element, dynamic_number, flex_div) {
-    var global_elementID = "audio_" + dynamic_number;
+function globalplay_audio(file_url, element, global_numberID, flex_div) {
+    var global_elementID = "audio_" + global_numberID;
     var fileName = element[0].fileName;
     var tapeID = element[0].tapeID;
     var duration = element[0].duration;
@@ -5010,7 +5018,7 @@ function globalplay_audio(file_url, element, dynamic_number, flex_div) {
 }
 
 // Play video or screen recording
-function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number) {
+function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element, global_numberID) {
     var global_elementID = "";
     var duration = element[0].duration; 
     var fileName = element[0].fileName;
@@ -5031,11 +5039,10 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                 // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
 
-                global_elementID = "video_" + dynamic_number;
+                global_elementID = "video_" + global_numberID;
 
                 var js_player = '<div id="' + global_elementID + '" class="divVideo" style="float:left;">';
-                js_player += '<video id="html_player2" preload="none"';
-                js_player += 'width: ' + visual_size_w + 'px; height: ' + visual_size_h + 'px; margin-top:30px;" name="visual_element" autoplay>';
+                js_player += '<video id="html_player2" preload="none" style="width:' + visual_size_w + 'px; height:' + visual_size_h + 'px;" name="visual_element" autoplay>';
                 js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
                 js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
                 js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
@@ -5083,7 +5090,6 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         setTimeout(function () {
 
                             try {
-                                $("#fbsviewer2")[0].play();
 
                                 var label = $("#globalplay_divVideoName h2");
                                 label.text(fileName);
@@ -5095,12 +5101,15 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                                 globalplay_remove_elements.push([global_elementID, element, label, duration_final]);
 
+                                // PLAY
+                                $("#fbsviewer2")[0].play();
+
                             } catch (err) {
                                 console.log("l:5087 Error pausing FBS Player");
                                 console.log(err);
                                 
                                 // Hide player until it is removed by "globalplay_remove_elements"
-                                //$("#divFbsviewer2").css("visibility", "hidden"); // TODO: VOLVER A AGREGAR
+                                $("#divFbsviewer2").css("visibility", "hidden"); // TODO: VOLVER A AGREGAR
 
                                 // Error message
                                 var label = $("#globalplay_divSpecialMessages h2");
@@ -5210,8 +5219,8 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 }
 
 // Play image
-function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element, dynamic_number) {
-    var global_elementID = "image_" + dynamic_number;
+function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element, global_numberID) {
+    var global_elementID = "image_" + global_numberID;
     var segmentID = element[0].segmentID;
     var fileName = element[0].fileName;
 
@@ -5232,8 +5241,8 @@ function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, elem
 }
 
 // Play document
-function globalplay_document(file_url, element, dynamic_number) {
-    var global_elementID = "image_" + dynamic_number;
+function globalplay_document(file_url, element, global_numberID) {
+    var global_elementID = "image_" + global_numberID;
     var fileName = element[0].fileName;
 
     var label = $("#globalplay_divDocumentsName h2");
@@ -5248,8 +5257,8 @@ function globalplay_document(file_url, element, dynamic_number) {
 }
 
 // Play comment
-function globalplay_comment(element, dynamic_number) {
-    var global_elementID = "comment_" + dynamic_number;
+function globalplay_comment(element, global_numberID) {
+    var global_elementID = "comment_" + global_numberID;
     var fileName = element[0].fileName;
     var duration = element[0].duration;
     var timestamp = element[0].timestamp;
@@ -5336,18 +5345,16 @@ function globalplay_removeElementsFromPlayback() {
             }
 
         } // for
-    } else {
-        //globalplay_removeAll();
-    }
-
+    } 
 }
 
 function globalplay_removeAll() {
+
     // Remove elements from globalplay player
-    globalplay_removeAllElements();
+    globalplay_removeDOMElements();
 
     // Stop all audios
-    globalplay_pauseAllCurrentMedia(true);
+    globalplay_pausePlayingElements(true);
 
     // Remove all audios
     if (globalplay_queue_elements != null && globalplay_queue_elements.length > 0) {
@@ -5380,24 +5387,21 @@ function globalplay_stop() {
     $("#globalplay_play").removeClass("globalplay_pause");
     $("#globalplay_play").addClass("globalplay_play");
 
-    // Close Fancybox 
-    //$.fancybox.close();
-
     TIMELINE_POINTER.css("left", "0%");
 
     // Stop all elements currently playing
-    globalplay_pauseAllCurrentMedia(true);
+    globalplay_pausePlayingElements(true);
 
     // Set ready elements already taken
     globalplay_prepareElementsAlreadyTaken();
 
     // Remove elements from globalplay player
-    globalplay_removeAllElements();
+    globalplay_removeDOMElements();
 
     // Clean info labels
     globalplay_cleanLabels();
 
-    dynamic_number = 0;
+    global_numberID = 0;
 
     // Stop timer 
     globalplay_abort();
@@ -5407,9 +5411,12 @@ function globalplay_stop() {
     // Clear global timer
     $('#divGlobalplay_timer').timer('remove');
 
-
-    // Queue of current elements playing
+    // Empty list of playing elements 
     globalplay_queue_elements = [[], [], []];
+
+    // Empty list of elements to remove
+    globalplay_remove_elements = [];
+
 }
 
 // Clean info labels
@@ -5421,7 +5428,7 @@ function globalplay_cleanLabels() {
 }
 
 // Remove elements from globalplay player
-function globalplay_removeAllElements() {
+function globalplay_removeDOMElements() {
     $(".flex").find('*').remove();
 
     // Clean all label elements
