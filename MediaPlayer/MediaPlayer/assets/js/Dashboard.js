@@ -4432,7 +4432,7 @@ function globalplay_pauseAllCurrentMedia(isStop) {
                                 case "webm":
                                 case "ogg": {
 
-                                    var html_player = $("#" + playID);
+                                    var html_player = $("#html_player2");
                                     if (html_player != null && html_player[0] != null) {
 
                                         if (isStop) {
@@ -4545,7 +4545,7 @@ function globalplay_resumeAllCurrentMedia() {
                                 case "webm":
                                 case "ogg": {
 
-                                    var html_player = $("#" + playID);
+                                    var html_player = $("#html_player2");
                                     if (html_player != null && html_player[0] != null) {
                                         html_player[0].play();
                                     }
@@ -4793,7 +4793,7 @@ function globalplay_loadElements() {
                 case 1:
                 case 2:
                     {
-                        visual_size_w = 600;
+                        visual_size_w = 600; 
                         visual_size_h = 600;
                         break;
                     }
@@ -4964,7 +4964,6 @@ function globalplay_audio(file_url, element, dynamic_number, flex_div) {
 
     // Get file extension
     var file_extension = getFileExtension(fileName);
-
     if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
 
         /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
@@ -4981,7 +4980,8 @@ function globalplay_audio(file_url, element, dynamic_number, flex_div) {
             global_elementID = "wav_object2";
 
             // ActiveX object
-            var wav_object = "<object id='" + global_elementID + "' data='" + file_url + "' type='audio/x-wav' width='" + width + "' height='50px' style='visibility: hidden;'>";
+            var wav_object = "<object id='" + global_elementID + "' data='" + file_url + "' type='audio/x-wav'"; 
+            wav_object += " width='" + width + "' height='50px' style='display: none;'>";
             wav_object += " <param name='src' value='" + file_url + "'>";
             wav_object += " <param name='autoplay' value='true'>";
             wav_object += " <param name='autoStart' value='1'>";
@@ -5033,12 +5033,13 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                 global_elementID = "video_" + dynamic_number;
 
-                var js_player = '<video id="' + global_elementID + '" preload="none" style="float:left;';
+                var js_player = '<div id="' + global_elementID + '" class="divVideo" style="float:left;">';
+                js_player += '<video id="html_player2" preload="none"';
                 js_player += 'width: ' + visual_size_w + 'px; height: ' + visual_size_h + 'px; margin-top:30px;" name="visual_element" autoplay>';
                 js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
                 js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
                 js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
-                js_player += '</video>';
+                js_player += '</video></div>';
 
                 flex_div.append(js_player);
 
@@ -5099,7 +5100,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                                 console.log(err);
                                 
                                 // Hide player until it is removed by "globalplay_remove_elements"
-                                $("#divFbsviewer2").css("visibility", "hidden");
+                                //$("#divFbsviewer2").css("visibility", "hidden"); // TODO: VOLVER A AGREGAR
 
                                 // Error message
                                 var label = $("#globalplay_divSpecialMessages h2");
@@ -5135,8 +5136,9 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                 if (getIsFirefoxOrIE()) {
                     global_elementID = "divWebchimera2";
 
-                    var applet = "<div id='" + global_elementID + "' style='float:left;'><object id='webchimera2' type='application/x-chimera-plugin' width='" + visual_size_w + "' " +
-                                 "height='" + visual_size_h + "' name='visual_element' style='position:relative; float:left; margin: 10px;'>";
+                    var applet = "<div id='" + global_elementID + "' class='divVideo' style='float:left;'>";
+                    applet += "<object id='webchimera2' type='application/x-chimera-plugin' width='" + (visual_size_w - 3) + "' ";
+                    applet += "height='" + (visual_size_h - 3) + "' name='visual_element' style='position:relative; float:left; margin: 10px;'>";
                     applet += "<param name='windowless' value='true' />";
                     applet += "</object>";
                     applet += "<div id='interface'></div></div>";
