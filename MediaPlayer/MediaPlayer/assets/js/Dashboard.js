@@ -28,7 +28,7 @@ var oldPlayer_activeElement_duration = "";
 var comment_popup_timestamp = "";
 var initial_size = 0;
 var selectedElementID = 0;
-var currentPointerPositionDate;
+var currentPointerPositionDate_str;
 var elementsInMemory = [];
 var globalplay_remove_elements = [];
 var globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
@@ -161,7 +161,7 @@ $(document).ready(function () {
     });
 
     /**** Progress Pointer settings ****/
-    currentPointerPositionDate = _TL_STARTDATE;
+    currentPointerPositionDate_str = _TL_STARTDATE;
 
     // If the folio selected is not valid, then hides the Pointer from timeline
     TIMELINE_POINTER.hide();
@@ -570,12 +570,12 @@ function handleDragStop(event, ui) {
     var posX = ui.offset.left - $("#svg_timeframe").offset().left;
     var position_date = window.timeframe_live.getTickDate(posX); // Datetime position - Formato: AÑO DIA MES
     if (position_date != null) {
-        var position_date_str = moment(position_date, "YYYY-MM-DD HH:mm:ss");
-        currentPointerPositionDate = position_date_str.format('DD-MM-YYYY HH:mm:ss');
+        var position_date_moment = moment(position_date, "YYYY-MM-DD HH:mm:ss");
+        currentPointerPositionDate_str = position_date_moment.format('DD-MM-YYYY HH:mm:ss');
 
         // Update popup dates: FileUpload and CommentUpload
-        $("#commentDate").val(currentPointerPositionDate);
-        $("#divUpload input[id*='uploadDate']").val(currentPointerPositionDate);
+        $("#commentDate").val(currentPointerPositionDate_str);
+        $("#divUpload input[id*='uploadDate']").val(currentPointerPositionDate_str);
 
         if (globalplay_active) {
 
@@ -583,20 +583,7 @@ function handleDragStop(event, ui) {
 
             // Set current timer
 
-            var actual_duration = getDuration_onDatetime(position_date_str)
-
-            /*
-            var start_date_str = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
-
-            var position_date_final = new Date(position_date_str);
-            var start_date_final = new Date(start_date_str);
-
-            var dif = start_date_final.getTime() - position_date_final.getTime();
-
-            var Seconds_from_T1_to_T2 = dif / 1000;
-            var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
-            */
-
+            var actual_duration = getDuration_onDatetime(position_date_moment)
             GLOBALPLAY_seconds_current = actual_duration;
 
             // Clear global timer
@@ -609,7 +596,7 @@ function handleDragStop(event, ui) {
             });
 
             // Set current timer
-            $("#lblGlobalplay_timer_current_longFormat").text(position_date_str.format('DD-MM-YYYY HH:mm:ss'));
+            $("#lblGlobalplay_timer_current_longFormat").text(position_date_moment.format('DD-MM-YYYY HH:mm:ss'));
 
             // Pause global timer 
             $('#divGlobalplay_timer').timer('pause');
@@ -621,7 +608,9 @@ function handleDragStop(event, ui) {
             //globalplay_removeAll();
             globalplay_pausePlayingElements(false); // ??
 
-        }
+            globalplay_loadElementSeek(actual_duration);
+
+        } // globalplay_active
     }
 }
 
@@ -1094,7 +1083,7 @@ function addCommentClick() {
 
             // Hide other popups
             $(".box2.popbox2").hide();
-            var date_str = moment(currentPointerPositionDate, "DD-MM-YYYY HH:mm:ss");
+            var date_str = moment(currentPointerPositionDate_str, "DD-MM-YYYY HH:mm:ss");
             $("#commentDate").val(date_str.format('DD-MM-YYYY HH:mm:ss'));
             $(".jslider-pointer").css("left", "0%");
 
@@ -1334,7 +1323,7 @@ function setCurrentPointerPositionDate(event) {
     var date = window.timeframe_live.getTickDate(x); // Datetime position
     if (date != null) {
         var date_str = moment(date, "YYYY-MM-DD HH:mm:ss");
-        currentPointerPositionDate = date_str.format('DD-MM-YYYY HH:mm:ss');
+        currentPointerPositionDate_str = date_str.format('DD-MM-YYYY HH:mm:ss');
     }
 }
 
@@ -1916,7 +1905,8 @@ function paintSelectionClick(tapeID, timestamp) {
     // Left panel
     $("#tblLeftGridElements button[name='btnTimelineElement']").removeClass("active");
     $("#tblLeftGridElements tr[id*='tape_'] > td > h5").attr("style", "color:black;");
-    $("#tblLeftGridElements tr[id*='tape_']").css("background-color", "white");
+    $("#tblLeftGridElements tr[id*='tape_']").not("[name='Oreka']").css("background-color", "inherit"); // white
+    $("#tblLeftGridElements tr[id*='tape_'][name='Oreka']").css("background-color", "rgb(232, 204, 204)"); // white
 
     // Bottom
     var vAllBottom_texts = $("g[id*='tlTape_'] > text");
@@ -1934,6 +1924,7 @@ function paintSelectionClick(tapeID, timestamp) {
     $("#tblLeftGridElements #tape_" + tapeID + " > td > h5").attr("style", "color:DodgerBlue");
     $("#tblLeftGridElements #tape_" + tapeID).css("background-color", "lightgray");
 
+
     // Bottom
     var vBottom_text = $("#tlTape_" + tapeID + " > text");
     var vBottom_rect = $("#tlTape_" + tapeID + " > rect");
@@ -1944,14 +1935,6 @@ function paintSelectionClick(tapeID, timestamp) {
         vBottom_rect.attr("stroke-opacity", 0.9);
     }
 
-    // Set Selected element
-    /*
-    selectedElementID = tapeID;
-    timeline_pointer_setLocation(tapeID);
-    */
-
-    // Set current pointer date, to the add-comment & upload-file functions
-    //currentPointerPositionDate = timestamp; 
 }
 
 function getOffset(evt) {
@@ -3659,7 +3642,7 @@ function addFileClick() {
             var posXoff = $("#btnUploadElement").offset().left;
             var posYoff = $("#btnUploadElement").offset().top + 60;
 
-            var date_str = moment(currentPointerPositionDate, "DD-MM-YYYY HH:mm:ss");
+            var date_str = moment(currentPointerPositionDate_str, "DD-MM-YYYY HH:mm:ss");
 
             $("#divUpload input[id*='uploadDate']").val(date_str.format('DD-MM-YYYY HH:mm:ss'));
             $("#divCamaras input[id*='camarasDate1']").val(date_str.format('DD-MM-YYYY HH:mm:ss'));
@@ -4226,7 +4209,7 @@ function confirmAddComment() {
                     tr += "<td>";
                     tr += "<h5>" + "" + "</h5>";
                     tr += "<td>";
-                    tr += "<button type='button' class='btn btn-default btn-sm' style='color:orange; opacity: 0.9; background-color: beige; border: 1px solid black; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' ";
+                    tr += "<button type='button' class='btn btn-default btn-sm' style='color:orange; opacity: 0.9; background-color: beige; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' ";
                     tr += "title='C' onclick='clickTimelineElement2(\"" + object.tapeID + "\", \"" + object.count + "\", \"" + object.duration + "\", \"" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "\", \"Comentario\", \"" + object.tapeID + "\", \"true\", \"" + object.fileName + "\", \"" + object.filePath + "\", \"" + object.duration_formatStr + "\", \"C\", \"OK\"" + ")' ><span class='glyphicon glyphicon-comment' aria-hidden='true'></span></button>";
                     tr += "<td>";
                     tr += "<h5 id='timestamp'>" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "</h5>";
@@ -4282,8 +4265,8 @@ function confirmAddComment() {
 // Remove mute buttons on audio elements
 function globalplay_removeMuteButtons() {
 
-    $("#svg_timeframe g").each(function () { $(this).attr("data-tooltip", ""); });
-    $("#svg_timeframe g").each(function () { $(this).removeAttr("data-tooltip"); });
+    //$("#svg_timeframe g").each(function () { $(this).attr("data-tooltip", ""); });
+    //$("#svg_timeframe g").each(function () { $(this).removeAttr("data-tooltip"); });
 
     //$("#svg_timeframe g").each(function () { $(this).unbind("DarkTooltip").removeData(); })
     //$("#svg_timeframe g[id*='tlTape_']").each(function () { $(this).unbind("DarkTooltip").removeData(); })
@@ -4321,7 +4304,7 @@ function globalplay_loadEvents() {
                         // Darktooltip Source: https://github.com/rubentd/darktooltip
 
                         var audio_element = $("#tlTape_" + element.tapeID);
-                        audio_element.attr("data-tooltip", " ");
+                        audio_element.attr("data-tooltip", "x");
 
                         // Add new Tooltip
                         audio_element.darkTooltip({
@@ -4414,18 +4397,38 @@ function globalplay_pausePlayingElements(isStop) {
                         if (getIsIE() && file_extension[0] == "wav") {
                             if ($("#wav_object2")[0] != null) {
                                 if (isStop) {
-                                    $("#wav_object2")[0].stop();
+                                    try {
+                                        $("#wav_object2")[0].stop();
+                                    } catch (err) {
+                                        console.log("l:4401 Error stoping IE ActiveX Player");
+                                        console.log(err);
+                                    }
                                 } else {
-                                    $("#wav_object2")[0].pause();
+                                    try {
+                                        $("#wav_object2")[0].pause();
+                                    } catch (err) {
+                                        console.log("l:4408 Error pausing IE ActiveX Player");
+                                        console.log(err);
+                                    }
                                 }
                             }
                         }
                         else { // Normal HTML5 Audio tag
                             if (isStop) {
-                                dynamic_object.pause();
-                                dynamic_object.currentTime = 0;
+                                try {
+                                    dynamic_object.pause();
+                                    dynamic_object.currentTime = 0;
+                                } catch (err) {
+                                    console.log("l:4420 Error pausing HTML5 Player");
+                                    console.log(err);
+                                }
                             } else {
-                                dynamic_object.pause();
+                                try {
+                                    dynamic_object.pause();
+                                } catch (err) {
+                                    console.log("l:4427 Error pausing HTML5 Player");
+                                    console.log(err);
+                                }
                             }
                         }
                         break;
@@ -4447,12 +4450,21 @@ function globalplay_pausePlayingElements(isStop) {
 
                                     var html_player = $("#html_player2");
                                     if (html_player != null && html_player[0] != null) {
-
                                         if (isStop) {
-                                            html_player[0].pause();
-                                            html_player[0].currentTime = 0;
+                                            try {
+                                                html_player[0].pause();
+                                                html_player[0].currentTime = 0;
+                                            } catch (err) {
+                                                console.log("l:4456 Error pausing HTML5 Player");
+                                                console.log(err);
+                                            }
                                         } else {
-                                            html_player[0].pause();
+                                            try {
+                                                html_player[0].pause();
+                                            } catch (err) {
+                                                console.log("l:4463 Error pausing HTML5 Player");
+                                                console.log(err);
+                                            }
                                         }
                                     }
                                     break;
@@ -4487,26 +4499,29 @@ function globalplay_pausePlayingElements(isStop) {
                                 default: {
 
                                     // Webchimera Plugin Player or else:
-                                    try {
-                                        if (isStop) {
+                                    if (isStop) {
+                                        try {
                                             wjs("#webchimera2").stop();
-                                        } else {
-                                            wjs("#webchimera2").pause();
+                                        } catch (err) {
+                                            console.log("l:4504 Error stopping webchimera");
+                                            console.log(err);
                                         }
-                                    } catch (err) {
-                                        console.log("l:4458 Error loading webchimera");
-                                        console.log(err);
+                                    } else {
+                                        try {
+                                            wjs("#webchimera2").pause();
+                                        } catch (err) {
+                                            console.log("l:4511 Error pausing webchimera");
+                                            console.log(err);
+                                        }
                                     }
-
                                     break;
                                 }
-                            }
+                            } // switch file_extension
                         }
-
                         break;
                     }
 
-                }
+                } // switch tapeType
             }
         } //for
     }
@@ -4538,7 +4553,12 @@ function globalplay_resumeAllCurrentMedia() {
                         /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
                         if (getIsIE() && file_extension[0] == "wav") {
                             if ($("#wav_object2")[0] != null) {
-                                $("#wav_object2")[0].play();
+                                try {
+                                    $("#wav_object2")[0].play();
+                                } catch (err) {
+                                    console.log("l:4545 Error playing IE ActiveX Player");
+                                    console.log(err);
+                                }
                             }
                         }
                         else { // Normal HTML5 Audio tag
@@ -4560,9 +4580,13 @@ function globalplay_resumeAllCurrentMedia() {
 
                                     var html_player = $("#html_player2");
                                     if (html_player != null && html_player[0] != null) {
-                                        html_player[0].play();
+                                        try {
+                                            html_player[0].play();
+                                        } catch (err) {
+                                            console.log("l:4572 Error playing HTML5 Player");
+                                            console.log(err);
+                                        }
                                     }
-
                                     break;
                                 }
 
@@ -4573,7 +4597,7 @@ function globalplay_resumeAllCurrentMedia() {
                                         try {
                                             $("#fbsviewer2")[0].play();
                                         } catch (err) {
-                                            console.log("l:4536 Error playing FBS Player");
+                                            console.log("l:4586 Error playing FBS Player");
                                             console.log(err);
                                         }
                                     }
@@ -4586,16 +4610,15 @@ function globalplay_resumeAllCurrentMedia() {
                                 case "bin":
                                 default: {
 
+                                    // Webchimera Plugin Player or else:
                                     try {
-
-                                        // Webchimera Plugin Player or else:
                                         wjs("#webchimera2").play();
 
                                     } catch (err) {
-                                        console.log("l:4555 Error loading webchimera");
+                                        console.log("l:4604 Error loading webchimera");
                                         console.log(err);
 
-/*
+                                        /*
                                         // Show alert message
                                         $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
                                         $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
@@ -4607,9 +4630,8 @@ function globalplay_resumeAllCurrentMedia() {
                                                 }
                                             }
                                         });
-*/
+                                        */
                                     }
-
                                     break;
                                 }
                             } // switch extension
@@ -5022,9 +5044,9 @@ function globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_
 // Play video or screen recording
 function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element_alreadyTaken, global_numberID) {
     var global_elementID = "";
-    var duration = element[0].duration; 
-    var fileName = element[0].fileName;
-    var timestamp = element[0].timestamp;
+    var duration = element_alreadyTaken[0].duration;
+    var fileName = element_alreadyTaken[0].fileName;
+    var timestamp = element_alreadyTaken[0].timestamp;
 
     var ok = false;
 
@@ -5317,7 +5339,7 @@ function globalplay_filterElementsChecked() {
 function globalplay_removeElementsFromPlayback() {
 
     /* Object
-     * 0: Element ID
+     * 0: Element DOM ID
      * 1: Element (globalplay_stack_elements)
      * 2: label
      * 3: Globalplay current = seconds to remove
@@ -5352,6 +5374,126 @@ function globalplay_removeElementsFromPlayback() {
 
         } // for
     } 
+}
+
+function globalplay_loadElementSeek(pointer_current_duration) {
+
+    // FORMAT: globalplay_queue_elements:
+    // element[0] = Element
+    // element[1] = Dynamic ID
+    // element[2] = Dynamic Object
+    if (globalplay_queue_elements != null && globalplay_queue_elements.length > 0) {
+        for (var i = 0; i < globalplay_queue_elements.length; i++) {
+            var queue_element = globalplay_queue_elements[i];
+            if (queue_element != null && queue_element.length) {
+                var element = queue_element[0];
+                if (element != null) {
+
+                    var tapeType = element.tapeType;
+                    var file_extension = element.file_extension;
+                    var timestamp = element.timestamp;
+                    var tapeID = element.tapeID;
+                    var fileName = element.fileName;
+
+                    var element_start_duration = getDuration_onDatetime(timestamp)
+                    if (pointer_current_duration > element_start_duration) {
+                        var element_current_duration = pointer_current_duration - element_start_duration;
+
+
+                        switch (tapeType) {
+                            case "A": {
+                                if (getIsIE() && file_extension == "wav") {
+                                    if ($("#wav_object2")[0] != null) {
+                                        try {
+                                            $("#wav_object2")[0].currentTime = element_current_duration;
+                                        } catch (err) {
+                                            console.log("l:5397 Error seeking IE ActiveX Player");
+                                            console.log(err);
+                                        }
+                                    }
+                                }
+                                else { // Normal HTML5 Audio tag
+                                    var dynamic_object = queue_element[2];
+                                    if (dynamic_object != null) {
+                                        try {
+                                            dynamic_object.currentTime = element_current_duration;
+                                        } catch (err) {
+                                            console.log("l:5408 Error seeking HTML5 Player");
+                                            console.log(err);
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+
+                            case "S":
+                            case "V": {
+
+                                // Get file extension
+                                var file_extension = getFileExtension(fileName);
+
+                                if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
+                                    switch (file_extension[0]) {
+
+                                        // HTML5 support:
+                                        case "mp4":
+                                        case "webm":
+                                        case "ogg": {
+
+                                            var html_player = $("#html_player2");
+                                            if (html_player != null && html_player[0] != null) {
+                                                try {
+                                                    html_player[0].currentTime = element_current_duration;
+                                                } catch (err) {
+                                                    console.log("l:4401 Error seeking HTML5 Player");
+                                                    console.log(err);
+                                                }
+                                            }
+                                            break;
+                                        }
+
+                                        case "fbs": {
+
+                                            // Oreka Player:
+                                            if (document.fbsviewer != null) {
+                                                try {
+                                                    $("#fbsviewer2")[0].seekViewerSeconds(element_current_duration);
+                                                } catch (err) {
+                                                    console.log("l:4429 Error seeking FBS Player");
+                                                    console.log(err);
+                                                }
+                                            }
+                                            break;
+                                        }
+
+                                        case "avi":
+                                        case "crypt":
+                                        case "bin":
+                                        default: {
+
+                                            // Webchimera Plugin Player or else:
+                                            try {
+                                                //wjs("#webchimera2").plugin.time = element_current_duration;
+                                                wjs("#webchimera2").time(element_current_duration);
+                                            } catch (err) {
+                                                console.log("l:4458 Error loading webchimera");
+                                                console.log(err);
+                                            }
+                                            break;
+                                        }
+                                    } // switch file_extension
+                                }
+                                break;
+                            }
+
+                        } // switch tapeType
+
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 function globalplay_removeAll() {
@@ -5483,7 +5625,12 @@ function globalplay_removeElement(global_elementID, element_alreadyTaken) {
             /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
             if (getIsIE() && file_extension == "wav") {
                 if ($("#wav_object2")[0] != null) {
-                    $("#wav_object2")[0].stop();
+                    try {
+                        $("#wav_object2")[0].stop();
+                    } catch (err) {
+                        console.log("l:5614 Error stopping IE ActiveX Player");
+                        console.log(err);
+                    }
                 }
             }
             else { // Normal HTML5 Audio tag
@@ -5491,7 +5638,12 @@ function globalplay_removeElement(global_elementID, element_alreadyTaken) {
                 if (dynamic_object_index > -1) {
                     var audio_object = globalplay_queue_elements[dynamic_object_index];
                     if (audio_object != null && audio_object[2] != null) {
-                        audio_object[2].pause();
+                        try {
+                            audio_object[2].pause();
+                        } catch (err) {
+                            console.log("l:5627 Error stopping HTML5 Player");
+                            console.log(err);
+                        }
                     }
                     globalplay_queue_elements[dynamic_object_index] = null;
                 }

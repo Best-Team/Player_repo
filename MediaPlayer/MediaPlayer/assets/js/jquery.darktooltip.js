@@ -140,8 +140,8 @@
 					//leftPos += this.bearer.outerWidth() + this.tip.outerWidth()/2 + 35; // +35
 					//topPos += this.bearer.outerHeight() / 2 - (this.tooltip.outerHeight() / 2);
 
-				    leftPos += this.bearer.outerWidth() / 2;// + this.tip.outerWidth() / 2 + 35; // +35
-				    topPos -= this.bearer.outerHeight() / 2;// - (this.tooltip.outerHeight() / 2);
+				    leftPos += this.bearer.outerWidth() / 2; + this.tip.outerWidth() / 2;// + 35; // +35
+				    topPos -= this.bearer.outerHeight() / 2; - (this.tooltip.outerHeight() / 2);
 
 					break;
 				case 'north':

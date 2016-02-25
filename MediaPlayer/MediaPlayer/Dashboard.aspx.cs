@@ -933,10 +933,10 @@ namespace MediaPlayer
                                 isExtra = true;
                             }
 
-                            //string color_icon = isExtra ? "#C4FFD6" : "beige";
                             string color_icon = "beige";
 
-                            string button_border = isExtra ? "1px solid black" : "2px solid darkred";
+                            string tr_color = isExtra ? "inherit" : "rgb(232, 204, 204)";
+                            string tr_name = isExtra ? "Extra" : "Oreka";
 
                             // Onclick event
                             string onclick_event = FolioElements_GetOnClickEvent(folio, index, isExtra, duration_formatStr, media_str);
@@ -945,7 +945,7 @@ namespace MediaPlayer
                             string title = folio.mediaType == "S" ? "Grabación de Pantalla" : media_str;
 
                             /****** Table data ******/
-                            htmlTable.AppendLine("<tr id='tape_" + folio.tapeID + "'>");
+                            htmlTable.AppendLine("<tr id='tape_" + folio.tapeID + "' style='background-color: " + tr_color + ";' name='"+ tr_name + "'>");
                             htmlTable.AppendLine("<td>");
 
                             htmlTable.AppendLine("<input type='checkbox' name='timeline_elements' class='button' value='" + folio.tapeID + "#" + isExtra.ToString().ToLowerInvariant() + "#" + folio.mediaType + "' onclick='manageElement(this, " + folio.tapeID + ", " + (index - 1).ToString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>");
@@ -959,7 +959,7 @@ namespace MediaPlayer
                             htmlTable.AppendLine("<h5>" + folio.remoteParty + "</h5>");
                             htmlTable.AppendLine("<td>");
 
-                            htmlTable.AppendLine("<button type='button' class='btn btn-default btn-sm' style='color:" + color_str + "; opacity: 0.9; background-color: " + color_icon + "; border: " + button_border + "; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' ");
+                            htmlTable.AppendLine("<button type='button' class='btn btn-default btn-sm' style='color:" + color_str + "; opacity: 0.9; background-color: " + color_icon + "; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' ");
                             htmlTable.AppendLine("title=" + title + " onclick='" + onclick_event + "'><span class='" + icon + "' aria-hidden='true'></span></button>");
                             htmlTable.AppendLine("<td>");
                             htmlTable.AppendLine("<h5 id='timestamp'>" + folio.timestamp.ToString("dd'-'MM'-'yyyy HH':'mm':'ss") + "</h5>");
