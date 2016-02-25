@@ -4742,9 +4742,6 @@ function globalplay_start() {
 function globalplay_whilePlaying() {
     if (!globalplay_playback_active) return;
 
-    // Update global variable: current timer
-    GLOBALPLAY_seconds_current = $("#divGlobalplay_timer").data('seconds');
-
     // Remove elements from DOM on globalplay screen 
     globalplay_removeElementsFromPlayback();
 
@@ -4752,6 +4749,9 @@ function globalplay_whilePlaying() {
     globalplay_loadElements();
 
     // Timer Source: http://jquerytimer.com/
+
+    // Update global variable: current timer
+    GLOBALPLAY_seconds_current = $("#divGlobalplay_timer").data('seconds');
 
     // Update current timer label
     $("#lblGlobalplay_timer_current").text($("#divGlobalplay_timer").text());
@@ -5019,7 +5019,7 @@ function globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_
         var actual_duration = getDuration_onDatetime(timestamp);
         var duration_final = actual_duration + duration_int + GLOBALPLAY_DEFAULT_DURATION_EXTRA;
 
-        globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, GLOBALPLAY_seconds_current, duration_final]);
+        globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, actual_duration, duration_final]);
     }
 
     return object;
@@ -5231,6 +5231,7 @@ function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, elem
     var global_elementID = "image_" + global_numberID;
     var segmentID = element_alreadyTaken[0].segmentID;
     var fileName = element_alreadyTaken[0].fileName;
+    var timestamp = element_alreadyTaken[0].timestamp;
 
     $('<a name="visual_element" id="' + global_elementID + '" style="width:' + visual_size_w + 'px; height:' + visual_size_h + 'px;' +
        'background-image:url(' + file_url + '); float:left; position:relative; margin:8px 12px; background-size: auto 100%;"' +
@@ -5242,24 +5243,27 @@ function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, elem
     // Salvattore Source: http://webdesign.tutsplus.com/tutorials/build-a-dynamic-grid-with-salvattore-and-bootstrap-in-10-minutes--cms-20410
 
     // Remove to element list
-    var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_DEFAULT_DURATION;
-    globalplay_remove_elements.push([global_elementID, element_alreadyTaken, null, GLOBALPLAY_seconds_current, duration_final]);
+    var actual_duration = getDuration_onDatetime(timestamp);
+    var duration_final = actual_duration + GLOBALPLAY_DEFAULT_DURATION;
+    globalplay_remove_elements.push([global_elementID, element_alreadyTaken, null, actual_duration, duration_final]);
 
     return global_elementID;
 }
 
 // Play document
 function globalplay_document(file_url, element_alreadyTaken, global_numberID) {
-    var global_elementID = "image_" + global_numberID;
+    var global_elementID = "document_" + global_numberID;
     var fileName = element_alreadyTaken[0].fileName;
+    var timestamp = element_alreadyTaken[0].timestamp;
 
     var label = $("#globalplay_divDocumentsName h2");
     label.text("Documento: " + fileName);
     label.show();
 
     // Remove to element list
-    var duration_final = GLOBALPLAY_seconds_current + GLOBALPLAY_DEFAULT_DURATION;
-    globalplay_remove_elements.push([null, null, label, GLOBALPLAY_seconds_current, duration_final]);
+    var actual_duration = getDuration_onDatetime(timestamp);
+    var duration_final = actual_duration + GLOBALPLAY_DEFAULT_DURATION;
+    globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, actual_duration, duration_final]);
 
     return global_elementID;
 }
@@ -5281,7 +5285,7 @@ function globalplay_comment(element_alreadyTaken, global_numberID) {
     var actual_duration = getDuration_onDatetime(timestamp);
     var duration_final = actual_duration + duration_sec;
 
-    globalplay_remove_elements.push([global_elementID, null, label, actual_duration, duration_final]);
+    globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, actual_duration, duration_final]);
 
     return global_elementID;
 }
@@ -5341,11 +5345,10 @@ function globalplay_removeElementsFromPlayback() {
 
                 //remove element from queue when current time is outside the playback time range for the element
                 if ( GLOBALPLAY_seconds_current < timeToStart || GLOBALPLAY_seconds_current >= timeToRemove) {
-                    if (elementDOM_ID != null && element != null) {
+                    if (element != null) {
                         globalplay_removeElement(elementDOM_ID, element);
                     }
                     if (label != null) {
-
                         // Empty label
                         globalplay_clearLabel(label);
 
@@ -5354,7 +5357,7 @@ function globalplay_removeElementsFromPlayback() {
                         }
                     }
 
-                    // "Remove" object in aray
+                    // "Remove" object in array
                     globalplay_remove_elements[i] = null;
                 }
             }
@@ -5478,9 +5481,6 @@ function globalplay_removeDOMElements() {
 }
 
 function globalplay_removeElement(global_elementID, element_alreadyTaken) {
-    $(".flex #" + global_elementID).remove();
-
-
     // FORMAT: element_alreadyTaken
     // element_alreadyTaken[0] = Element
     // element_alreadyTaken[1] = AlreadyTaken bool
@@ -5512,7 +5512,12 @@ function globalplay_removeElement(global_elementID, element_alreadyTaken) {
                     globalplay_queue_elements[dynamic_object_index] = null;
                 }
             }
+        } else if (tapeType === "V" || tapeType === "S" || tapeType === "I") {
+            //remove visual element from player
+            $(".flex #" + global_elementID).remove();
         }
+
+
 
         // FORMAT: globalplay_queue_elements:
         // element[0] = Element
@@ -5552,7 +5557,8 @@ function getElementInMemoryByCurrentPlayingTime() {
                 var element = element_alreadyTaken[0];
                 if (element != null && element.timestamp != null && element.duration != null) {
                     element_start = moment(element.timestamp, "DD-MM-YYYY HH:mm:ss");
-                    element_end = element_start.add(element.duration, "seconds");
+                    element_end = moment(element.timestamp, "DD-MM-YYYY HH:mm:ss");
+                    element_end = element_end.add(element.duration, "seconds");
                 }
             }
             return element_start != null && element_end != null && element_alreadyTaken[1] === false && // AlreadyTaken false

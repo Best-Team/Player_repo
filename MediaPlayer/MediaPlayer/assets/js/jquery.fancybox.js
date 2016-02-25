@@ -438,7 +438,7 @@
 				GLOBALPLAY_seconds_current = 0;
 
 			    // Show Video player box
-				var divPlayer_VIDEO = $("#divPlayer_VIDEO").css("visibility", "visible");;
+				$("#divPlayer_VIDEO").css("visibility", "visible");;
 
 			    // Hide overlay
 				$("#fade").hide();
@@ -448,7 +448,8 @@
 
 				globalplay_removeAll();
 
-				globalplay_active = false;
+				globalplay_active = false; //global player is not active 
+				globalplay_playback_active = false; //global player is not playing back
 
 			    /************** Globalplay END **************/
 			}
