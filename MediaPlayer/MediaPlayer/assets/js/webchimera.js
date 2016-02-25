@@ -379,7 +379,41 @@ wjs.init.prototype.state = function() {
 	}
 	return this;
 }
-wjs.init.prototype.time = function(newTime) {
+wjs.init.prototype.time = function (newTime) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // CHECK THIS SHIT.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	if (this.allElements.length == 1) {
 		if (typeof newTime === 'number') this.plugin.time = newTime;
 		else return this.plugin.time;
