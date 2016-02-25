@@ -13,18 +13,20 @@
 		this.hideEvent;
 		this.mouseOverMode=(this.options.trigger == "hover" || this.options.trigger == "mouseover" || this.options.trigger == "onmouseover");
 	}
-
-	var script_button = '<a href="#" id="btnMuteSound" class="open btn btn-default btnMuteSound">' + //onclick="globalplay_muteSound();"
+/*
+	var script_button = '<a href="#" id="btnMute_" class="open btn btn-default btnMuteSound">' + //onclick="globalplay_muteSound();"
 						'<span class="glyphicon glyphicon-volume-off"></span>' +
 					    '</a>';
-
+                        */
 	DarkTooltip.prototype = {
 
 		show: function(){
 		    var dt = this;
+            /*
 		    if (!this.options.content) {
 		        return;
 		    }
+            */
 			if(this.options.modal){
 				this.modalLayer.css('display', 'block');
 			}
@@ -200,7 +202,14 @@
 		},
 
 		addConfirm: function () {
+
+		    var script_button = '<a href="#" id="btnMute_' + this.bearer.attr("id") + '" class="open btn btn-default btnMuteSound">' + //onclick="globalplay_muteSound();"
+						'<span class="glyphicon glyphicon-volume-off"></span>' +
+					    '</a>'; 
+
 		    this.tooltip.append(script_button);
+
+		    
 			//this.tooltip.append("<ul class = 'confirm'><li class = 'darktooltip-yes'>" 
 				//+ this.options.yes + "</li></ul>" + script_button); //<li class = 'darktooltip-no'>"+ this.options.no +"</li>
 			this.setConfirmEvents();

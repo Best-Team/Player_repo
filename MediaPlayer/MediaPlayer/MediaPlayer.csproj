@@ -135,6 +135,7 @@
     <Content Include="assets\js\Dashboard.js" />
     <Content Include="assets\js\datetimepicker.full.min.js" />
     <Content Include="assets\js\draggable-0.1.js" />
+    <Content Include="assets\js\Globalplay.js" />
     <Content Include="assets\js\highlight.js" />
     <Content Include="assets\js\inputmask.date.extensions.js" />
     <Content Include="assets\js\inputmask.dependencyLib.jquery.js" />
@@ -190,6 +191,8 @@
     <Content Include="Scripts\jquery-1.7.1.js" />
     <Content Include="Scripts\jquery-1.7.1.min.js" />
     <Content Include="Application NOTES.txt" />
+    <Content Include="assets\js\themes\sleek\main.qml" />
+    <Content Include="assets\js\main.qml" />
     <None Include="Service References\RecordingIntegration\configuration91.svcinfo" />
     <None Include="Service References\RecordingIntegration\configuration.svcinfo" />
     <None Include="Service References\RecordingIntegration\OperacionesGrabacion1.wsdl" />
@@ -323,7 +326,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2055</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7071</IISUrl>
+          <IISUrl>http://gborderolle1</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

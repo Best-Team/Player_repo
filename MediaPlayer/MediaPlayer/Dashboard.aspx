@@ -33,6 +33,7 @@
     <script src="assets/js/jquery.fancybox.js"></script>
     <script src="assets/js/timer.jquery.js"></script>
     <script src="assets/js/Dashboard.js"></script>
+    <script src="assets/js/Globalplay.js"></script>
 
     <!-- Styles -->
     <link href="assets/css/datetimepicker.css" type="text/css" rel="stylesheet" />
@@ -247,10 +248,9 @@
                                             <!-- Contiene el Applet -->
                                         </div>
                                         <img id="imgPlayer" class='photobox' style='max-width: 100%; margin: auto; display: none;' alt='' />
-                                        <!-- javascript:$("#imgPlayer").photobox(); max-height:390px -->
 
                                         <!-- PLAYER - VIDEO - Controls Mask -->
-                                        <div id="divControlsMask_VIDEO" class="sound_player_class1 sm2-bar-ui compact full-width" style="position: absolute; top: 0; right: 0; height: 54px; display: none;">
+                                        <div id="divControlsMask_VIDEO" class="sound_player_class1 sm2-bar-ui compact full-width" style="position: absolute; top: -1px; right: 0; height: 54px; display: none;">
                                             <!-- Controles -->
                                             <div class="bd sm2-main-controls" style="height: 100%;">
                                                 <div class="sm2-inline-texture"></div>
