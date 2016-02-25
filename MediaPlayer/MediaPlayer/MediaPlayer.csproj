@@ -323,7 +323,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2055</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://gborderolle1</IISUrl>
+          <IISUrl>http://localhost:7071</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
