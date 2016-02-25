@@ -4802,7 +4802,6 @@ function globalplay_whilePlaying() {
 
         // Stop timer 
         globalplay_abort();
-        timer_globalplay = 0;
     }
 }
 
@@ -5564,6 +5563,7 @@ function getElementInQueueArray(elementID) {
 // Stop timer 
 function globalplay_abort() {
     clearInterval(timer_globalplay);
+    timer_globalplay = 0;
     $('#divGlobalplay_timer').timer('pause');
 }
 
@@ -5602,7 +5602,6 @@ function globalplay_stop() {
 
     // Empty list of elements to remove
     globalplay_remove_elements = [];
-    timer_globalplay = 0;
     globalplay_playback_active = false;
 }
 
@@ -5632,7 +5631,7 @@ function globalplay_removeElement(global_elementID, element_alreadyTaken) {
         var tapeType = element.tapeType;
         var file_extension = element.file_extension;
 
-        // Set available true back:
+        // Set alreadyTaken to false to signal the element is available again:
         globalplay_setElementAlreadyTaken(tapeID, false);
 
         // If is Audio stop it and remove it
@@ -5710,7 +5709,7 @@ function getElementInMemoryByCurrentPlayingTime() {
                 if (element != null && element.timestamp != null && element.duration != null) {
                     element_start = moment(element.timestamp, "DD-MM-YYYY HH:mm:ss");
                     element_end = moment(element.timestamp, "DD-MM-YYYY HH:mm:ss");
-                    element_end = element_end.add(element.duration, "seconds");
+                    element_end.add(element.duration, "seconds");
                 }
             }
             return element_start != null && element_end != null && element_alreadyTaken[1] === false && // AlreadyTaken false
