@@ -242,7 +242,7 @@ $(document).ready(function () {
     var playerBox_h = parseInt(PLAYER_BOX.css("height"), 10);
     $("#imgPlayer").css("max-height", playerBox_h);
 
-    // Globalplay click effects
+    // Globalplay play button click effects
     $("#globalplay_play").click(function () {
         $(this).effect("scale", {}, 10);
     });
@@ -270,20 +270,10 @@ function loadGlobalplay_settings() {
 
     // ************* Globalplay Timer settings *************
 
-    //var date_str1 = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
     var date_str2 = moment(_TL_ENDDATE, "DD-MM-YYYY HH:mm:ss");
 
     var actual_duration = getDuration_onDatetime(date_str2)
 
-    /*
-    var date1 = new Date(date_str1);
-    var date2 = new Date(date_str2);
-
-    var dif = date2.getTime() - date1.getTime();
-
-    var Seconds_from_T1_to_T2 = dif / 1000;
-    var Seconds_Between_Dates = Math.abs(Seconds_from_T1_to_T2);
-    */
     GLOBALPLAY_seconds_total = actual_duration;
 
     // Get duration format: HH:mm:ss
@@ -2304,6 +2294,9 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
         case "P":
         case "V": {
             oldPlayer_activeElement_type = tapeType == "P" ? "S" : tapeType;
+
+            // Special case
+            file_url = tapeType === "S" ? WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0" : file_url;
 
             loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration, fileStatus, tapeID, segmentID);
             break;

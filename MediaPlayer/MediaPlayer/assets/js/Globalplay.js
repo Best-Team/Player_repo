@@ -215,7 +215,7 @@ function globalplay_loadElements() {
             $("#lblGlobalplay_element_count").text(elementsCandidate.length);
 
             // Prepare URL elements to reproduce
-            var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download;
+            var filePath_OREKA = WS_Oreka_Server + WS_InConcert_URL_download;
             var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
 
             // globalplay box container
@@ -287,6 +287,10 @@ function globalplay_loadElements() {
 
                             case "S":
                             case "V": {
+
+                                // Special case
+                                file_url = tapeType === "S" ? WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0" : file_url;
+
                                 dynamic_id = globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element_alreadyTaken, global_numberID, element_current_duration);
                                 break;
                             }
