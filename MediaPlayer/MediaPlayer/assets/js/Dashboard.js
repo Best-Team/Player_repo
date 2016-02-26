@@ -603,15 +603,19 @@ function handleDragStop(event, ui) {
             $('#divGlobalplay_timer').timer('pause');
 
             // Set player mask pause
-            $("#globalplay_play").removeClass("globalplay_pause"); //pauseAudio
+            $("#globalplay_play").removeClass("globalplay_pause"); 
             $("#globalplay_play").addClass("globalplay_play");
 
-            //globalplay_removeAll();
-            globalplay_pausePlayingElements(false); // ??
+            globalplay_pausePlayingElements(false); 
 
             globalplay_loadElementSeek(actual_duration);
 
-        } // globalplay_active
+            // DO PLAY *new*
+            setTimeout(function () {
+                $("#globalplay_play").click();
+            }, 200); 
+
+        } 
     }
 }
 
@@ -1907,8 +1911,8 @@ function paintSelectionClick(tapeID, timestamp) {
     // Left panel
     $("#tblLeftGridElements button[name='btnTimelineElement']").removeClass("active");
     $("#tblLeftGridElements tr[id*='tape_'] > td > h5").attr("style", "color:black;");
-    $("#tblLeftGridElements tr[id*='tape_']").not("[name='Oreka']").css("background-color", "inherit"); // white
-    $("#tblLeftGridElements tr[id*='tape_'][name='Oreka']").css("background-color", "rgb(232, 204, 204)"); // white
+    $("#tblLeftGridElements tr[id*='tape_']").not("[name='Extra']").css("background-color", "inherit"); // white
+    $("#tblLeftGridElements tr[id*='tape_'][name='Extra']").css("background-color", "rgb(187, 226, 217)"); // white
 
     // Bottom
     var vAllBottom_texts = $("g[id*='tlTape_'] > text");
@@ -3689,7 +3693,7 @@ function TimeRefreshLoop(totalDurationSecs) {
                 playVideo_ok = true;
                 setTimeout(function () {
                     TimeRefreshLoop(totalDurationSecs)
-                }, 1000); //1000
+                }, 1000); 
 
                 // doTimeout Source: http://benalman.com/code/projects/jquery-dotimeout/examples/delay-poll/
             }
@@ -4290,7 +4294,7 @@ function confirmAddComment() {
                     var username = globalUserName;
 
                     // Create new row to HTML table
-                    var tr = "<tr id='tape_" + object.tapeID + "'>";
+                    var tr = "<tr id='tape_" + object.tapeID + "' style='background-color:rgb(187, 226, 217);' name='Extra'>";
                     tr += "<td>";
                     tr += "<input type='checkbox' name='timeline_elements' class='button' value='" + object.tapeID + "#true#C' checked>";//onclick='manageElement(this, " + object.tapeID + ", " + (index - 1).toString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>";
                     tr += "<td>";

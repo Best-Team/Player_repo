@@ -384,7 +384,9 @@ function globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_
             wav_object += " </object>";
 
             flex_div.append(wav_object);
-            object[1] = wav_object;
+
+            var audio = $("#" + global_elementID);
+            object[1] = audio[0];
 
         } else { // Normal HTML5 Audio tag
 
@@ -538,7 +540,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                                 console.log(err);
 
                                 // Hide player until it is removed by "globalplay_remove_elements"
-                                $("#divFbsviewer2").css("visibility", "hidden"); 
+                                $("#divFbsviewer2").css("visibility", "hidden");
 
                                 // Error message
                                 var label = $("#globalplay_divSpecialMessages h2");
@@ -577,14 +579,16 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                     if (getIsIE()) {
 
-                    // ActiveX video object
-                    global_elementID = "divIEVideo2";
+                        // WMP IE Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
 
-                    var js_player = "<div id='" + global_elementID + "' class='divVideo' style='float:left; width='" + visual_size_w + "px;' " + "height='" + visual_size_h + "px;'> ";
-                    js_player += "<object id='video_object2' data='" + file_url + "' ";
-                    js_player += " width='" + visual_size_w + "' height='" + visual_size_h + "' ";
+                        // ActiveX video object
+                        global_elementID = "divIEVideo2";
 
-                    //if (getIsIE()) {
+                        var js_player = "<div id='" + global_elementID + "' class='divVideo' style='float:left; width='" + visual_size_w + "px;' " + "height='" + visual_size_h + "px;'> ";
+                        js_player += "<object id='video_object2' data='" + file_url + "' ";
+                        js_player += " width='" + visual_size_w + "' height='" + visual_size_h + "' ";
+
+                        //if (getIsIE()) {
                         js_player += "CLASSID='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
                         js_player += "<PARAM name='URL' value='" + file_url + "'> ";
                         /*
@@ -593,23 +597,23 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         js_player += "<PARAM name='videoUrl' value='" + file_url + "'> ";
                     }
                     */
-                    js_player += "<PARAM name='uiMode' value='none'> ";
-                    js_player += " </object></div>";
+                        js_player += "<PARAM name='uiMode' value='none'> ";
+                        js_player += " </object></div>";
 
 
-                    flex_div.append(js_player);
+                        flex_div.append(js_player);
 
 
-                    var html_player = $("#video_object2");
-                    if (element_current_duration != null && element_current_duration > 0) {
+                        var html_player = $("#video_object2");
+                        if (element_current_duration != null && element_current_duration > 0) {
+                            ok = true;
+
+                            setTimeout(function () {
+                                html_player[0].controls.currentPosition = element_current_duration;
+                            }, 1300);
+                        }
+
                         ok = true;
-
-                        setTimeout(function () {
-                            html_player[0].controls.currentPosition = element_current_duration;
-                        }, 1300);
-                    }
-
-                    ok = true;
 
                     } else {
 
@@ -816,8 +820,6 @@ function globalplay_loadEvents() {
         }
     } // for
 
-
-
 }
 
 function globalplay_muteAudio(event) {
@@ -828,26 +830,48 @@ function globalplay_muteAudio(event) {
         var icon = $("#btnMute_" + event[0].id + " > span");
 
         if (id != null) {
-            var dynamic_object = globalplay_getQueueElementByID(id);
-            if (dynamic_object != null && dynamic_object.muted != null) {
+            var element_object = globalplay_getQueueElementByID(id);
+            if (element_object != null && element_object.length > 2 != null && element_object[0] != null && element_object[2] != null) {
 
-                // change button icon
-                if (icon.hasClass("glyphicon-volume-up")) {
-                    icon.addClass("glyphicon-volume-off");
-                    icon.removeClass("glyphicon-volume-up");
-                } else {
-                    icon.addClass("glyphicon-volume-up");
-                    icon.removeClass("glyphicon-volume-off");
+                var dynamic_object = element_object[2];
+                if (dynamic_object != null) {
+
+                    var element = element_object[0];
+                    var fileName = element.fileName;
+                    var file_extension = getFileExtension(fileName);
+
+                    var ok = false;
+                    /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
+                    if (getIsIE() && file_extension != null && file_extension[0] != null && file_extension[0] == "wav") {
+                        if (dynamic_object.mute != null) {
+                            ok = true;
+                            dynamic_object.mute = !dynamic_object.mute;
+                        }
+                    }
+                    else {
+                        if (dynamic_object.muted != null) {
+                            ok = true;
+                            dynamic_object.muted = !dynamic_object.muted;
+                        }
+                    }
+                    if (ok) {
+                        // change button icon
+                        if (icon.hasClass("glyphicon-volume-up")) {
+                            icon.addClass("glyphicon-volume-off");
+                            icon.removeClass("glyphicon-volume-up");
+                        } else {
+                            icon.addClass("glyphicon-volume-up");
+                            icon.removeClass("glyphicon-volume-off");
+                        }
+                    }
                 }
-                dynamic_object.muted = !dynamic_object.muted;
+                else {
+                    icon.parent().hide();
+                    icon.parent().show("bounce", 80);
+                }
             }
-            else {
-                icon.parent().hide();
-                icon.parent().show("bounce", 80);
-            }
-        } 
+        }
     }
-    
 }
 
 function globalplay_getQueueElementByID(elementID) {
@@ -862,10 +886,7 @@ function globalplay_getQueueElementByID(elementID) {
             var element = globalplay_queue_elements[i];
             if (element != null && element.length > 1 && element[0] != null && element[0].tapeID != null && element[2] != null) {
                 if (element[0].tapeID == elementID) {
-                    var dynamic_object = element[2];
-                    if (dynamic_object != null) {
-                        return dynamic_object;
-                    }
+                    return element;
                 }
             }
         } // for

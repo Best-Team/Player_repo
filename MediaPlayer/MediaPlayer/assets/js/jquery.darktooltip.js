@@ -204,7 +204,7 @@
 		addConfirm: function () {
 
 		    var script_button = '<a href="#" id="btnMute_' + this.bearer.attr("id") + '" class="open btn btn-default btnMuteSound">' + //onclick="globalplay_muteSound();"
-						'<span class="glyphicon glyphicon-volume-off"></span>' +
+						'<span class="glyphicon glyphicon-volume-up"></span>' +
 					    '</a>'; 
 
 		    this.tooltip.append(script_button);

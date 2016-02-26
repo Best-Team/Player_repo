@@ -102,7 +102,7 @@
 
                                 <div class="pull-right" style="margin-right: 8px; margin-top: -20px;">
                                     <h6># Resultados: 
-						<asp:Label Text="0" ID="lblResultsCount" runat="server" />
+						                <asp:Label Text="0" ID="lblResultsCount" runat="server" />
                                     </h6>
                                 </div>
 
