@@ -214,13 +214,10 @@
                     <div id="light" class="white_content">
                         <div id="light_row" class="row">
                         </div>
-                        <hr />
-                        <div class="row-short">
-                            <button id="btnCloseFullscreen" type="submit" class="btn btn-default pull-right" title="Cerrar pantalla completa" onclick="closeFullscreen();">
-                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            </button>
-                            <label class="label" id="lblFullscreenTitle"></label>
-                        </div>
+                        <button id="btnCloseFullscreen" type="submit" class="btn btn-default pull-right" title="Cerrar pantalla completa" style="position: absolute; bottom: 0; right: 0; margin: 20px;" onclick="closeFullscreen();">
+                            <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                        </button>
+                        <label class="label" id="lblFullscreenTitle"></label>
                     </div>
                     <div id="fade" class="black_overlay"></div>
 

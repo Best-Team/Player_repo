@@ -857,7 +857,7 @@ function openFullscreen() {
                         case "webm":
                         case "ogg": {
 
-                            openFullscreen_video(true);
+                            openFullscreen_video(true, "html_video");
 
                             break;
                         }
@@ -877,9 +877,9 @@ function openFullscreen() {
                         default: {
 
                             if (getIsIE()) {
-                                openFullscreen_video(true);
+                                openFullscreen_video(true, "video_object1");
                             } else {
-                                openFullscreen_video(false);
+                                openFullscreen_video(false, null);
                             }
 
                             break;
@@ -894,7 +894,7 @@ function openFullscreen() {
 
 }
 
-function openFullscreen_video(isHTML5) {
+function openFullscreen_video(isHTML5, videoID) {
 
     var light = $("#light");
     var fade = $("#fade");
@@ -907,9 +907,19 @@ function openFullscreen_video(isHTML5) {
         var height = MONITOR_HEIGHT - (MONITOR_HEIGHT * 40 / 100);
 
         if (isHTML5) {
-            $("#html_video").css("width", width);
-            $("#html_video").css("height", height);
 
+            //divPlayer_VIDEO.css("height", height); 
+
+
+            var video_player = null;
+            if (videoID != null) {
+                video_player = $("#" + videoID);
+            }
+
+            if (videoID != null) {
+                video_player.css("width", width);
+                video_player.css("height", height);
+            }
 
             //
             //divPlayer_VIDEO.css("width", width);
@@ -996,7 +1006,7 @@ function closeFullscreen() {
                         case "webm":
                         case "ogg": {
 
-                            closeFullscreen_video(true, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade);
+                            closeFullscreen_video(true, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade, "html_video");
 
                             break;
                         }
@@ -1016,9 +1026,9 @@ function closeFullscreen() {
                         default: {
 
                             if (getIsIE()) {
-                                closeFullscreen_video(true, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade);
+                                closeFullscreen_video(true, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade, "video_object1");
                             } else {
-                                closeFullscreen_video(false, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade);
+                                closeFullscreen_video(false, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade, null);
                             }
 
                             break;
@@ -1033,7 +1043,7 @@ function closeFullscreen() {
     }
 }
 
-function closeFullscreen_video(isHTML5, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade) {
+function closeFullscreen_video(isHTML5, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade, videoID) {
 
     // Move player and banner to div container
     divControlsMask_VIDEO.appendTo(PLAYER_BOX);
@@ -1061,8 +1071,16 @@ function closeFullscreen_video(isHTML5, divControlsMask_VIDEO, divPlayer_VIDEO, 
     var divPlayer_VIDEO_h = parseInt(divPlayer_VIDEO.css("height"), 10);
 
     if (isHTML5) {
-        $("#html_video").css("width", divPlayer_VIDEO_w);
-        $("#html_video").css("height", divPlayer_VIDEO_h);
+
+        var video_player = null;
+        if (videoID != null) {
+            video_player = $("#" + videoID);
+        }
+
+        if (videoID != null) {
+            video_player.css("width", divPlayer_VIDEO_w);
+            video_player.css("height", divPlayer_VIDEO_h);
+        }
 
     } else {
         document.getElementById("webchimera1").width = divPlayer_VIDEO_w;
@@ -2462,6 +2480,9 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
     SetAudioPlaylistURL(0, "xx");
     SetAudioPlaylistURL(1, "xx");
 
+    // Hide Video Player
+    $("#divControlsMask_VIDEO").addClass("disabled");
+
     // Show volume control
     $("#volume_AUDIO").show();
 
@@ -2747,13 +2768,13 @@ function loadElement_document(divControlsMask_VIDEO, divControlsMask_VIDEO) {
 
 function loadPlayer_HTML5_Webchimera_Styles1(divPlayer_VIDEO, divControlsMask_VIDEO) {
     /************************ Styles START ************************/
-    var manual_offset = 52;
+    var manual_offset = 50;
     divPlayer_VIDEO.show();
-    divPlayer_VIDEO.css("height", (parseInt(PLAYER_BOX.css("height"), 10) - manual_offset - 2) + "px");
+    divPlayer_VIDEO.css("height", (parseInt(PLAYER_BOX.css("height"), 10) - manual_offset) + "px");
 
     divControlsMask_VIDEO.show();
 
-    divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top + manual_offset });
+    divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top + manual_offset + 2 });
 
     /************************ Styles END ************************/
 }
@@ -2901,7 +2922,7 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
 
             // ActiveX video object
 
-            var video_player = "<div id='divVideo_object1' style='width:" + width + "px; " + "height:" + height + "px; margin:0 auto;'> ";
+            var video_player = "<div id='divVideo_object1' style='width:" + width + "px; " + "height:auto; margin:0 auto; display: inline;'> "; // height
             video_player += "<object id='video_object1' data='" + file_url + "' ";
             video_player += "width='" + width + "' height='" + height + "' ";
             video_player += "style='margin-top:4px;' ";
@@ -2948,6 +2969,7 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
                 }
             });
 
+            var ok = true;
 
             /***************** EVENTS END *****************/
 
