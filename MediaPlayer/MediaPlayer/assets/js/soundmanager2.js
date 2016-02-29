@@ -69,7 +69,7 @@
             'flashVersion': 8,                  // flash build to use (8 or 9.) Some API features require 9.
             'debugMode': true,                  // enable debugging output (console.log() with HTML fallback)
             'debugFlash': false,                // enable debugging output inside SWF, troubleshoot Flash/browser issues
-            'useConsole': true,                 // use console.log() if available (otherwise, writes to #soundmanager-debug element)
+            'useConsole': false,                 // use console.log() if available (otherwise, writes to #soundmanager-debug element)
             'consoleOnly': true,                // if console is being used, do not create/write to #soundmanager-debug
             'waitForWindowLoad': false,         // force SM2 to wait for window.onload() before trying to call soundManager.onload()
             'bgColor': '#ffffff',               // SWF background color. N/A when wmode = 'transparent'
@@ -4426,6 +4426,7 @@
 
         strings = {
 
+            /*
             // <d>
             notReady: 'Unavailable - wait until onready() has fired.',
             notOK: 'Audio support is not available.',
@@ -4475,7 +4476,7 @@
             globalHTML5: 'Using singleton HTML5 Audio() pattern for this device.',
             ignoreMobile: 'Ignoring mobile restrictions for this device.'
             // </d>
-
+            */
         };
 
         str = function () {

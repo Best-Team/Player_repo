@@ -21,9 +21,8 @@ function globalplay_init() {
         $("#globalplay_play").addClass("globalplay_pause");
 
         if (GLOBALPLAY_seconds_current == 0) {
-            /********** BEGIN CASE **********/
 
-            //globalplay_remove_elements = [];
+            /********** START PLAY CASE **********/
 
             // Clean timer
             $('#divGlobalplay_timer').timer('remove');
@@ -80,7 +79,6 @@ function globalplay_init() {
         $('#divGlobalplay_timer').timer('pause');
 
         // Stop timer 
-        //globalplay_abort();
         globalplay_playback_active = false;
 
         // Pause all media current playing elements
@@ -101,12 +99,9 @@ function globalplay_start() {
     // Init event while playing if GLOBALPLAY_seconds_total is already loaded
     if (GLOBALPLAY_seconds_total > 0) {
 
-        // Filter elements checked on left grid
-        //globalplay_filterElementsChecked();
-
         if (timer_globalplay === 0) {
             // Little delay to begin
-            setTimeout(function () { timer_globalplay = setInterval(globalplay_whilePlaying, 1000); }, 800);
+            setTimeout(function () { timer_globalplay = setInterval(globalplay_whilePlaying, 100); }, 100); 
         }
     }
 
@@ -177,7 +172,7 @@ function globalplay_loadElements() {
         var visual_size_h = 275;
 
         // Get visual elements already added in globalplay player
-        var visual_alreadyAdded = $(".flex").find('#webchimera2, #fbsviewer2, [name="visual_element"]').length;
+        var visual_alreadyAdded = $(".flex").find('[name="webchimera"], [name="fbsviewer"], [name="visual_element"]').length;
         var visual_count = visual_queue.length + visual_alreadyAdded;
 
         // MAX Amount of simultaneous elements 
@@ -215,7 +210,7 @@ function globalplay_loadElements() {
             $("#lblGlobalplay_element_count").text(elementsCandidate.length);
 
             // Prepare URL elements to reproduce
-            var filePath_OREKA = WS_Oreka_Server + WS_InConcert_URL_download;
+            var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download;
             var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
 
             // globalplay box container
@@ -248,6 +243,7 @@ function globalplay_loadElements() {
                     if (element_alreadyTaken[1] == false) {
                         globalplay_setElementAlreadyTaken(element_alreadyTaken[0].tapeID, true);
 
+                        var segmentID = element_alreadyTaken[0].segmentID;
                         var tapeType = element_alreadyTaken[0].tapeType;
                         var isVisual = (tapeType == "V" || tapeType == "S" || tapeType == "I") ? true : false;
                         /*
@@ -351,7 +347,6 @@ function globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_
     var fileName = element_alreadyTaken[0].fileName;
     var tapeID = element_alreadyTaken[0].tapeID;
     var duration = element_alreadyTaken[0].duration;
-    var fileName = element_alreadyTaken[0].fileName;
     var timestamp = element_alreadyTaken[0].timestamp;
     
     var object = new Array();
@@ -368,48 +363,50 @@ function globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_
         /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
         if (getIsIE() && file_extension[0] == "wav") {
 
-            // Create avi player
-            var w = parseInt($("#divControlsMask_AUDIO").css("width"), 10);
-            var h = parseInt($("#divControlsMask_AUDIO").css("height"), 10);
-
             // Source: http://joliclic.free.fr/html/object-tag/en/
 
-            var width = flex_div.css("width");
-
-            global_elementID = "wav_object2";
-
-            // ActiveX audio object
-            var wav_object = "<object id='" + global_elementID + "' data='" + file_url + "' type='audio/x-wav'";
-            wav_object += " width='" + width + "' height='50px' style='display: none;'>";
-            wav_object += " <param name='src' value='" + file_url + "'>";
-            wav_object += " <param name='autoplay' value='true'>";
-            wav_object += " <param name='autoStart' value='1'>";
-            wav_object += " <a href='" + file_url + "'>Play</a>";
-            wav_object += " </object>";
+            // ActiveX audio object - wav -
+            var wav_object = "<object id='" + global_elementID + "' data='" + file_url + "' type='audio/x-wav' ";
+            wav_object += "style='display: none;' classid='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
+            wav_object += "<param name='URL' value='" + file_url + "'> ";
+            wav_object += "<param name='autoplay' value='true'> ";
+            wav_object += "<param name='autoStart' value='1'> ";
+            wav_object += "</object>";
 
             flex_div.append(wav_object);
 
-            var audio = $("#" + global_elementID);
-            object[1] = audio[0];
+            var audio_player = $("#" + global_elementID);
+            if (audio_player != null && audio_player[0] != null) {
+
+                // Get element current duration
+                if (element_current_duration != null && element_current_duration > 0) {
+                    setTimeout(function () {
+                        if (audio_player[0].controls != null) {
+                            audio_player[0].controls.currentPosition = element_current_duration;
+                        }
+                    }, 200);
+                }
+
+                object[1] = audio_player[0];
+            }
 
         } else { // Normal HTML5 Audio tag
 
-            var audio = new Audio(file_url);
+            var audio_tag = "<audio id='" + global_elementID + "' src='" + file_url + "' autoplay style='display: none;' />";
+            flex_div.append(audio_tag);
 
-            // Get element current duration
-            var seek = false;
-            if (element_current_duration != null && element_current_duration > 0) {
-                audio.play();
-                setTimeout(function () {
-                    audio.currentTime = element_current_duration;
-                }, 500);
-                seek = true;
-            }
+            var audio_player = $("#" + global_elementID);
+            if (audio_player != null && audio_player[0] != null) {
 
-            if (!seek) {
-                audio.play();
+                // Get element current duration
+                if (element_current_duration != null && element_current_duration > 0) {
+                    setTimeout(function () {
+                        audio_player[0].currentTime = element_current_duration;
+                    }, 200);
+                }
+
+                object[1] = audio_player[0];
             }
-            object[1] = audio;
         }
 
         // Remove to element list
@@ -434,8 +431,10 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
     // Get file extension
     var file_extension = getFileExtension(fileName);
-
     if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
+
+        global_elementID = "Video_" + global_numberID;
+
         switch (file_extension[0]) {
 
             // HTML5 support:
@@ -445,10 +444,8 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                 // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
 
-                global_elementID = "video_" + global_numberID;
-
-                var js_player = '<div id="' + global_elementID + '" class="divVideo" style="float:left;">';
-                js_player += '<video id="html_player2" preload="none" style="width:' + visual_size_w + 'px; height:' + visual_size_h + 'px;" name="visual_element" autoplay>';
+                var js_player = '<div id="div' + global_elementID + '" class="divVideo" style="float:left;">';
+                js_player += '<video id="' + global_elementID + '" preload="none" style="width:' + visual_size_w + 'px; height:' + visual_size_h + 'px;" name="visual_element" autoplay>';
                 js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
                 js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
                 js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
@@ -456,25 +453,28 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                 flex_div.append(js_player);
 
-                var html_player = $("#html_player2");
+                var html_player = $("#" + global_elementID);
+                if (html_player != null && html_player[0] != null) {
+                    var seek = false;
+                    if (element_current_duration != null && element_current_duration > 0) {
+                        html_player[0].play();
+                        ok = true;
 
-                var seek = false;
-                if (element_current_duration != null && element_current_duration > 0) {
-                    html_player[0].play();
+                        setTimeout(function () {
+                            if (html_player[0].currentTime != null) {
+                                html_player[0].currentTime = element_current_duration;
+                            }
+                        }, 500);
+                        seek = true;
+                    }
+
+                    if (!seek) {
+                        html_player[0].play();
+                        ok = true;
+                    }
+
                     ok = true;
-
-                    setTimeout(function () {
-                        html_player[0].currentTime = element_current_duration;
-                    }, 500);
-                    seek = true;
                 }
-
-                if (!seek) {
-                    html_player[0].play();
-                    ok = true;
-                }
-
-                ok = true;
                 break;
             }
 
@@ -483,11 +483,10 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                 if (getIsFirefoxOrIE()) {
                     if (fileStatus != "PROCESSING" && fileStatus != "ERROR") {
 
-                        global_elementID = "divFbsviewer2";
                         var fileStatus = element_alreadyTaken[0].fileStatus;
 
-                        var applet = "<div id='" + global_elementID + "' style='float:left;'><applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' " +
-                            "height='" + visual_size_h + "px;' name='fbsviewer' id='fbsviewer2' title='undefined'>";
+                        var applet = "<div id='div" + global_elementID + "' style='float:left;'><applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' " +
+                            "height='" + visual_size_h + "px;' name='fbsviewer' id='" + global_elementID + "' title='undefined'>";
 
                         applet += "<param name='HOST' value=''>";
                         applet += "<param name='PORT' value='5901'>";
@@ -516,27 +515,33 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                                 var label = $("#globalplay_divVideoName h2");
                                 label.text(fileName);
+
+                                // FBS Special case
+                                label.css("background-color", "blue");
                                 label.show();
 
+                                // Insert only if was loaded ok
                                 var duration_int = parseInt(duration, 10);
                                 var actual_duration = getDuration_onDatetime(timestamp);
                                 var duration_final = actual_duration + duration_int + GLOBALPLAY_DEFAULT_DURATION_EXTRA;
 
                                 globalplay_remove_elements.push([global_elementID, element_alreadyTaken, label, actual_duration, duration_final]);
 
+                                var video_player = $("#" + global_elementID);
+
                                 // PLAY
                                 var seek = false;
                                 if (element_current_duration != null && element_current_duration > 0) {
-                                    $("#fbsviewer2")[0].play();
+                                    video_player[0].play();
 
                                     setTimeout(function () {
-                                        $("#fbsviewer2")[0].seekViewerSeconds(element_current_duration);
+                                        video_player[0].seekViewerSeconds(element_current_duration);
                                     }, 500);
                                     seek = true;
                                 }
 
                                 if (!seek) {
-                                    $("#fbsviewer2")[0].play();
+                                    video_player[0].play();
                                 }
 
                             } catch (err) {
@@ -544,7 +549,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                                 console.log(err);
 
                                 // Hide player until it is removed by "globalplay_remove_elements"
-                                $("#divFbsviewer2").css("visibility", "hidden");
+                                $("#div" + video_player).css("visibility", "hidden");
 
                                 // Error message
                                 var label = $("#globalplay_divSpecialMessages h2");
@@ -586,46 +591,37 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         // WMP IE Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
 
                         // ActiveX video object
-                        global_elementID = "divIEVideo2";
-
-                        var js_player = "<div id='" + global_elementID + "' class='divVideo' style='float:left; width='" + visual_size_w + "px;' " + "height='" + visual_size_h + "px;'> ";
-                        js_player += "<object id='video_object2' data='" + file_url + "' ";
-                        js_player += " width='" + visual_size_w + "' height='" + visual_size_h + "' ";
-
-                        //if (getIsIE()) {
+                        var js_player = "<div id='div" + global_elementID + "' class='divVideo' style='float:left; width:" + visual_size_w + "px; " + "height:" + visual_size_h + "px;'> "; // TODO TEST style change
+                        js_player += "<object id='" + global_elementID + "' data='" + file_url + "' ";
+                        js_player += "width='" + (visual_size_w - 5) + "' height='" + (visual_size_h - 5) + "' ";
                         js_player += "CLASSID='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
                         js_player += "<PARAM name='URL' value='" + file_url + "'> ";
-                        /*
-                    } else { // Firefox 
-                        js_player += 'type="video/x-ms-wmp" ';
-                        js_player += "<PARAM name='videoUrl' value='" + file_url + "'> ";
-                    }
-                    */
                         js_player += "<PARAM name='uiMode' value='none'> ";
-                        js_player += " </object></div>";
-
+                        js_player += "</object></div>";
 
                         flex_div.append(js_player);
 
+                        var video_player = $("#" + global_elementID);
+                        if (video_player != null && video_player[0] != null) {
 
-                        var html_player = $("#video_object2");
-                        if (element_current_duration != null && element_current_duration > 0) {
+                            if (element_current_duration != null && element_current_duration > 0) {
+                                ok = true;
+
+                                setTimeout(function () {
+                                    if (video_player[0].controls != null) {
+                                        video_player[0].controls.currentPosition = element_current_duration;
+                                    }
+                                }, 1300);
+                            }
+
                             ok = true;
-
-                            setTimeout(function () {
-                                html_player[0].controls.currentPosition = element_current_duration;
-                            }, 1300);
                         }
-
-                        ok = true;
 
                     } else {
 
                         // Webchimera
-                        global_elementID = "divWebchimera2";
-
-                        var applet = "<div id='" + global_elementID + "' class='divVideo' style='float:left;'>";
-                        applet += "<object id='webchimera2' type='application/x-chimera-plugin' width='" + (visual_size_w - 3) + "' ";
+                        var applet = "<div id='div" + global_elementID + "' class='divVideo' style='float:left;'>";
+                        applet += "<object id='" + global_elementID + "' type='application/x-chimera-plugin' width='" + (visual_size_w - 3) + "' ";
                         applet += "height='" + (visual_size_h - 3) + "' name='visual_element' style='position:relative; float:left; margin: 10px;'>";
                         applet += "<param name='windowless' value='true' />";
                         applet += "</object>";
@@ -636,21 +632,21 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         var webchimera_loaded = true;
 
                         try {
-                            wjs("#webchimera2").clearPlaylist();
-                            wjs("#webchimera2").addPlaylist(file_url);
+                            wjs("#" + global_elementID).clearPlaylist();
+                            wjs("#" + global_elementID).addPlaylist(file_url);
 
                             var seek = false;
                             if (element_current_duration != null && element_current_duration > 0) {
-                                wjs("#webchimera2").play();
+                                wjs("#" + global_elementID).play();
 
                                 setTimeout(function () {
-                                    wjs("#webchimera2").time(element_current_duration);
+                                    wjs("#" + global_elementID).time(element_current_duration);
                                 }, 500);
                                 seek = true;
                             }
 
                             if (!seek) {
-                                wjs("#webchimera2").play();
+                                wjs("#" + global_elementID).play();
                             }
 
                         } catch (err) {
@@ -694,6 +690,9 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
         var label = $("#globalplay_divVideoName h2");
         label.text(fileName);
+
+        // Remove FBS Special case
+        label.css("background-color", "purple");
         label.show();
 
         var duration_int = parseInt(duration, 10);
@@ -816,7 +815,6 @@ function globalplay_loadEvents() {
                         var id = audio_element.attr('id');
                         $("#darktooltip-" + id).css("z-index", 9000);
                         break;
-
                     }
 
                 } // switch tapeType
@@ -837,6 +835,7 @@ function globalplay_muteAudio(event) {
             var element_object = globalplay_getQueueElementByID(id);
             if (element_object != null && element_object.length > 2 != null && element_object[0] != null && element_object[2] != null) {
 
+                var ok1 = false;
                 var dynamic_object = element_object[2];
                 if (dynamic_object != null) {
 
@@ -844,35 +843,41 @@ function globalplay_muteAudio(event) {
                     var fileName = element.fileName;
                     var file_extension = getFileExtension(fileName);
 
-                    var ok = false;
-                    /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
-                    if (getIsIE() && file_extension != null && file_extension[0] != null && file_extension[0] == "wav") {
-                        if (dynamic_object.mute != null) {
-                            ok = true;
-                            dynamic_object.mute = !dynamic_object.mute;
+                    var ok2 = false;
+
+                    // Get file extension
+                    var file_extension = getFileExtension(fileName);
+                    if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
+
+                        /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
+                        if (getIsIE() && file_extension[0] == "wav") {
+                            if (dynamic_object.mute != null) {
+                                ok1 = ok2 = true;
+                                dynamic_object.mute = !dynamic_object.mute;
+                            }
                         }
-                    }
-                    else {
-                        if (dynamic_object.muted != null) {
-                            ok = true;
-                            dynamic_object.muted = !dynamic_object.muted;
+                        else {
+                            if (dynamic_object.muted != null) {
+                                ok1 = ok2 = true;
+                                dynamic_object.muted = !dynamic_object.muted;
+                            }
                         }
-                    }
-                    if (ok) {
-                        // change button icon
-                        if (icon.hasClass("glyphicon-volume-up")) {
-                            icon.addClass("glyphicon-volume-off");
-                            icon.removeClass("glyphicon-volume-up");
-                        } else {
-                            icon.addClass("glyphicon-volume-up");
-                            icon.removeClass("glyphicon-volume-off");
+                        if (ok2) {
+                            // change button icon
+                            if (icon.hasClass("glyphicon-volume-up")) {
+                                icon.addClass("glyphicon-volume-off");
+                                icon.removeClass("glyphicon-volume-up");
+                            } else {
+                                icon.addClass("glyphicon-volume-up");
+                                icon.removeClass("glyphicon-volume-off");
+                            }
                         }
                     }
                 }
-                else {
-                    icon.parent().hide();
-                    icon.parent().show("bounce", 80);
-                }
+            }
+            if (!ok1) {
+                icon.parent().hide();
+                icon.parent().show("bounce", 80);
             }
         }
     }
@@ -907,10 +912,11 @@ function globalplay_pausePlayingElements(isStop) {
     if (globalplay_queue_elements != null && globalplay_queue_elements.length > 0) {
         for (var i = 0; i < globalplay_queue_elements.length; i++) {
             var element = globalplay_queue_elements[i];
+
             if (element != null && element[0] != null && element[0].tapeType != null) {
                 var tapeType = element[0].tapeType;
                 var fileName = element[0].fileName;
-                var playID = element[1];
+                var dynamicID = element[1];
                 var dynamic_object = element[2];
 
                 // Get file extension
@@ -919,41 +925,53 @@ function globalplay_pausePlayingElements(isStop) {
                 switch (tapeType) {
                     case "A": {
 
-                        /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
-                        if (getIsIE() && file_extension[0] == "wav") {
-                            if ($("#wav_object2")[0] != null) {
-                                if (isStop) {
-                                    try {
-                                        $("#wav_object2")[0].stop();
-                                    } catch (err) {
-                                        console.log("l:4401 Error stoping IE ActiveX Player");
-                                        console.log(err);
+                        // Get file extension
+                        var file_extension = getFileExtension(fileName);
+                        if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
+
+                            var audio_player = $("#" + dynamicID);
+                            if (audio_player != null && audio_player[0] != null) {
+
+                                /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
+                                if (getIsIE() && file_extension[0] == "wav") {
+
+                                    if (audio_player[0].controls != null) {
+
+                                        // ActiveX audio object - wav -
+                                        if (isStop) {
+                                            try {
+                                                audio_player[0].controls.stop();
+                                            } catch (err) {
+                                                console.log("l:936 Error stoping IE ActiveX Player");
+                                                console.log(err);
+                                            }
+                                        } else {
+                                            try {
+                                                audio_player[0].controls.pause();
+                                            } catch (err) {
+                                                console.log("l:943 Error pausing IE ActiveX Player");
+                                                console.log(err);
+                                            }
+                                        }
                                     }
-                                } else {
-                                    try {
-                                        $("#wav_object2")[0].pause();
-                                    } catch (err) {
-                                        console.log("l:4408 Error pausing IE ActiveX Player");
-                                        console.log(err);
+                                } else { // Normal HTML5 Audio tag
+
+                                    if (isStop) {
+                                        try {
+                                            audio_player[0].pause();
+                                            audio_player[0].currentTime = 0;
+                                        } catch (err) {
+                                            console.log("l:955 Error pausing HTML5 Player");
+                                            console.log(err);
+                                        }
+                                    } else {
+                                        try {
+                                            audio_player[0].pause();
+                                        } catch (err) {
+                                            console.log("l:962 Error pausing HTML5 Player");
+                                            console.log(err);
+                                        }
                                     }
-                                }
-                            }
-                        }
-                        else { // Normal HTML5 Audio tag
-                            if (isStop) {
-                                try {
-                                    dynamic_object.pause();
-                                    dynamic_object.currentTime = 0;
-                                } catch (err) {
-                                    console.log("l:4420 Error pausing HTML5 Player");
-                                    console.log(err);
-                                }
-                            } else {
-                                try {
-                                    dynamic_object.pause();
-                                } catch (err) {
-                                    console.log("l:4427 Error pausing HTML5 Player");
-                                    console.log(err);
                                 }
                             }
                         }
@@ -965,110 +983,112 @@ function globalplay_pausePlayingElements(isStop) {
 
                         // Get file extension
                         var file_extension = getFileExtension(fileName);
-
                         if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
-                            switch (file_extension[0]) {
 
-                                // HTML5 support:
-                                case "mp4":
-                                case "webm":
-                                case "ogg": {
+                            var video_player = $("#" + dynamicID);
+                            if (video_player != null && video_player[0] != null) {
 
-                                    var html_player = $("#html_player2");
-                                    if (html_player != null && html_player[0] != null) {
+                                switch (file_extension[0]) {
+
+                                    // HTML5 support:
+                                    case "mp4":
+                                    case "webm":
+                                    case "ogg": {
+
                                         if (isStop) {
                                             try {
-                                                html_player[0].pause();
-                                                html_player[0].currentTime = 0;
+                                                video_player[0].pause();
+                                                video_player[0].currentTime = 0;
                                             } catch (err) {
                                                 console.log("l:4456 Error pausing HTML5 Player");
                                                 console.log(err);
                                             }
                                         } else {
                                             try {
-                                                html_player[0].pause();
+                                                video_player[0].pause();
                                             } catch (err) {
                                                 console.log("l:4463 Error pausing HTML5 Player");
                                                 console.log(err);
                                             }
                                         }
+                                        break;
                                     }
-                                    break;
-                                }
 
-                                case "fbs": {
+                                    case "fbs": {
 
-                                    // Oreka Player:
-                                    if (document.fbsviewer != null) {
-                                        if (isStop) {
-                                            try {
-                                                $("#fbsviewer2")[0].stop();
-                                            } catch (err) {
-                                                console.log("l:4429 Error playing FBS Player");
-                                                console.log(err);
-                                            }
-                                        } else {
-                                            try {
-                                                $("#fbsviewer2")[0].pause();
-                                            } catch (err) {
-                                                console.log("l:4436 Error pausing FBS Player");
-                                                console.log(err);
-                                            }
-                                        }
-                                    }
-                                    break;
-                                }
-
-                                case "avi":
-                                case "crypt":
-                                case "bin":
-                                default: {
-
-                                    if (getIsIE()) {
-
-                                        // ActiveX video object
-                                        if ($("#video_object2")[0] != null && $("#video_object2")[0].controls != null) {
+                                        // Oreka Player:
+                                        if (document.fbsviewer != null) {
                                             if (isStop) {
                                                 try {
-                                                    $("#video_object2")[0].controls.stop();
+                                                    video_player[0].stop();
                                                 } catch (err) {
-                                                    console.log("l:4504 Error stopping IE video object");
+                                                    console.log("l:4429 Error playing FBS Player");
                                                     console.log(err);
                                                 }
                                             } else {
                                                 try {
-                                                    $("#video_object2")[0].controls.pause();
+                                                    video_player[0].pause();
                                                 } catch (err) {
-                                                    console.log("l:4511 Error pausing IE video object");
+                                                    console.log("l:4436 Error pausing FBS Player");
+                                                    console.log(err);
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+
+                                    case "avi":
+                                    case "crypt":
+                                    case "bin":
+                                    default: {
+
+                                        if (getIsIE()) {
+
+                                            // ActiveX video object
+                                            if (video_player[0].controls != null) {
+
+                                                if (isStop) {
+                                                    try {
+                                                        video_player[0].controls.stop();
+                                                    } catch (err) {
+                                                        console.log("l:1033 Error stopping IE video object");
+                                                        console.log(err);
+                                                    }
+                                                } else {
+                                                    try {
+                                                        video_player[0].controls.pause();
+                                                    } catch (err) {
+                                                        console.log("l:1040 Error pausing IE video object");
+                                                        console.log(err);
+                                                    }
+                                                }
+
+                                            }
+                                        } else {
+
+                                            // Webchimera Plugin Player or else:
+                                            if (isStop) {
+                                                try {
+                                                    wjs("#" + dynamicID).stop();
+                                                } catch (err) {
+                                                    console.log("l:4504 Error stopping webchimera");
+                                                    console.log(err);
+                                                }
+                                            } else {
+                                                try {
+                                                    wjs("#" + dynamicID).pause();
+                                                } catch (err) {
+                                                    console.log("l:4511 Error pausing webchimera");
                                                     console.log(err);
                                                 }
                                             }
 
                                         }
-                                    } else {
 
-                                        // Webchimera Plugin Player or else:
-                                        if (isStop) {
-                                            try {
-                                                wjs("#webchimera2").stop();
-                                            } catch (err) {
-                                                console.log("l:4504 Error stopping webchimera");
-                                                console.log(err);
-                                            }
-                                        } else {
-                                            try {
-                                                wjs("#webchimera2").pause();
-                                            } catch (err) {
-                                                console.log("l:4511 Error pausing webchimera");
-                                                console.log(err);
-                                            }
-                                        }
-
+                                        break;
                                     }
-
-                                    break;
-                                }
-                            } // switch file_extension
+                                } // switch file_extension
+                            }
                         }
                         break;
                     }
@@ -1093,121 +1113,114 @@ function globalplay_resumeAllCurrentMedia() {
             if (element != null && element[0] != null && element[0].tapeType != null) {
                 var tapeType = element[0].tapeType;
                 var fileName = element[0].fileName;
-                var playID = element[1];
+                var dynamicID = element[1];
                 var dynamic_object = element[2];
 
                 // Get file extension
                 var file_extension = getFileExtension(fileName);
+                if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
 
-                switch (tapeType) {
-                    case "A": {
+                    switch (tapeType) {
+                        case "A": {
 
-                        /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
-                        if (getIsIE() && file_extension[0] == "wav") {
-                            if ($("#wav_object2")[0] != null) {
-                                try {
-                                    $("#wav_object2")[0].play();
-                                } catch (err) {
-                                    console.log("l:4545 Error playing IE ActiveX Player");
-                                    console.log(err);
+                            var audio_player = $("#" + dynamicID);
+                            if (audio_player != null && audio_player[0] != null) {
+
+                                /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
+                                if (getIsIE() && file_extension[0] == "wav") {
+
+                                    if (audio_player[0].controls != null) {
+
+                                        try {
+                                            audio_player[0].controls.play();
+                                        } catch (err) {
+                                            console.log("l:4545 Error playing IE ActiveX Player");
+                                            console.log(err);
+                                        }
+
+                                    }
+                                }
+                                else { // Normal HTML5 Audio tag
+
+                                    audio_player[0].play();
                                 }
                             }
+                            break;
                         }
-                        else { // Normal HTML5 Audio tag
-                            dynamic_object.play();
-                        }
-                        break;
-                    }
 
-                    case "S":
-                    case "V": {
+                        case "S":
+                        case "V": {
 
-                        if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
-                            switch (file_extension[0]) {
+                            var video_player = $("#" + dynamicID);
+                            if (video_player != null && video_player[0] != null) {
 
-                                // HTML5 support:
-                                case "mp4":
-                                case "webm":
-                                case "ogg": {
+                                switch (file_extension[0]) {
 
-                                    var html_player = $("#html_player2");
-                                    if (html_player != null && html_player[0] != null) {
-                                        try {
-                                            html_player[0].play();
-                                        } catch (err) {
-                                            console.log("l:4572 Error playing HTML5 Player");
-                                            console.log(err);
-                                        }
-                                    }
-                                    break;
-                                }
+                                    // HTML5 support:
+                                    case "mp4":
+                                    case "webm":
+                                    case "ogg": {
 
-                                case "fbs": {
-
-                                    // Oreka Player:
-                                    if (document.fbsviewer != null) {
-                                        try {
-                                            $("#fbsviewer2")[0].play();
-                                        } catch (err) {
-                                            console.log("l:4586 Error playing FBS Player");
-                                            console.log(err);
-                                        }
-                                    }
-
-                                    break;
-                                }
-
-                                case "avi":
-                                case "crypt":
-                                case "bin":
-                                default: {
-
-                                    if (getIsIE()) {
-
-                                        // ActiveX video object
-                                        if ($("#video_object2")[0] != null && $("#video_object2")[0].controls != null) {
                                             try {
-                                                $("#video_object2")[0].controls.play();
+                                                video_player[0].play();
                                             } catch (err) {
-                                                console.log("l:1148 Error resuming IE video object");
+                                                console.log("l:4572 Error playing HTML5 Player");
                                                 console.log(err);
                                             }
-                                        }
-                                    } else {
+                                        break;
+                                    }
 
+                                    case "fbs": {
 
-                                        // Webchimera Plugin Player or else:
-                                        try {
-                                            wjs("#webchimera2").play();
+                                        // Oreka Player:
+                                            try {
+                                                video_player[0].play();
+                                            } catch (err) {
+                                                console.log("l:4586 Error playing FBS Player");
+                                                console.log(err);
+                                            }
+                                        break;
+                                    }
 
-                                        } catch (err) {
-                                            console.log("l:1160 Error resuming webchimera");
-                                            console.log(err);
+                                    case "avi":
+                                    case "crypt":
+                                    case "bin":
+                                    default: {
 
-                                            /*
-                                            // Show alert message
-                                            $("#dialog_WebChimera p").text(hashMessages["InstallWebchimera"]);
-                                            $("#dialog_WebChimera a").attr("href", hashMessages["InstallWebchimera_url"]);
-                                            $("#dialog_WebChimera a").text("aquí.")
-                                            $("#dialog_WebChimera").dialog({
-                                                buttons: {
-                                                    "OK": function () {
-                                                        $(this).dialog("close");
-                                                    }
+                                        if (getIsIE()) {
+
+                                            // ActiveX video object
+                                            if (video_player[0].controls != null) {
+
+                                                try {
+                                                    video_player[0].controls.play();
+                                                } catch (err) {
+                                                    console.log("l:1148 Error resuming IE video object");
+                                                    console.log(err);
                                                 }
-                                            });
-                                            */
 
-                                        }
-                                    } // END webchimera
-                                    break;
-                                }
-                            } // switch extension
+                                            }
+                                        } else {
+
+
+                                            // Webchimera Plugin Player or else:
+                                            try {
+                                                wjs("#" + dynamicID).play();
+
+                                            } catch (err) {
+                                                console.log("l:1160 Error resuming webchimera");
+                                                console.log(err);                                               
+                                            }
+                                        } // END webchimera
+                                        break;
+                                    }
+                                } // switch extension
+                            }
+                            break;
                         }
-                        break;
-                    }
 
-                } // switch type
+                    } // switch type
+                }
             }
         } // for
     }
@@ -1249,7 +1262,7 @@ function globalplay_filterElementsChecked() {
 function globalplay_removeElementsFromPlayback() {
 
     /* Object
-     * 0: Element DOM ID
+     * 0: Element DOM ID - dynamicID
      * 1: Element (globalplay_stack_elements)
      * 2: label
      * 3: Element playback start time
@@ -1259,7 +1272,7 @@ function globalplay_removeElementsFromPlayback() {
         for (var i = 0; i < globalplay_remove_elements.length; i++) {
             var object = globalplay_remove_elements[i];
             if (object != null) {
-                var elementDOM_ID = object[0];
+                var dynamicID = object[0]; // dynamicID 
                 var element = object[1];
                 var label = object[2];
                 var timeToStart = object[3]
@@ -1268,13 +1281,13 @@ function globalplay_removeElementsFromPlayback() {
                 //remove element from queue when current time is outside the playback time range for the element
                 if (GLOBALPLAY_seconds_current < timeToStart || GLOBALPLAY_seconds_current >= timeToRemove) {
                     if (element != null) {
-                        globalplay_removeElement(elementDOM_ID, element);
+                        globalplay_removeElement(dynamicID, element);
                     }
                     if (label != null) {
                         // Empty label
                         globalplay_clearLabel(label);
 
-                        if (elementDOM_ID == null) {
+                        if (dynamicID == null) {
                             label.hide();
                         }
                     }
@@ -1304,11 +1317,12 @@ function globalplay_loadElementSeek(pointer_current_duration) {
         for (var i = 0; i < globalplay_queue_elements.length; i++) {
             var queue_element = globalplay_queue_elements[i];
             if (queue_element != null && queue_element.length) {
+
+                var dynamicID = queue_element[1];
                 var element = queue_element[0];
                 if (element != null) {
 
                     var tapeType = element.tapeType;
-                    var file_extension = element.file_extension;
                     var timestamp = element.timestamp;
                     var tapeID = element.tapeID;
                     var fileName = element.fileName;
@@ -1318,115 +1332,122 @@ function globalplay_loadElementSeek(pointer_current_duration) {
                     if (pointer_current_duration > element_start_duration) {
                         var element_current_duration = pointer_current_duration - element_start_duration;
 
-                        switch (tapeType) {
-                            case "A": {
-                                if (getIsIE() && file_extension == "wav") {
-                                    if ($("#wav_object2")[0] != null) {
-                                        try {
-                                            $("#wav_object2")[0].currentTime = element_current_duration;
-                                        } catch (err) {
-                                            console.log("l:5397 Error seeking IE ActiveX Player");
-                                            console.log(err);
-                                        }
-                                    }
-                                }
-                                else { // Normal HTML5 Audio tag
-                                    var dynamic_object = queue_element[2];
-                                    if (dynamic_object != null) {
-                                        try {
-                                            dynamic_object.currentTime = element_current_duration;
-                                        } catch (err) {
-                                            console.log("l:5408 Error seeking HTML5 Player");
-                                            console.log(err);
-                                        }
-                                    }
-                                }
-                                break;
-                            }
+                        // Get file extension
+                        var file_extension = getFileExtension(fileName);
+                        if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
 
-                            case "S":
-                            case "V": {
+                            switch (tapeType) {
+                                case "A": {
 
-                                // Get file extension
-                                var file_extension = getFileExtension(fileName);
-                                if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
-                                    switch (file_extension[0]) {
+                                    if (dynamicID != null) {
+                                        var audio_player = $("#" + dynamicID);
+                                        if (audio_player != null && audio_player[0] != null) {
 
-                                        // HTML5 support:
-                                        case "mp4":
-                                        case "webm":
-                                        case "ogg": {
+                                            /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
+                                            if (getIsIE() && file_extension[0] == "wav") {
 
-                                            var html_player = $("#html_player2");
-                                            if (html_player != null && html_player[0] != null) {
-                                                try {
-                                                    html_player[0].currentTime = element_current_duration;
-                                                } catch (err) {
-                                                    console.log("l:4401 Error seeking HTML5 Player");
-                                                    console.log(err);
-                                                }
-                                            }
-                                            break;
-                                        }
+                                                if (audio_player[0].controls != null) {
 
-                                        case "fbs": {
-
-                                            // Oreka Player:
-                                            if (document.fbsviewer != null) {
-                                                try {
-                                                    $("#fbsviewer2")[0].seekViewerSeconds(element_current_duration);
-                                                } catch (err) {
-                                                    console.log("l:4429 Error seeking FBS Player");
-                                                    console.log(err);
-                                                }
-                                            }
-                                            break;
-                                        }
-
-                                        case "avi":
-                                        case "crypt":
-                                        case "bin":
-                                        default: {
-
-                                            if (getIsIE()) {
-
-                                                // ActiveX video object
-                                                if ($("#video_object2")[0] != null && $("#video_object2")[0].controls != null) {
                                                     try {
-                                                        $("#video_object2")[0].controls.currentPosition = element_current_duration;
+                                                        // ActiveX audio object - wav -
+                                                        audio_player[0].controls.currentPosition = element_current_duration;
                                                     } catch (err) {
-                                                        console.log("l:1375 Error seeking IE video object");
+                                                        console.log("l:1330 Error seeking IE ActiveX Player");
                                                         console.log(err);
                                                     }
-                                                }
-                                            } else {
 
-                                                    
-                                                // Webchimera Plugin Player or else:
+                                                }
+                                            }
+                                            else { // Normal HTML5 Audio tag
+
+                                                audio_player[0].currentTime = element_current_duration;
+                                            }
+                                        }
+                                    }
+                                    break;
+                                }
+
+                                case "S":
+                                case "V": {
+
+                                    var video_player = $("#" + dynamicID);
+                                    if (video_player != null && video_player[0] != null) {
+
+                                        switch (file_extension[0]) {
+
+                                            // HTML5 support:
+                                            case "mp4":
+                                            case "webm":
+                                            case "ogg": {
+
                                                 try {
-                                                    //wjs("#webchimera2").plugin.time = element_current_duration;
-                                                    wjs("#webchimera2").time(element_current_duration);
+                                                    video_player[0].currentTime = element_current_duration;
                                                 } catch (err) {
-                                                    console.log("l:1386 Error seeking webchimera");
+                                                    console.log("l:1366 Error seeking HTML5 Player");
                                                     console.log(err);
                                                 }
-                                            } // END webchimera
+                                                break;
+                                            }
 
-                                            break;
-                                        }
-                                    } // switch file_extension
+                                            case "fbs": {
+
+                                                // Oreka Player:
+                                                try {
+                                                    video_player[0].seekViewerSeconds(element_current_duration);
+                                                } catch (err) {
+                                                    console.log("l:1379 Error seeking FBS Player");
+                                                    console.log(err);
+                                                }
+
+                                                break;
+                                            }
+
+                                            case "avi":
+                                            case "crypt":
+                                            case "bin":
+                                            default: {
+
+                                                if (getIsIE()) {
+
+                                                    // ActiveX video object
+                                                    if (video_player[0].controls != null) {
+
+                                                        try {
+                                                            video_player[0].controls.currentPosition = element_current_duration;
+                                                        } catch (err) {
+                                                            console.log("l:1375 Error seeking IE video object");
+                                                            console.log(err);
+                                                        }
+
+                                                    }
+                                                } else {
+
+
+                                                    // Webchimera Plugin Player or else:
+                                                    try {
+                                                        //wjs("#" + dynamicID).plugin.time = element_current_duration;
+                                                        wjs("#" + dynamicID).time(element_current_duration);
+                                                    } catch (err) {
+                                                        console.log("l:1386 Error seeking webchimera");
+                                                        console.log(err);
+                                                    }
+                                                } // END webchimera
+
+                                                break;
+                                            }
+                                        } // switch file_extension
+                                    }
+                                    break;
                                 }
-                                break;
-                            }
 
-                        } // switch tapeType
+                            } // switch tapeType
 
+                        }
                     }
                 }
             }
         }
     }
-
 }
 
 function globalplay_removeAll() {
@@ -1437,7 +1458,7 @@ function globalplay_removeAll() {
     // Stop all audios
     globalplay_pausePlayingElements(true);
 
-    // Remove all audios
+    // Remove all audios from queue
     if (globalplay_queue_elements != null && globalplay_queue_elements.length > 0) {
         for (var i = 0; i < globalplay_queue_elements.length; i++) {
 
@@ -1449,12 +1470,7 @@ function globalplay_removeAll() {
             }
         } // for
     }
-
-    // set AlreadyTaken false
-
-
 }
-
 
 function getElementInQueueArray(elementID) {
 
@@ -1537,7 +1553,8 @@ function globalplay_removeDOMElements() {
     $("#flex_messages div h2").text("");
 }
 
-function globalplay_removeElement(global_elementID, element_alreadyTaken) {
+function globalplay_removeElement(dynamicID, element_alreadyTaken) {
+
     // FORMAT: element_alreadyTaken
     // element_alreadyTaken[0] = Element
     // element_alreadyTaken[1] = AlreadyTaken bool
@@ -1545,7 +1562,7 @@ function globalplay_removeElement(global_elementID, element_alreadyTaken) {
     if (element != null) {
         var tapeID = element.tapeID;
         var tapeType = element.tapeType;
-        var file_extension = element.file_extension;
+        var fileName = element.fileName;
 
         // Set alreadyTaken to false to signal the element is available again:
         globalplay_setElementAlreadyTaken(tapeID, false);
@@ -1553,38 +1570,42 @@ function globalplay_removeElement(global_elementID, element_alreadyTaken) {
         // If is Audio stop it and remove it
         if (tapeType === "A") {
 
-            /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
-            if (getIsIE() && file_extension == "wav") {
-                if ($("#wav_object2")[0] != null) {
-                    try {
-                        $("#wav_object2")[0].stop();
-                    } catch (err) {
-                        console.log("l:5614 Error stopping IE ActiveX Player");
-                        console.log(err);
-                    }
-                }
-            }
-            else { // Normal HTML5 Audio tag
-                var dynamic_object_index = getElementInQueueArray(tapeID);
-                if (dynamic_object_index > -1) {
-                    var audio_object = globalplay_queue_elements[dynamic_object_index];
-                    if (audio_object != null && audio_object[2] != null) {
-                        try {
-                            audio_object[2].pause();
-                        } catch (err) {
-                            console.log("l:5627 Error stopping HTML5 Player");
-                            console.log(err);
+            var audio_player = $("#" + dynamicID);
+            if (audio_player != null && audio_player[0] != null) {
+
+                // Get file extension
+                var file_extension = getFileExtension(fileName);
+                if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
+
+                    /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
+                    if (getIsIE() && file_extension != null && file_extension[0] == "wav") {
+
+                        if (audio_player[0].controls != null) {
+
+                            try {
+                                audio_player[0].controls.stop();
+                            } catch (err) {
+                                console.log("l:5614 Error stopping IE ActiveX Player");
+                                console.log(err);
+                            }
+
                         }
                     }
-                    globalplay_queue_elements[dynamic_object_index] = null;
+                    else { // Normal HTML5 Audio tag
+
+                        audio_player[0].pause();
+                    }
                 }
             }
-        } else if (tapeType === "V" || tapeType === "S" || tapeType === "I") {
+        } else if (tapeType === "V" || tapeType === "S") {
+
             //remove visual element from player
-            $(".flex #" + global_elementID).remove();
+            $(".flex #div" + dynamicID).remove();
+        } else if (tapeType === "I") {
+
+            //remove visual element from player
+            $(".flex #" + dynamicID).remove();
         }
-
-
 
         // FORMAT: globalplay_queue_elements:
         // element[0] = Element
@@ -1595,7 +1616,7 @@ function globalplay_removeElement(global_elementID, element_alreadyTaken) {
         if (globalplay_queue_elements != null && globalplay_queue_elements.length > 0) {
             globalplay_queue_elements = $.grep(globalplay_queue_elements, function (queue_element, i) {
                 if (queue_element != null && queue_element[1] != null)
-                    return queue_element[1] != global_elementID; 
+                    return queue_element[1] != dynamicID;
             });
         }
 

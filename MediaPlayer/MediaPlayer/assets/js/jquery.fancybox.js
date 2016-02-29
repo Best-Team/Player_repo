@@ -446,6 +446,7 @@
 			    // Remove mute buttons on audio elements
 				globalplay_removeMuteButtons();
 
+                // Remove playbacks from queue
 				globalplay_removeAll();
 
 				globalplay_active = false; //global player is not active 

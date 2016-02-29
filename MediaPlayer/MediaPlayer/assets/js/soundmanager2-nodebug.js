@@ -24,9 +24,9 @@
         this.setupOptions = {
             'url': (smURL || null),
             'flashVersion': 8,
-            'debugMode': true,
+            'debugMode': false,
             'debugFlash': false,
-            'useConsole': true,
+            'useConsole': false,
             'consoleOnly': true,
             'waitForWindowLoad': false,
             'bgColor': '#ffffff',

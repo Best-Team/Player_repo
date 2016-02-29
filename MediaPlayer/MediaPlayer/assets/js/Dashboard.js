@@ -285,6 +285,7 @@ function loadGlobalplay_settings() {
 
 /**** Event: OnClick Load on click event fullscreen button for Screen recording elements ****/
 function loadClickFullscreen_event() {
+
     $("#aBtnFullscreen").click(function (event) {
         event.preventDefault();
         var $this = $(this);
@@ -295,6 +296,7 @@ function loadClickFullscreen_event() {
                 timer = (document.fbsviewer.getCurrTimeOffsetInMSec() / 1000).toString();
                 document.fbsviewer.pause();
             } catch (err) {
+                console.log("l:299 Error getCurrTimeOffsetInMSec fbsviewer");
                 console.log(err);
             }
         }
@@ -874,7 +876,11 @@ function openFullscreen() {
                         case "bin":
                         default: {
 
-                            openFullscreen_video(false);
+                            if (getIsIE()) {
+                                openFullscreen_video(true);
+                            } else {
+                                openFullscreen_video(false);
+                            }
 
                             break;
                         }
@@ -903,16 +909,18 @@ function openFullscreen_video(isHTML5) {
         if (isHTML5) {
             $("#html_video").css("width", width);
             $("#html_video").css("height", height);
+
+
+            //
+            //divPlayer_VIDEO.css("width", width);
+            //divPlayer_VIDEO.css("height", height);
+
         } else {
             document.getElementById("webchimera1").width = width;
             document.getElementById("webchimera1").height = height;
 
             var player_top = parseInt(divPlayer_VIDEO.css('top'), 10);
             divPlayer_VIDEO.css('top', (player_top + 6) + "px");
-
-            var duration = oldPlayer_activeElement_duration;
-
-
         }
 
         light.css('width', '70%');
@@ -1007,7 +1015,11 @@ function closeFullscreen() {
                         case "bin":
                         default: {
 
-                            closeFullscreen_video(false, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade);
+                            if (getIsIE()) {
+                                closeFullscreen_video(true, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade);
+                            } else {
+                                closeFullscreen_video(false, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade);
+                            }
 
                             break;
                         }
@@ -1044,7 +1056,7 @@ function closeFullscreen_video(isHTML5, divControlsMask_VIDEO, divPlayer_VIDEO, 
     divPlayer_VIDEO.css("height", height_final + "px");
     divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top + manual_offset });
 
-    // Webchimera player size
+    // Video player size
     var divPlayer_VIDEO_w = parseInt(divPlayer_VIDEO.css("width"), 10);
     var divPlayer_VIDEO_h = parseInt(divPlayer_VIDEO.css("height"), 10);
 
@@ -2215,7 +2227,19 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     $("#photobox-container img").remove();
 
     // Remove all objects if exist (including wav_object activeX audio)
+    $("#audioContainer object").each(function () {
+        var audio_player = $(this)[0];
+        if (audio_player != null && audio_player.controls != null) {
+            audio_player.controls.pause();
+        }
+    });
+
     $("#audioContainer object").remove();
+
+    // Remove progress click event - Audio ActiveX object  - 
+    if (playPauseInterval != null) {
+        clearInterval(playPauseInterval);
+    }
 
 
     /************************ General styles END ************************/
@@ -2407,6 +2431,7 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
     //#endregion
 }
 
+
 //************************************** 2. AUDIO Element ***************************************
 function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_AUDIO, file_extension, tapeID, aPlayPause_AUDIO, duration) {
 
@@ -2428,26 +2453,32 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
     // Clear player control settings
     $("#lnkSound_AUDIO").attr("href", "");
     $("#sm2-inline-time_AUDIO").text("0:00");
-    $("#sm2-inline-duration_AUDIO").text("0:00");
+
+    // Get duration format: m:ss
+    var currentTime_final = getFormatDuration_short(duration);
+    $("#sm2-inline-duration_AUDIO").text(currentTime_final);
 
     // Clear SoundManager previous playlist
     SetAudioPlaylistURL(0, "xx");
     SetAudioPlaylistURL(1, "xx");
 
-    // Show sound player
-    if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length) {
-        divControlsMask_AUDIO.show("blind", 200);
-    }
+    // Show volume control
+    $("#volume_AUDIO").show();
 
     // Set title
     $("#lblSoundTitle1_AUDIO, #lblSoundTitle2_AUDIO").text(fileName);
 
     // Set Stop icon
     if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length > 0) {
+
+        // Show sound player
+        divControlsMask_AUDIO.show("blind", 200);
+
         if (divControlsMask_AUDIO.hasClass("playing")) {
             divControlsMask_AUDIO.addClass("paused");
             divControlsMask_AUDIO.removeClass("playing");
         }
+
         divControlsMask_AUDIO.on("click", { _tapeID: tapeID }, playAudioElement);
     }
     // Set background image
@@ -2455,95 +2486,73 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
 
     ////////////////////////////////////
 
-
     if (file_extension != null && file_extension.length > 0 && file_extension[0] && file_extension[0].length > 0) {
 
         /* Important: ----------- PCM WAVE Case: Only for IE cases because it does not reproduce WAV files ----------- */
         if (getIsIE() && file_extension[0] == "wav") {
 
-            // Create avi player
+            // Create audio player
             var w = parseInt($("#divControlsMask_AUDIO").css("width"), 10);
             var h = parseInt($("#divControlsMask_AUDIO").css("height"), 10);
 
-            // Source: http://joliclic.free.fr/html/object-tag/en/
-
-            // Get duration format: m:ss
-            var currentTime_final = getFormatDuration_short(duration);
-            $("#sm2-inline-duration_AUDIO").text(currentTime_final);
+            // WMP player Source 1: http://joliclic.free.fr/html/object-tag/en/
+            // WMP player Source 2: https://coderwall.com/p/8yulaa/windows-media-player-events-framework
 
             // ActiveX object
-            //var wav_object = "<object id='wav_object1' data='" + file_url + "' type='audio/x-wav' width='" + w + "' height='" + h + "' style='visibility: hidden;'>";
-            var wav_object = "<object id='wav_object1' data='" + file_url + "' type='audio/x-wav' width='" + w + "' height='" + h + "'>";
-            wav_object += " <param name='src' value='" + file_url + "'>";
-            wav_object += " <param name='autoplay' value='false'>";
-            wav_object += " <param name='autoStart' value='0'>";
-            wav_object += " <a href='" + file_url + "'>Play</a>";
-            wav_object += " </object>";
+            var wav_object = "<object id='wav_object1' data='" + file_url + "' type='audio/x-wav' width='" + w + "' height='" + h + "' ";
+            wav_object += "style='display: none;' classid='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
+            wav_object += "<param name='URL' value='" + file_url + "'> ";
+            wav_object += "<param name='autoplay' value='false'> ";
+            wav_object += "<param name='autoStart' value='0'> ";
+            wav_object += "</object>";
 
             $("#audioContainer object").remove();
             $("#audioContainer").append(wav_object);
 
-            divControlsMask_AUDIO.hide(); //
+            // Hide volume control
+            $("#volume_AUDIO").hide();
 
-            /*
+            // Remove previous error messages from the audio player
+            $(".load-error").remove();
 
-            // Click on Play icon VIDEO
+            var duration_int = parseInt(duration, 10);
+
+            // Click on Play icon AUDIO
             aPlayPause_AUDIO.bind("click", function () {
                 if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length > 0) {
 
-                    if (divControlsMask_AUDIO.hasClass("paused")) {
-                        divControlsMask_AUDIO.addClass("playing");
-                        divControlsMask_AUDIO.removeClass("paused");
-                        if ($("#wav_object1")[0] != null) {
-                            $("#wav_object1")[0].play()
+                    if ($("#wav_object1") != null && $("#wav_object1")[0] != null && $("#wav_object1")[0].controls != null) {
 
-                            // Remove previous error messages from the audio player
-                            $(".load-error").remove();
+                        if (divControlsMask_AUDIO.hasClass("paused")) {
+                            divControlsMask_AUDIO.addClass("playing");
+                            divControlsMask_AUDIO.removeClass("paused");
+                            $("#wav_object1")[0].controls.play();
+
+                            // EVENT: Whileplaying
+                            IEObjectPlayer_audio_whileplaying(duration_int);
+
+                        } else {
+                            divControlsMask_AUDIO.addClass("paused");
+                            divControlsMask_AUDIO.removeClass("playing");
+                            $("#wav_object1")[0].controls.pause();
+
+                            // Pause Whileplaying event
+                            IEObjectPlayer_whileplaying_pause();
                         }
 
-                    } else {
-                        divControlsMask_AUDIO.addClass("paused");
-                        divControlsMask_AUDIO.removeClass("playing");
-                        if ($("#wav_object1")[0] != null) {
-                            $("#wav_object1")[0].pause()
+                        // Remove previous error messages from the audio player
+                        setTimeout(function () {
 
-                            // Remove previous error messages from the audio player
                             $(".load-error").remove();
-                        }
+                        }, 200);
                     }
                 }
             });
-            */
 
-            // TODO TESTING 
-            /*
-            if ($("#wav_object1")[0] != null) {
+            // Click on Progress track AUDIO
+            $("#sm2-progress-track_AUDIO").on("click", { _duration: duration_int }, pre_getClickPosition_AUDIO);
 
-                // Event: While Playing
-                $("#wav_object1").on("timeupdate", function () {
-                    //onTrackedVideoFrame(this.currentTime, this.duration, timer_VIDEO, divControlsMask_AUDIO);
-                    alert("asdasd1");
-                });
 
-                $('#wav_object1').bind('canplay', function () {
-                    //this.currentTime = 29; // jumps to 29th secs
-                    alert("asdasd1");
-                });
-
-                /*
-                $('#wav_object1').on('timeupdate', function () {
-                    $('#seekbar').attr("value", this.currentTime / this.duration);
-                });
-
-        }
-        */
-
-            // $("#wav_object1")[0].play()
-            /*
-            $("#audioContainer object").remove();
-            $("#audioContainer").append(wav_object);
-            divControlsMask_AUDIO.hide();
-            */
         } else { // Normal HTML5 Audio tag
 
             // Prepare audio player
@@ -2551,8 +2560,130 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
             SetAudioPlaylistURL(0, file_url);
         }
     }
-
 }
+
+function pre_getClickPosition_AUDIO(event){
+    getClickPosition_AUDIO(event, event.data._duration);
+}
+
+function getClickPosition_AUDIO(event, duration) {
+    if (duration != null) {
+        var parentPosition = getPosition3(event.currentTarget);
+        var xPosition = event.clientX - parentPosition.x;
+        var yPosition = event.clientY - parentPosition.y;
+        var sm2_progress_track_AUDIO = $("#sm2-progress-track_AUDIO");
+
+        if (sm2_progress_track_AUDIO != null && sm2_progress_track_AUDIO.length) {
+            var left_percentage = parseInt(xPosition / parseInt(sm2_progress_track_AUDIO.css("width"), 10) * 100, 10);
+            var currentSecs = left_percentage * duration / 100;
+
+            var video_player = $("#wav_object1");
+            if (video_player != null && video_player[0] != null && video_player[0].controls != null) {
+                video_player[0].controls.currentPosition = currentSecs;
+            }
+        }
+    }
+}
+
+
+// Audio IE Object - Event Whileplaying variable
+var playPauseInterval;
+
+// Audio IE Object EVENT: Whileplaying
+function IEObjectPlayer_audio_whileplaying(duration) {
+
+    playPauseInterval = setInterval(function () {
+
+        if ($("#wav_object1") != null && $("#wav_object1")[0] != null && $("#wav_object1")[0].controls != null) {
+            var currentTime = $("#wav_object1")[0].controls.currentPosition;
+
+            var currentTime_int = parseFloat(currentTime, 10);
+            var currentTime_final = getFormatDuration_short(currentTime_int);
+            var max_time = $("#sm2-inline-duration_AUDIO").text();
+
+            if (currentTime < duration && currentTime != 0) {
+
+                // Move Pointer 
+                var progress_percentage = currentTime * 100 / duration;
+                var left_final_percentage = progress_percentage + '%';
+
+                var pointer_AUDIO = $('#sm2-progress-ball_AUDIO');
+                if (pointer_AUDIO != null) {
+                    pointer_AUDIO.css("left", left_final_percentage);
+                }
+
+                // Update current timer label
+                $('#sm2-inline-time_AUDIO').text(currentTime_final);
+            } else {
+                if (currentTime != 0) {
+                    $("#divControlsMask_AUDIO").addClass("paused");
+                    $("#divControlsMask_AUDIO").removeClass("playing");
+
+                    if (currentTime >= duration && max_time != "N/A") {
+
+                        // Update current timer label to reach the maximum
+                        $('#sm2-inline-time_AUDIO').text(max_time);
+                    }
+                }
+            }
+        }
+    }, 100);
+}
+
+
+// Pause Whileplaying event
+function IEObjectPlayer_whileplaying_pause() {
+
+    clearInterval(playPauseInterval);
+}
+
+
+// Video IE Object - Event Whileplaying variable
+var playPauseInterval;
+
+// Video IE Object EVENT: Whileplaying
+function IEObjectPlayer_video_whileplaying(duration) {
+
+    playPauseInterval = setInterval(function () {
+
+        if ($("#video_object1") != null && $("#video_object1")[0] != null && $("#video_object1")[0].controls != null) {
+            var currentTime = $("#video_object1")[0].controls.currentPosition;
+
+            var currentTime_int = parseFloat(currentTime, 10);
+            var currentTime_final = getFormatDuration_short(currentTime_int);
+            var max_time = $("#sm2-inline-duration_VIDEO").text();
+
+            if (currentTime < duration && currentTime != 0) {
+
+                // Move Pointer 
+                var progress_percentage = currentTime * 100 / duration;
+                var left_final_percentage = progress_percentage + '%';
+
+                var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
+                if (pointer_VIDEO != null) {
+                    pointer_VIDEO.css("left", left_final_percentage);
+                }
+
+                // Update current timer label
+                $('#sm2-inline-time_VIDEO').text(currentTime_final);
+            } else {
+                if (currentTime != 0) {
+                    $("#divControlsMask_VIDEO").addClass("paused");
+                    $("#divControlsMask_VIDEO").removeClass("playing");
+
+                    if (currentTime >= duration && max_time != "N/A") {
+
+                        // Update current timer label to reach the maximum
+                        $('#sm2-inline-time_VIDEO').text(max_time);
+                    }
+                }
+            }
+        }
+    }, 100);
+}
+
+
+
 
 //************************************* 3. COMMENT Element **************************************
 function loadElement_comment(divControlsMask_VIDEO, timestamp, fileName) {
@@ -2645,8 +2776,6 @@ function loadPlayer_HTML5_Webchimera_Styles2(fileName, duration, divControlsMask
     // Video player
     $("#sm2-progress-track_VIDEO").on("click", { _duration: duration, _fileName: fileName }, setVideoCurrent);
 
-    // Bottom progress track
-    //$("#sm2-progress-track").on("click", { _duration: duration, _fileName: fileName }, setVideoCurrent);
     /************************ Events END ************************/
 
 
@@ -2694,9 +2823,6 @@ function loadPlayer_OrekaPlayer(tapeID, fileStatus, duration, divControlsMask_AU
         // Click over progress bar 
         // Video player
         $("#sm2-progress-track_VIDEO").on("click", { _duration: duration, _fileName: fileName }, setVideoCurrent);
-
-        // Bottom progress track
-        //$("#sm2-progress-track").on("click", { _duration: duration, _fileName: fileName }, setVideoCurrent);
 
         // Click over play/pause button 
         divControlsMask_AUDIO.on("click", { _tapeID: tapeID }, playAudioElement);
@@ -2763,29 +2889,69 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
     // INIT webchimera
     if (getIsFirefoxOrIE()) {
 
+        // Clear previous onclick events
+        aPlayPause_VIDEO.attr('onclick', '');
+        aPlayPause_VIDEO.off("click");
+
         // Create video player
         var width = parseInt(divPlayer_VIDEO.css("width"), 10);
         var height = parseInt(divPlayer_VIDEO.css("height"), 10);
 
-        /*
         if (getIsIE()) {
 
             // ActiveX video object
 
-            var js_player = "<div id='divVideo_object1' style='float:left; width='" + width + "px;' " + "height='" + height + "px;'> ";
-            js_player += "<object id='video_object1' data='" + file_url + "' ";
-            js_player += " width='" + width + "' height='" + height + "' ";
-            js_player += "CLASSID='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
-            js_player += "<PARAM name='URL' value='" + file_url + "'> ";
-            js_player += "<PARAM name='autoStart' value='False'> ";
-            js_player += "<PARAM name='uiMode' value='none'> ";
-            js_player += " </object></div>";
+            var video_player = "<div id='divVideo_object1' style='width:" + width + "px; " + "height:" + height + "px; margin:0 auto;'> ";
+            video_player += "<object id='video_object1' data='" + file_url + "' ";
+            video_player += "width='" + width + "' height='" + height + "' ";
+            video_player += "style='margin-top:4px;' ";
+            video_player += "CLASSID='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
+            video_player += "<PARAM name='URL' value='" + file_url + "'> ";
+            video_player += "<PARAM name='autoStart' value='False'> ";
+            video_player += "<PARAM name='uiMode' value='none'> ";
+            video_player += "</object></div>";
 
             $("#divPlayer_VIDEO object").remove(); // revisar no solo objetos
-            divPlayer_VIDEO.append(js_player);
+            divPlayer_VIDEO.append(video_player);
+
+
+            /***************** EVENTS START *****************/
+
+            ////////////////////////////////
+
+            var duration_int = parseInt(duration, 10);
+
+            // Click on Play icon VIDEO
+            aPlayPause_VIDEO.bind("click", function () {
+                if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
+
+                    if ($("#video_object1") != null && $("#video_object1")[0] != null && $("#video_object1")[0].controls != null) {
+
+                        if (divControlsMask_VIDEO.hasClass("paused")) {
+                            divControlsMask_VIDEO.addClass("playing");
+                            divControlsMask_VIDEO.removeClass("paused");
+                            $("#video_object1")[0].controls.play();
+
+                            // EVENT: Whileplaying
+                            IEObjectPlayer_video_whileplaying(duration_int);
+
+                        } else {
+                            divControlsMask_VIDEO.addClass("paused");
+                            divControlsMask_VIDEO.removeClass("playing");
+                            $("#video_object1")[0].controls.pause();
+
+                            // Pause Whileplaying event
+                            IEObjectPlayer_whileplaying_pause();
+                        }
+
+                    }
+                }
+            });
+
+
+            /***************** EVENTS END *****************/
 
         } else {
-        */
 
             // BEGIN webchimera -------------------------------------------------------
 
@@ -2823,99 +2989,80 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
                 ok = false;
             }
 
-        //} // END webchimera
 
-        // Clear previous onclick events
-        aPlayPause_VIDEO.attr('onclick', '');
-        aPlayPause_VIDEO.off("click");
+            /***************** EVENTS START *****************/
 
-        // Source: http://wiki.webchimera.org/Player_JavaScript_API
 
-        // Click on Play icon VIDEO
-        aPlayPause_VIDEO.bind("click", function () {
+            // Click on Play icon VIDEO
+            aPlayPause_VIDEO.bind("click", function () {
 
-            if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
+                if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
 
-                //var html_player = $("#video_object1");
+                    if (divControlsMask_VIDEO.hasClass("paused")) {
+                        divControlsMask_VIDEO.addClass("playing");
+                        divControlsMask_VIDEO.removeClass("paused");
 
-                if (divControlsMask_VIDEO.hasClass("paused")) {
-                    divControlsMask_VIDEO.addClass("playing");
-                    divControlsMask_VIDEO.removeClass("paused");
+                        // BEGIN webchimera -------------------------------------------------------
 
-                    /* Active X video object
-                    if (getIsIE()) {
+                        wjs("#webchimera1").play();
 
-                        html_player[0].controls.play();
+                        // Event: While playing
+                        var previousSecsAVI = 0;
+                        wjs("#webchimera1").onTime(function () {
+                            var timer_VIDEO = $('#sm2-inline-time_VIDEO');
+                            var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
+                            var currentSecs = wjs("#webchimera1").time() / 1000;
 
+                            if (currentSecs < duration && /* currentSecs >= previousSecs && */ currentSecs != 0) {
+                                previousSecsAVI = currentSecs;
+                                var left = (wjs("#webchimera1").position() * 100) + "%";
+                                var secs_int = parseInt(currentSecs, 10);
+                                timer_VIDEO.text(getTime(wjs("#webchimera1").time(), true).toString());
+
+                                // Pointers progress
+                                pointer_VIDEO.css("left", left);
+                            }
+                        });
+
+                    } else {
+                        divControlsMask_VIDEO.addClass("paused");
+                        divControlsMask_VIDEO.removeClass("playing");
+
+                        wjs("#webchimera1").pause();
                     }
-                    else {
-                    */
-                    // BEGIN webchimera -------------------------------------------------------
-
-                    wjs("#webchimera1").play();
-
-                    // Event: While playing
-                    var previousSecsAVI = 0;
-                    wjs("#webchimera1").onTime(function () {
-                        var timer_VIDEO = $('#sm2-inline-time_VIDEO');
-                        var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
-                        var currentSecs = wjs("#webchimera1").time() / 1000;
-
-                        if (currentSecs < duration && /* currentSecs >= previousSecs && */ currentSecs != 0) {
-                            previousSecsAVI = currentSecs;
-                            var left = (wjs("#webchimera1").position() * 100) + "%";
-                            var secs_int = parseInt(currentSecs, 10);
-                            timer_VIDEO.text(getTime(wjs("#webchimera1").time(), true).toString());
-
-                            // Pointers progress
-                            pointer_VIDEO.css("left", left);
-                        }
-                    });
-                    //}
-
-                } else {
-                    divControlsMask_VIDEO.addClass("paused");
-                    divControlsMask_VIDEO.removeClass("playing");
-
-                    /*
-                    if (getIsIE()) {
-                        html_player[0].controls.pause();
-                    }
-                    else {
-                    */
-                    // BEGIN webchimera -------------------------------------------------------
-                    wjs("#webchimera1").pause();
-
-                    //}
                 }
-            }
-        });
+            });
 
-        // Event: While playing
-        var previousSecsAVI = 0;
-        wjs("#webchimera1").onTime(function () {
-            var timer_VIDEO = $('#sm2-inline-time_VIDEO');
-            var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
-            var currentSecs = wjs("#webchimera1").time() / 1000;
+            // Event: While playing
+            var previousSecsAVI = 0;
+            wjs("#webchimera1").onTime(function () {
+                var timer_VIDEO = $('#sm2-inline-time_VIDEO');
+                var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
+                var currentSecs = wjs("#webchimera1").time() / 1000;
 
-            if (currentSecs < duration && /* currentSecs >= previousSecs && */ currentSecs != 0) {
-                previousSecsAVI = currentSecs;
-                var left = (wjs("#webchimera1").position() * 100) + "%";
-                var secs_int = parseInt(currentSecs, 10);
-                timer_VIDEO.text(getTime(wjs("#webchimera1").time(), true).toString());
+                if (currentSecs < duration && /* currentSecs >= previousSecs && */ currentSecs != 0) {
+                    previousSecsAVI = currentSecs;
+                    var left = (wjs("#webchimera1").position() * 100) + "%";
+                    var secs_int = parseInt(currentSecs, 10);
+                    timer_VIDEO.text(getTime(wjs("#webchimera1").time(), true).toString());
 
-                // Pointers progress
-                pointer_VIDEO.css("left", left);
-            }
-        });
+                    // Pointers progress
+                    pointer_VIDEO.css("left", left);
+                }
+            });
+
+            /***************** EVENTS END *****************/
+
+            // Bottom progress track
+            $("#sm2-progress-track").on("click", {
+                _duration: duration,
+                _fileName: fileName
+            }, setVideoCurrent);
 
 
-        // Bottom progress track
-        $("#sm2-progress-track").on("click", {
-            _duration: duration,
-            _fileName: fileName
-        }, setVideoCurrent);
+        } // END webchimera
 
+        
         /************************ Events END ************************/
 
         ok = true;
@@ -2933,7 +3080,7 @@ function loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divContro
     var width = parseInt(divPlayer_VIDEO.css("width"), 10);
     var height = parseInt(divPlayer_VIDEO.css("height"), 10);
 
-    var js_player = '<video id="html_video" preload="none" style="width: ' + width + 'px; height: ' + height + 'px;">';
+    var js_player = '<video id="html_video" preload="none" style="width: ' + width + 'px; height: ' + height + 'px; margin: 0 auto;">';
     js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
     js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
     js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
@@ -2963,13 +3110,13 @@ function loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divContro
         }
     });
 
+    var timer_VIDEO = $('#sm2-inline-time_VIDEO');
+
     // Event: While Playing
     $("#html_video").on("timeupdate", function (event) {
         onTrackedVideoFrame(this.currentTime, this.duration, timer_VIDEO, divControlsMask_VIDEO);
     });
     /************************ Events END ************************/
-
-    var timer_VIDEO = $('#sm2-inline-time_VIDEO');
 
     return true;
 }
@@ -3000,7 +3147,7 @@ function onTrackedVideoFrame(currentTime, duration, timer_VIDEO, divControlsMask
 
             if (currentTime >= duration && max_time != "N/A") {
 
-                // Update current timer label to reach the maximum
+                // Update current timer label to reach the top
                 timer_VIDEO.text(max_time);
             }
         }
@@ -3209,6 +3356,15 @@ function getClickPosition(e, duration, fileName) {
                         case "bin":
                         default: {
 
+                            if (getIsIE()) {
+
+                                var video_player = $("#video_object1");
+                                if (video_player != null && video_player[0] != null && video_player[0].controls != null) {
+                                    video_player[0].controls.currentPosition = currentSecs;
+                                }
+
+                            } else {
+
                                 // Webchimera Plugin Player or else:
                                 try {
                                     if (wjs("#webchimera1") != null) {
@@ -3219,14 +3375,12 @@ function getClickPosition(e, duration, fileName) {
                                     console.log(err);
                                 }
 
+                            }
+
                             break;
                         }
                     } // switch file_extension
                 }
-
-
-                
-
 
             }
         }
@@ -3310,8 +3464,8 @@ function setVideoLength(duration) {
 
 // Button play/pause actions
 function ActionVideoPlay(tapeID, duration, isAudioPlaying) {
-    var aPlayPause_VIDEO = $("#aPlayPause_VIDEO");
     var divControlsMask_VIDEO = $("#divControlsMask_VIDEO");
+    var aPlayPause_VIDEO = $("#aPlayPause_VIDEO");
     var divPlayer_VIDEO = $("#divPlayer_VIDEO");
 
     // Set duration
@@ -3373,7 +3527,6 @@ function ActionVideoPlay(tapeID, duration, isAudioPlaying) {
             if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
 
                 // If it is paused
-                //if (divControlsMask_VIDEO.hasClass("paused")) {
                 divControlsMask_VIDEO.addClass("playing");
                 divControlsMask_VIDEO.removeClass("paused");
                 playVideo_ok = true;
@@ -3652,7 +3805,6 @@ function traverse(obj, fun) {
 /* ************* FBS Player settings ************* */
 
 function TimeRefreshLoop(totalDurationSecs) {
-    //if (playVideo_ok)
     {
         var timer_VIDEO = $('#sm2-inline-time_VIDEO');
         var pointer_VIDEO = $('#sm2-progress-ball_VIDEO');
@@ -3660,35 +3812,35 @@ function TimeRefreshLoop(totalDurationSecs) {
 
         if (document.fbsviewer != null) {
 
-            var currentSecs = document.fbsviewer.getCurrTimeOffsetInMSec() / 1000;
+            try{
+                var currentSecs = document.fbsviewer.getCurrTimeOffsetInMSec() / 1000;
 
-            //Si supero los segundos totales, o detecto que el tiempo fue para atras, asumo que termino y dejo de refrecar
-            if (currentSecs < totalDurationSecs && currentSecs >= previousSecs) { // && currentSecs != 0) {
+                //Si supero los segundos totales, o detecto que el tiempo fue para atras, asumo que termino y dejo de refrecar
+                if (currentSecs < totalDurationSecs && currentSecs >= previousSecs) { // && currentSecs != 0) {
 
-                //if (currentSecs <= totalDurationSecs && currentSecs >= previousSecs && currentSecs !=0) {
-                previousSecs = currentSecs;
+                    //if (currentSecs <= totalDurationSecs && currentSecs >= previousSecs && currentSecs !=0) {
+                    previousSecs = currentSecs;
 
-                var left = Math.round(100 * currentSecs / totalDurationSecs) + "%";
-                var secs_int = parseInt(currentSecs, 10);
-                var timer = getTime(document.fbsviewer.getCurrTimeOffsetInMSec(), true).toString();
+                    var left = Math.round(100 * currentSecs / totalDurationSecs) + "%";
+                    var secs_int = parseInt(currentSecs, 10);
+                    var timer = getTime(document.fbsviewer.getCurrTimeOffsetInMSec(), true).toString();
 
-                timer_VIDEO.text(timer);
+                    timer_VIDEO.text(timer);
 
-                // Pointers progress
-                pointer_VIDEO.css("left", left);
+                    // Pointers progress
+                    pointer_VIDEO.css("left", left);
 
-                /*
-                TIMELINE_POINTER.show();
-                TIMELINE_POINTER.css("left", left);
-                */
+                    //divControlsMask_VIDEO.addClass("playing");
+                    playVideo_ok = true;
+                    setTimeout(function () {
+                        TimeRefreshLoop(totalDurationSecs)
+                    }, 1000);
 
-                //divControlsMask_VIDEO.addClass("playing");
-                playVideo_ok = true;
-                setTimeout(function () {
-                    TimeRefreshLoop(totalDurationSecs)
-                }, 1000); 
-
-                // doTimeout Source: http://benalman.com/code/projects/jquery-dotimeout/examples/delay-poll/
+                    // doTimeout Source: http://benalman.com/code/projects/jquery-dotimeout/examples/delay-poll/
+                }
+            } catch (err) {
+                console.log("l:3842 Error getCurrTimeOffsetInMSec fbsviewer");
+                console.log(err);
             }
         } else {
             // Si terminó

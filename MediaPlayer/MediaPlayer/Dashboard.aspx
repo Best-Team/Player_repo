@@ -337,7 +337,7 @@
                                                                 <div class="sm2-row">
                                                                     <div id="sm2-inline-time_AUDIO" class="sm2-inline-time">0:00</div>
                                                                     <div class="sm2-progress-bd">
-                                                                        <div class="sm2-progress-track">
+                                                                        <div id="sm2-progress-track_AUDIO" class="sm2-progress-track">
                                                                             <div class="sm2-progress-bar"></div>
                                                                             <div id="sm2-progress-ball_AUDIO" class="sm2-progress-ball">
                                                                                 <div class="icon-overlay"></div>
@@ -348,7 +348,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div class="sm2-inline-element sm2-button-element sm2-volume">
+                                                        <div id="volume_AUDIO" class="sm2-inline-element sm2-button-element sm2-volume">
                                                             <div class="sm2-button-bd">
                                                                 <span class="sm2-inline-button sm2-volume-control volume-shade"></span>
                                                                 <a href="#volume" class="sm2-inline-button sm2-volume-control">volume</a>
