@@ -1634,7 +1634,9 @@ function getElementInMemoryByCurrentPlayingTime() {
 
         var current_duration = GLOBALPLAY_seconds_current;
         var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
-        timeCurrent.add(current_duration, "seconds");
+        if (current_duration > 1) { // Check the first element
+            timeCurrent.add(current_duration, "seconds");
+        }
 
         // element_alreadyTaken[0] = element
         // element_alreadyTaken[1] = AlreadyTaken
