@@ -591,7 +591,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         // WMP IE Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
 
                         // ActiveX video object
-                        var js_player = "<div id='div" + global_elementID + "' class='divVideo' style='float:left; width:" + visual_size_w + "px; " + "height:" + visual_size_h + "px;'> "; // TODO TEST style change
+                        var js_player = "<div id='div" + global_elementID + "' name='visual_element' class='divVideo' style='float:left; width:" + visual_size_w + "px; " + "height:" + visual_size_h + "px;'> "; // TODO TEST style change
                         js_player += "<object id='" + global_elementID + "' data='" + file_url + "' ";
                         js_player += "width='" + (visual_size_w - 5) + "' height='" + (visual_size_h - 5) + "' ";
                         js_player += "CLASSID='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
