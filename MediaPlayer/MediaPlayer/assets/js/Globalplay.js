@@ -162,180 +162,184 @@ function globalplay_loadElements() {
     var elementsCandidate = getElementInMemoryByCurrentPlayingTime();
     if (elementsCandidate != null && elementsCandidate.length > 0) {
 
+        // Get visual elements already added in globalplay player
+        var visual_size = globalplay_resizeAlreadyAdded(elementsCandidate);
+
+        // Set label elements on play
+        $("#lblGlobalplay_element_count").text(elementsCandidate.length);
+
+        // Prepare URL elements to reproduce
+        var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download;
+        var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
+
+        // globalplay box container
+        var flex_div = $("#divgp_sc .flex");
+
+        var id_list = "";
+        for (var i = 0; i < elementsCandidate.length; i++) {
+            var element_alreadyTaken = elementsCandidate[i];
+            if (element_alreadyTaken != null) {
+
+                global_numberID++;
+
+                // Set id_list label
+                id_list = id_list + element_alreadyTaken[0].tapeID + "(" + element_alreadyTaken[0].tapeType + "), ";
+                $("#lblGlobalplay_element_ids").text(id_list);
+
+                var current_duration = GLOBALPLAY_seconds_current;
+                var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
+                timeCurrent.add(current_duration, "seconds");
+
+                var duration_int = parseInt(element_alreadyTaken[0].duration, 10);
+                var element_end = moment(element_alreadyTaken[0].timestamp, "DD-MM-YYYY HH:mm:ss");
+                element_end.add(duration_int, "seconds");
+
+                // Si el elemento no fue procesado, hacerlo *IMPORTANTE*
+                if (element_alreadyTaken[1] == false) {
+                    globalplay_setElementAlreadyTaken(element_alreadyTaken[0].tapeID, true);
+
+                    var segmentID = element_alreadyTaken[0].segmentID;
+                    var tapeType = element_alreadyTaken[0].tapeType;
+                    var isVisual = (tapeType == "V" || tapeType == "S" || tapeType == "I") ? true : false;
+                    /*
+                    A: Audio
+                    V: Video
+                    S: Screen recording
+                    I: Image
+                    D: Document
+                    C: Comment
+                    */
+
+                    // IsExtra = If filePath is NOT empty, then is extra from incextras table
+                    var isExtra = element_alreadyTaken[0].filePath.length == 0 ? false : true;
+
+                    // Prepare URL elements
+                    var path_extra = filePath_EXTRA + "?id=" + element_alreadyTaken[0].segmentID + "&isExtra=1";
+                    var path_oreka = filePath_OREKA + "?segid=" + element_alreadyTaken[0].segmentID;
+
+                    // SET Element file path
+                    var file_url = isExtra ? path_extra : path_oreka;
+
+                    // Get if element is starting on seek
+                    var element_current_duration = 0;
+                    var element_start_duration = getDuration_onDatetime(element_alreadyTaken[0].timestamp);
+                    if (element_start_duration != null && GLOBALPLAY_seconds_current > element_start_duration) {
+                        element_current_duration = GLOBALPLAY_seconds_current - element_start_duration;
+                    }
+
+                    var dynamic_id = "";
+                    var audio_object = null;
+
+                    switch (tapeType) {
+                        case "A": {
+                            audio_object = globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_div, element_current_duration);
+                            break;
+                        }
+
+                        case "S":
+                        case "V": {
+
+                            // Special case
+                            file_url = tapeType === "S" ? WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0" : file_url;
+
+                            dynamic_id = globalplay_video_screenRecording(file_url, visual_size, flex_div, element_alreadyTaken, global_numberID, element_current_duration);
+                            break;
+                        }
+
+                        case "I": {
+                            dynamic_id = globalplay_image(file_url, visual_size, flex_div, element_alreadyTaken, global_numberID);
+                            break;
+                        }
+
+                        case "D": {
+                            dynamic_id = globalplay_document(file_url, element_alreadyTaken, global_numberID);
+                            break;
+                        }
+
+                        case "C": {
+                            dynamic_id = globalplay_comment(element_alreadyTaken, global_numberID);
+                            break;
+                        }
+                    }
+
+                    var dynamic_object = null;
+                    if (audio_object != null) {
+                        dynamic_id = audio_object[0];
+                        dynamic_object = audio_object[1];
+                    }
+
+                    if (dynamic_id != "") {
+                        var array = new Array();
+                        array[0] = element_alreadyTaken[0];
+                        array[1] = dynamic_id;
+                        array[2] = dynamic_object;
+                        globalplay_queue_elements.push(array);
+                    }
+
+                } // else: elemento ya procesado
+
+            }
+        } // for
+
+    } // GLOBALPLAY_MAX_COLLISION_ELEMENTS
+    else {
+        var label = $(".flex #globalplay_divSpecialMessages h2");
+        label.text(hashMessages["MaxElementsSimultaneous"]);
+        label.show();
+
+        // Remove to element list
+        var duration_label = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
+        globalplay_remove_elements.push([null, null, label, GLOBALPLAY_seconds_current, duration_label]);
+    }
+}
+
+function globalplay_resizeAlreadyAdded(elementsCandidate) {
+
+    var visual_queue_length = 0;
+    if (elementsCandidate != null && elementsCandidate.length > 0) {
+
         // visual_queue: video, screen_recording and images
         var visual_queue = $.grep(elementsCandidate, function (el, i) {
             return el[0].tapeType == "V" || el[0].tapeType == "S" || el[0].tapeType == "I";
         });
 
-        // Case >= 4: elements to resize
-        var visual_size_w = 275;
-        var visual_size_h = 275;
+        visual_queue_length = visual_queue.length;
+    }
 
-        // Get visual elements already added in globalplay player
-        var visual_alreadyAdded = $(".flex").find('[name="webchimera"], [name="fbsviewer"], [name="visual_element"]').length;
-        var visual_count = visual_queue.length + visual_alreadyAdded;
+    var visual_alreadyAdded = $(".flex").find('[name="webchimera"], [name="fbsviewer"], [name="visual_element"]').length;
+    var visual_count = visual_queue_length + visual_alreadyAdded;
 
-        // MAX Amount of simultaneous elements 
-        var max_amount = GLOBALPLAY_MAX_COLLISION_ELEMENTS;
-        if (visual_count <= max_amount) {
+    // Case >= 4: elements to resize
+    var visual_size = 275;
 
-            // Element distinct types 
-            switch (visual_count) {
-                case 1:
-                case 2:
-                    {
-                        visual_size_w = 600;
-                        visual_size_h = 600;
-                        break;
-                    }
-                case 3:
-                    {
-                        visual_size_w = 400;
-                        visual_size_h = 400;
-                        break;
-                    }
-            }
+    // MAX Amount of simultaneous elements 
+    var max_amount = GLOBALPLAY_MAX_COLLISION_ELEMENTS;
+    if (visual_count <= max_amount) {
 
-            // Resize elements already added 
-            if (visual_alreadyAdded > 0) {
-
-                $(".flex").find('*').not('.info-label, .info-label *').each(function (index, el) {
-                    $(this).css("width", visual_size_w);
-                    $(this).css("height", visual_size_h);
-
-                });
-            }
-
-            // Set label elements on play
-            $("#lblGlobalplay_element_count").text(elementsCandidate.length);
-
-            // Prepare URL elements to reproduce
-            var filePath_EXTRA = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download;
-            var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
-
-            // globalplay box container
-            var flex_div = $("#divgp_sc .flex");
-
-            // Location variables
-            var visual_count = visual_alreadyAdded; // = 0
-            var visual_new = 0;
-
-            var id_list = "";
-            for (var i = 0; i < elementsCandidate.length; i++) {
-                var element_alreadyTaken = elementsCandidate[i];
-                if (element_alreadyTaken != null) {
-
-                    global_numberID++;
-
-                    // Set id_list label
-                    id_list = id_list + element_alreadyTaken[0].tapeID + "(" + element_alreadyTaken[0].tapeType + "), ";
-                    $("#lblGlobalplay_element_ids").text(id_list);
-
-                    var current_duration = GLOBALPLAY_seconds_current;
-                    var timeCurrent = moment(_TL_STARTDATE, "DD-MM-YYYY HH:mm:ss");
-                    timeCurrent.add(current_duration, "seconds");
-
-                    var duration_int = parseInt(element_alreadyTaken[0].duration, 10);
-                    var element_end = moment(element_alreadyTaken[0].timestamp, "DD-MM-YYYY HH:mm:ss");
-                    element_end.add(duration_int, "seconds");
-
-                    // Si el elemento no fue procesado, hacerlo *IMPORTANTE*
-                    if (element_alreadyTaken[1] == false) {
-                        globalplay_setElementAlreadyTaken(element_alreadyTaken[0].tapeID, true);
-
-                        var segmentID = element_alreadyTaken[0].segmentID;
-                        var tapeType = element_alreadyTaken[0].tapeType;
-                        var isVisual = (tapeType == "V" || tapeType == "S" || tapeType == "I") ? true : false;
-                        /*
-                        A: Audio
-                        V: Video
-                        S: Screen recording
-                        I: Image
-                        D: Document
-                        C: Comment
-                        */
-
-                        // IsExtra = If filePath is NOT empty, then is extra from incextras table
-                        var isExtra = element_alreadyTaken[0].filePath.length == 0 ? false : true;
-
-                        // Prepare URL elements
-                        var path_extra = filePath_EXTRA + "?id=" + element_alreadyTaken[0].segmentID + "&isExtra=1";
-                        var path_oreka = filePath_OREKA + "?segid=" + element_alreadyTaken[0].segmentID;
-
-                        // SET Element file path
-                        var file_url = isExtra ? path_extra : path_oreka;
-
-                        // Get if element is starting on seek
-                        var element_current_duration = 0;
-                        var element_start_duration = getDuration_onDatetime(element_alreadyTaken[0].timestamp);
-                        if (element_start_duration != null && GLOBALPLAY_seconds_current > element_start_duration) {
-                            element_current_duration = GLOBALPLAY_seconds_current - element_start_duration;
-                        }
-
-                        var dynamic_id = "";
-                        var audio_object = null;
-
-                        switch (tapeType) {
-                            case "A": {
-                                audio_object = globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_div, element_current_duration);
-                                break;
-                            }
-
-                            case "S":
-                            case "V": {
-
-                                // Special case
-                                file_url = tapeType === "S" ? WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0" : file_url;
-
-                                dynamic_id = globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element_alreadyTaken, global_numberID, element_current_duration);
-                                break;
-                            }
-
-                            case "I": {
-                                dynamic_id = globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element_alreadyTaken, global_numberID);
-                                break;
-                            }
-
-                            case "D": {
-                                dynamic_id = globalplay_document(file_url, element_alreadyTaken, global_numberID);
-                                break;
-                            }
-
-                            case "C": {
-                                dynamic_id = globalplay_comment(element_alreadyTaken, global_numberID);
-                                break;
-                            }
-                        }
-
-                        var dynamic_object = null;
-                        if (audio_object != null) {
-                            dynamic_id = audio_object[0];
-                            dynamic_object = audio_object[1];
-                        }
-
-                        if (dynamic_id != "") {
-                            var array = new Array();
-                            array[0] = element_alreadyTaken[0];
-                            array[1] = dynamic_id;
-                            array[2] = dynamic_object;
-                            globalplay_queue_elements.push(array);
-                        }
-
-                    } // else: elemento ya procesado
-
+        // Element distinct types 
+        switch (visual_count) {
+            case 1:
+            case 2:
+                {
+                    visual_size = 600;
+                    break;
                 }
-            } // for
-
-        } // GLOBALPLAY_MAX_COLLISION_ELEMENTS
-        else {
-            var label = $(".flex #globalplay_divSpecialMessages h2");
-            label.text(hashMessages["MaxElementsSimultaneous"]);
-            label.show();
-
-            // Remove to element list
-            var duration_label = GLOBALPLAY_seconds_current + GLOBALPLAY_LABEL_DEFAULT_DURATION;
-            globalplay_remove_elements.push([null, null, label, GLOBALPLAY_seconds_current, duration_label]);
+            case 3:
+                {
+                    visual_size = 400;
+                    break;
+                }
         }
+
+        if (visual_alreadyAdded > 0) {
+            $(".flex").find('*').not('.info-label, .info-label *').each(function (index, el) {
+                $(this).css("width", visual_size);
+                $(this).css("height", visual_size);
+
+            });
+        }
+
+        return visual_size;
     }
 }
 
@@ -421,7 +425,7 @@ function globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_
 }
 
 // Play video or screen recording
-function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h, flex_div, element_alreadyTaken, global_numberID, element_current_duration) {
+function globalplay_video_screenRecording(file_url, visual_size, flex_div, element_alreadyTaken, global_numberID, element_current_duration) {
     var global_elementID = "";
     var duration = element_alreadyTaken[0].duration;
     var fileName = element_alreadyTaken[0].fileName;
@@ -445,7 +449,7 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                 // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
 
                 var js_player = '<div id="div' + global_elementID + '" class="divVideo" style="float:left;">';
-                js_player += '<video id="' + global_elementID + '" preload="none" style="width:' + visual_size_w + 'px; height:' + visual_size_h + 'px;" name="visual_element" autoplay>';
+                js_player += '<video id="' + global_elementID + '" preload="none" style="width:' + visual_size + 'px; height:' + visual_size + 'px;" name="visual_element" autoplay>';
                 js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
                 js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
                 js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
@@ -485,8 +489,8 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                         var fileStatus = element_alreadyTaken[0].fileStatus;
 
-                        var applet = "<div id='div" + global_elementID + "' style='float:left;'><applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_w + "px' " +
-                            "height='" + visual_size_h + "px;' name='fbsviewer' id='" + global_elementID + "' title='undefined'>";
+                        var applet = "<div id='div" + global_elementID + "' style='float:left;'><applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size + "px' " +
+                            "height='" + visual_size + "px;' name='fbsviewer' id='" + global_elementID + "' title='undefined'>";
 
                         applet += "<param name='HOST' value=''>";
                         applet += "<param name='PORT' value='5901'>";
@@ -591,9 +595,9 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
                         // WMP IE Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
 
                         // ActiveX video object
-                        var js_player = "<div id='div" + global_elementID + "' name='visual_element' class='divVideo' style='float:left; width:" + visual_size_w + "px; " + "height:" + visual_size_h + "px;'> "; // TODO TEST style change
+                        var js_player = "<div id='div" + global_elementID + "' name='visual_element' class='divVideo' style='float:left; width:" + visual_size + "px; " + "height:" + visual_size + "px;'> "; // TODO TEST style change
                         js_player += "<object id='" + global_elementID + "' data='" + file_url + "' ";
-                        js_player += "width='" + (visual_size_w - 5) + "' height='" + (visual_size_h - 5) + "' ";
+                        js_player += "width='" + (visual_size - 5) + "' height='" + (visual_size - 5) + "' ";
                         js_player += "CLASSID='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
                         js_player += "<PARAM name='URL' value='" + file_url + "'> ";
                         js_player += "<PARAM name='uiMode' value='none'> ";
@@ -621,8 +625,8 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 
                         // Webchimera
                         var applet = "<div id='div" + global_elementID + "' class='divVideo' style='float:left;'>";
-                        applet += "<object id='" + global_elementID + "' type='application/x-chimera-plugin' width='" + (visual_size_w - 3) + "' ";
-                        applet += "height='" + (visual_size_h - 3) + "' name='visual_element' style='position:relative; float:left; margin: 10px;'>";
+                        applet += "<object id='" + global_elementID + "' type='application/x-chimera-plugin' width='" + (visual_size - 3) + "' ";
+                        applet += "height='" + (visual_size - 3) + "' name='visual_element' style='position:relative; float:left; margin: 10px;'>";
                         applet += "<param name='windowless' value='true' />";
                         applet += "</object>";
                         applet += "<div id='interface'></div></div>";
@@ -705,15 +709,15 @@ function globalplay_video_screenRecording(file_url, visual_size_w, visual_size_h
 }
 
 // Play image
-function globalplay_image(file_url, visual_size_w, visual_size_h, flex_div, element_alreadyTaken, global_numberID) {
+function globalplay_image(file_url, visual_size, flex_div, element_alreadyTaken, global_numberID) {
     var global_elementID = "image_" + global_numberID;
     var segmentID = element_alreadyTaken[0].segmentID;
     var fileName = element_alreadyTaken[0].fileName;
     var timestamp = element_alreadyTaken[0].timestamp;
 
-    $('<a name="visual_element" id="' + global_elementID + '" style="width:' + visual_size_w + 'px; height:' + visual_size_h + 'px;' +
+    $('<a name="visual_element" id="' + global_elementID + '" style="width:' + visual_size + 'px; height:' + visual_size + 'px;' +
        'background-image:url(' + file_url + '); float:left; position:relative; margin:8px 12px; background-size: auto 100%;"' +
-       'width="' + visual_size_w + '" height="' + visual_size_h + '">' + fileName + '</a>').appendTo(flex_div).fadeIn(2000);
+       'width="' + visual_size + '" height="' + visual_size + '">' + fileName + '</a>').appendTo(flex_div).fadeIn(2000);
 
     // Add Fullscreen click Event
     $("#" + global_elementID).attr("src", file_url).photobox();
@@ -1601,10 +1605,16 @@ function globalplay_removeElement(dynamicID, element_alreadyTaken) {
 
             //remove visual element from player
             $(".flex #div" + dynamicID).remove();
+
+            // Resize elements already added
+            globalplay_resizeAlreadyAdded(null);
         } else if (tapeType === "I") {
 
             //remove visual element from player
             $(".flex #" + dynamicID).remove();
+
+            // Resize elements already added
+            globalplay_resizeAlreadyAdded(null);
         }
 
         // FORMAT: globalplay_queue_elements:
