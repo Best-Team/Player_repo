@@ -861,11 +861,6 @@ function openFullscreen() {
 
     if (oldPlayer_activeElement_type != null && oldPlayer_activeElement_type.length > 0) {
         switch (oldPlayer_activeElement_type) {
-            case "S": {
-
-                break;
-            }
-
             case "I": {
 
                 /* ------------------  IMAGE CASE ------------------ */
@@ -878,6 +873,7 @@ function openFullscreen() {
                 break;
             }
 
+            case "S":
             case "V": {
 
                 if (oldPlayer_activeElement_extension != null && oldPlayer_activeElement_extension.length > 0) {
@@ -889,14 +885,6 @@ function openFullscreen() {
                         case "ogg": {
 
                             openFullscreen_video(true, "html_video");
-
-                            break;
-                        }
-
-                            // Oreka Player:
-                        case "fbs": {
-
-                            // Oreka Player:
 
                             break;
                         }
@@ -939,9 +927,6 @@ function openFullscreen_video(isHTML5, videoID) {
 
         if (isHTML5) {
 
-            //divPlayer_VIDEO.css("height", height); 
-
-
             var video_player = null;
             if (videoID != null) {
                 video_player = $("#" + videoID);
@@ -951,10 +936,6 @@ function openFullscreen_video(isHTML5, videoID) {
                 video_player.css("width", width);
                 video_player.css("height", height);
             }
-
-            //
-            //divPlayer_VIDEO.css("width", width);
-            //divPlayer_VIDEO.css("height", height);
 
         } else {
             document.getElementById("webchimera1").width = width;
@@ -1022,11 +1003,7 @@ function closeFullscreen() {
                 break;
             }
 
-            case "S": {
-
-                break;
-            }
-
+            case "S":
             case "V": {
 
                 if (oldPlayer_activeElement_extension != null && oldPlayer_activeElement_extension.length > 0) {
@@ -1042,15 +1019,7 @@ function closeFullscreen() {
                             break;
                         }
 
-                            // Oreka Player:
-                        case "fbs": {
-
-                            // Oreka Player:
-
-                            break;
-                        }
-
-                            // Webchimera Plugin Player or else:
+                        // Webchimera Plugin Player or else:
                         case "avi":
                         case "crypt":
                         case "bin":
@@ -2238,15 +2207,8 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     }
 
     // Disable functions logic
-    $("#btnFullscreen").addClass("disabled");
-    $("#aBtnFullscreen").addClass("disabled");
-
-    // If the element is PROCESSING or ERROR 
-    if (fileStatus === "PROCESSING" || fileStatus === "ERROR") {
-        $("#lnkElementDownload").addClass("disabled");
-        $("#btnFullscreen").addClass("disabled");
-        $("#aBtnFullscreen").addClass("disabled");
-    }
+    $("#btnFullscreen").addClass("disabled"); // Any other video Fullscreen
+    $("#aBtnFullscreen").addClass("disabled"); // FBS Fullscreen  
 
     // Empty video and audio progress
     $(".sm2-progress-bar").css("width", 0);
@@ -2403,6 +2365,13 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
 
     }
 
+    // If the element is PROCESSING or ERROR 
+    if (fileStatus === "PROCESSING" || fileStatus === "ERROR") {
+        $("#lnkElementDownload").addClass("disabled");
+        $("#btnFullscreen").addClass("disabled");
+        $("#aBtnFullscreen").addClass("disabled");
+    }
+
     /************************ Load element on Player END ************************/
 }
 
@@ -2425,6 +2394,12 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
             case "mp4":
             case "webm":
             case "ogg": {
+
+                $("#btnFullscreen").show(); // Any other video Fullscreen
+                $("#btnFullscreen").removeClass("disabled"); 
+
+                $("#aBtnFullscreen").hide(); // FBS Fullscreen
+                $("#aBtnFullscreen").addClass("disabled"); 
 
                 loadPlayer_HTML5_Webchimera_Styles1(divPlayer_VIDEO, divControlsMask_VIDEO);
 

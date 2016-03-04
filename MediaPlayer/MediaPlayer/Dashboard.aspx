@@ -214,7 +214,7 @@
                     <div id="light" class="white_content">
                         <div id="light_row" class="row">
                         </div>
-                        <button id="btnCloseFullscreen" type="submit" class="btn btn-default pull-right" title="Cerrar pantalla completa" style="position: absolute; bottom: 0; right: 0; margin: 20px;" onclick="closeFullscreen();">
+                        <button id="btnCloseFullscreen" type="submit" class="btn btn-default pull-right" title="Minimizar video" style="position: absolute; bottom: 0; right: 0; margin: 20px;" onclick="closeFullscreen();">
                             <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
                         </button>
                         <label class="label" id="lblFullscreenTitle"></label>
@@ -459,11 +459,11 @@
                                         </div>
                                     </div>
 
-                                    <button id="btnFullscreen" class="btn btn-default" type="button" title="Ver en pantalla completa" onclick="openFullscreen();">
+                                    <button id="btnFullscreen" class="btn btn-default" type="button" title="Maximizar video" onclick="openFullscreen();">
                                         <span class="fa fa-arrows-alt" aria-hidden="true"></span>
                                     </button>
 
-                                    <a id="aBtnFullscreen" class="btn btn-default" type="button" style="margin-right: 4px; display: none;" href="Fullscreen.aspx">
+                                    <a id="aBtnFullscreen" class="btn btn-default" type="button" title="Maximizar video" style="margin-right: 4px; display: none;" href="Fullscreen.aspx">
                                         <span class="fa fa-arrows-alt" aria-hidden="true"></span>
                                     </a>
 
