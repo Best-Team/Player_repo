@@ -1151,6 +1151,7 @@ namespace MediaPlayer
                 json_element.end = date_final_end;
                 json_element.id = elementID.ToString(); 
                 json_element.type = "C";
+                json_element.duration = duration; // new
                 json_element.role = string.Empty;
             }
             return JsonConvert.SerializeObject(json_element);

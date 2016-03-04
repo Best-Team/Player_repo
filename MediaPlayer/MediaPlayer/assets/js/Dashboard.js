@@ -4473,8 +4473,8 @@ function confirmAddComment() {
                     var json_object = JSON.parse(response.d);
                     var object = {
                         count: timeline_data.spans.length + 1,
-                        duration: "1",
-                        duration_formatStr: "00:00:01",
+                        duration: json_object.duration,
+                        duration_formatStr: getFormatDuration(json_object.duration), // new
                         endDate: json_object.end, //"24-10-2015 01:00:01"
                         fileName: json_object.name,
                         filePath: "",
