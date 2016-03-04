@@ -34,13 +34,9 @@
 
     $(document).bind('click', function (event) {
         if (!$(event.target).closest(settings['selector']).length && !$(event.target).is('button') && !$(event.target).is('a') &&
-            !$(event.target).is('span') && !$(event.target).is('img') && $(event.target)[0].id != 'imgPointer') {
+            !$(event.target).is('span') && !$(event.target).is('img') && $(event.target)[0].id != 'imgPointer' && !$(event.target).is('input')) {
                 methods.close();
-        } else {
-            //if (flag_pop1) {
-              //  methods.close();
-            //}
-        }
+        } 
     });
 
     return this.each(function(){

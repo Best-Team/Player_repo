@@ -191,7 +191,8 @@ namespace MediaPlayer
 
         private void UploadFile()
         {
-            if (HttpContext.Current.Session["UserID"] != null && ViewState["FolioID"] != null)
+            string folioID = _hdnFolioID_selected.Value;
+            if (HttpContext.Current.Session["UserID"] != null && !string.IsNullOrWhiteSpace(folioID))
             {
                 // #1- Logger variables
                 System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame();
@@ -211,7 +212,7 @@ namespace MediaPlayer
 
                 /* ******** Global variables ******** */
                 string userID = HttpContext.Current.Session["UserID"].ToString();
-                string folioID = ViewState["FolioID"].ToString();
+
                 string repoFilename = "", repoFilenameAUX = "", fullLocalPath = "", relativeLocalPath = "";
                 bool ok = true, isFileAUX_created = false, isWavFile = false;
 
@@ -842,8 +843,9 @@ namespace MediaPlayer
                     List<Folio> list = this.folio_filteredList.Where(x => x.deleted == 0).ToList();
                     if (list != null && list.Count > 0)
                     {
-                        ViewState["FolioID"] = list[0].folio_textID;
-                        _hdnFolioID.Value = list[0].folio_textID;
+                        // Save FolioID only if get results
+                        ViewState["FolioID"] = qs_folioID;
+                        _hdnFolioID.Value = qs_folioID;
 
                         foreach (Folio folio in list)
                         {
@@ -991,12 +993,21 @@ namespace MediaPlayer
                 else
                 {
                     // Folio does not exist
-                    ViewState["FolioID"] = 0;
+                    ViewState["FolioID"] = "0";
                     _hdnJSonEnd.Value = "0";
 
                     _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus.Value = string.Empty;
                     ScriptManager.RegisterStartupScript(this, typeof(Page), "clear_timeline", "clear_timeline();", true);
                 }
+            }
+            else
+            {
+                // Empty Folio search textbox 
+                ViewState["FolioID"] = "0";
+                _hdnJSonEnd.Value = "0";
+
+                _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus.Value = string.Empty;
+                ScriptManager.RegisterStartupScript(this, typeof(Page), "clear_timeline", "clear_timeline();", true);
             }
             htmlTable.AppendLine("</tbody>");
             htmlTable.AppendLine("</table>");
@@ -1088,8 +1099,6 @@ namespace MediaPlayer
         [System.Web.Services.WebMethod]
         public static string AddFolioComment(string userID, string folioID, string comment, string date, string duration)
         {
-            Logger.LogDebug("Log Test Dashboard.aspx.cs");
-
             Span json_element = null;
             if (!string.IsNullOrWhiteSpace(userID) && !string.IsNullOrWhiteSpace(folioID) && !string.IsNullOrWhiteSpace(comment) && !string.IsNullOrWhiteSpace(date) && !string.IsNullOrWhiteSpace(duration))
             {
@@ -1117,7 +1126,6 @@ namespace MediaPlayer
                 DateTime date_2 = DateTime.Now;
                 Logger.LogDebug("(%s) (%s) -- Intentando convertir a datetime. Formato: dd-MM-yyyy HH:mm:ss. Dato: " + date.ToString(), className, methodName);
                 if (!DateTime.TryParseExact(date, "dd-MM-yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out date_2))
-                //if (!DateTime.TryParse(date, out date_2))
                 {
                     date_final_start = date_final_end = date;
 
@@ -1141,7 +1149,7 @@ namespace MediaPlayer
                 json_element.name = comment;
                 json_element.start = date_final_start;
                 json_element.end = date_final_end;
-                json_element.id = elementID.ToString(); // wrong: folioID
+                json_element.id = elementID.ToString(); 
                 json_element.type = "C";
                 json_element.role = string.Empty;
             }

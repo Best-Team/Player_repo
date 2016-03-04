@@ -25,8 +25,23 @@
 
 				$container.show().addClass("active"); // Finally, display the container
 
+
+			    /******* Globalplay START ******/
+
+				$(".flex div[name='visual_element'] object").css("visibility", "hidden")
+
+			    /******* Globalplay END ******/
+
+
 				// For closing
-				$("#photobox-close").click(function(e) {
+				$("#photobox-close").click(function (e) {
+
+				    /******* Globalplay START ******/
+
+				    $(".flex div[name='visual_element'] object").css("visibility", "visible")
+
+				    /******* Globalplay END ******/
+
 					$img.remove();
 					$container.hide();
 				});

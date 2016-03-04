@@ -130,6 +130,15 @@ namespace MediaPlayer {
         protected global::System.Web.UI.WebControls.Button btnSearchCandidate;
         
         /// <summary>
+        /// txbDummy control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txbDummy;
+        
+        /// <summary>
         /// RegularExpressionValidator1 control.
         /// </summary>
         /// <remarks>
@@ -434,5 +443,14 @@ namespace MediaPlayer {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField _hdnGlobalplay_maxCollisionElements;
+        
+        /// <summary>
+        /// _hdnFolioID_selected control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField _hdnFolioID_selected;
     }
 }

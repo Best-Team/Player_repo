@@ -266,6 +266,35 @@ $(document).ready(function () {
 }); // END On Ready
 
 
+/**** Load Folios ID to UploadFile and AddComment ****/
+function loadFoliosID() {
+
+    // Clear previous Folios ID
+    $("#divFolioSelection_fileUpload").empty();
+    $("#divFolioSelection_addComment").empty();
+
+    var folioID = "";
+    var _hdnFolioID = $("input[id*='_hdnFolioID']");
+    if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
+        folioID = _hdnFolioID.val();
+
+        var folio_split = folioID.split(',');
+        if (folio_split != null && folio_split.length > 0) {
+            for (var i = 0; i < folio_split.length; i++) {
+                if (folio_split[i] != null) {
+                    if (i == 0) {
+                        $("#divFolioSelection_fileUpload").append('<input type="radio" name="rbFolios_fileUpload" style="margin-left:5px;" value="' + folio_split[i] + '" checked="true"> ' + folio_split[i] + '</input>')
+                        $("#divFolioSelection_addComment").append('<input type="radio" name="rbFolios_addComment" style="margin-left:5px;" value="' + folio_split[i] + '" checked="true"> ' + folio_split[i] + '</input>')
+                    } else {
+                        $("#divFolioSelection_fileUpload").append('<input type="radio" name="rbFolios_fileUpload" style="margin-left:5px;" value="' + folio_split[i] + '"> ' + folio_split[i] + '</input>')
+                        $("#divFolioSelection_addComment").append('<input type="radio" name="rbFolios_addComment" style="margin-left:5px;" value="' + folio_split[i] + '"> ' + folio_split[i] + '</input>')
+                    }
+                }
+            }
+        }
+    }
+}
+
 function loadGlobalplay_settings() {
 
     // ************* Globalplay Timer settings *************
@@ -675,6 +704,8 @@ function LoadAlertMessagesBackup() {
     hashMessages["MaxElementsSimultaneous"] = "Atención, máxima cantidad de elementos en simultáneo alcanzadainstale el plugin WebChimera para reproducir el elemento. ";
     hashMessages["OrekaPlayerError"] = "Ocurrió un error cargando el Player Oreka, por favor, verifique Java y su conexión con el servidor de Oreka.";
     hashMessages["ConfirmarBorrarUnElemento"] = "Está a punto de borrar el elemento, confirme su contraseña para continuar.";
+    hashMessages["SeleccioneFolioID"] = "Por favor, seleccione un número de Folio.";
+    hashMessages["DatosIncorrectos"] = "Datos incorrectos.";
     
 }
 
@@ -1091,14 +1122,8 @@ function closeFullscreen_video(isHTML5, divControlsMask_VIDEO, divPlayer_VIDEO, 
 function addCommentClick() {
 
     // Check if folio is selected
-    var folioID = 0;
     var _hdnFolioID = $("input[id*='_hdnFolioID']");
     if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
-        folioID = _hdnFolioID.val();
-    }
-    var folioID_int = parseInt(folioID, 10);
-
-    if (folioID_int != null && !isNaN(folioID_int) && folioID_int > 0) {
 
         if (!$('#btnAddComment').hasClass("opened")) {
             var posXoff = $("#btnAddComment").offset().left;
@@ -1412,8 +1437,13 @@ function clear_timeline() {
     // Clean div content
     $("#timeframe").empty();
     $("#timeframe").hide();
+    $("#playerContainer").addClass("disabled");
 
     TIMELINE_POINTER.hide();
+
+    // Clear previous Folios ID
+    $("#divFolioSelection_fileUpload").empty();
+    $("#divFolioSelection_addComment").empty();
 }
 
 function pre_timeframe_prepare() {
@@ -1441,6 +1471,9 @@ function pre_timeframe_prepare() {
 
     /**** Load Globalplay settings ****/
     loadGlobalplay_settings();
+
+    /**** Load Folios ID to UploadFile and AddComment ****/
+    loadFoliosID();
 
     /**** Slider control: comment duration ****/
     $("#sliderSingle1").slider({
@@ -1550,6 +1583,10 @@ function timeframe_draw(timeline_data, start, end) {
         /* ************* Style settings ************* */
 
         if (elementsInMemory.length > 0) {
+
+            // Enable Globalplay
+            $("#playerContainer").removeClass("disabled");
+
 
             // Loop into elements in memory
             for (var i = 0; i < elementsInMemory.length; i++) {
@@ -3893,14 +3930,8 @@ function playAudioElement(event) {
 function addFileClick() {
 
     // Check if folio is selected
-    var folioID = 0;
     var _hdnFolioID = $("input[id*='_hdnFolioID']");
     if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
-        folioID = _hdnFolioID.val();
-    }
-    var folioID_int = parseInt(folioID, 10);
-
-    if (folioID_int != null && !isNaN(folioID_int) && folioID_int > 0) {
 
         if (!$('#btnUploadElement').hasClass("opened")) {
             var posXoff = $("#btnUploadElement").offset().left;
@@ -4008,14 +4039,8 @@ function callback3() {
 function downloadAll() {
 
     // Check if folio is selected
-    var folioID = 0;
     var _hdnFolioID = $("input[id*='_hdnFolioID']");
     if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
-        folioID = _hdnFolioID.val();
-    }
-    var folioID_int = parseInt(folioID, 10);
-
-    if (folioID_int != null && !isNaN(folioID_int) && folioID_int > 0) {
 
         // Get only visible and checked checkboxes to remove
         var list_elements = [];
@@ -4360,6 +4385,29 @@ function prepareFileUpload_a(e) {
         _hdnIsUpdateNeeded.val("true");
     }
 
+    var _hdnFolioID_selected = $("#_hdnFolioID_selected");
+    if (_hdnFolioID_selected != null) {
+        var checked_folio = $("#divFolioSelection_fileUpload input:radio[name='rbFolios_fileUpload']:checked").val();
+        if (checked_folio != null && checked_folio.length) {
+            _hdnFolioID_selected.val(checked_folio);
+        }
+    }
+
+    if (_hdnFolioID_selected == null || _hdnFolioID_selected.val() == null || _hdnFolioID_selected.val().length == 0) {
+
+        $("#dialog p").text(hashMessages["SeleccioneFolioID"]);
+        $("#dialog").dialog({
+            buttons: {
+                "Confirmar": function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+        if (e) {
+            e.preventDefault();
+        }
+    }
+
     var MyFileUpload = $("#divUpload input[id*='MyFileUpload']");
     if (MyFileUpload != null && (MyFileUpload.val() == null || MyFileUpload.val().length == 0)) {
 
@@ -4371,7 +4419,9 @@ function prepareFileUpload_a(e) {
                 }
             }
         });
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
     }
 }
 
@@ -4402,12 +4452,15 @@ function confirmAddComment() {
     var userID = globalUserID;
 
     // Check if folio is selected
-    var folioID = 0;
+    var folioID = "";
     var _hdnFolioID = $("input[id*='_hdnFolioID']");
     if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
-        folioID = _hdnFolioID.val();
+
+        var checked_folio = $("#divFolioSelection_addComment input:radio[name='rbFolios_addComment']:checked").val();
+        if (checked_folio != null && checked_folio.length) {
+            folioID = checked_folio;
+        }
     }
-    var folioID_int = parseInt(folioID, 10);
 
     var comment = $("#txbComment").val();
     var date = $("#commentDate").val();
@@ -4417,7 +4470,7 @@ function confirmAddComment() {
     if ($("#_hdnIsUpdateNeeded") != null) {
         $("#_hdnIsUpdateNeeded").val("true");
     }
-    if (userID != null && userID != "" && comment != null && comment != "" && date != null && date != "" && duration != null && duration != "") {
+    if (userID != null && userID != "" && comment != null && comment != "" && date != null && date != "" && duration != null && duration != "" && folioID != null && folioID != "") {
 
         console.log("Ajax call: Dashboard.aspx/AddFolioComment. Params:");
         console.log("userID: " + userID + ", type: " + type(userID));
@@ -4463,7 +4516,7 @@ function confirmAddComment() {
                     // Create new row to HTML table
                     var tr = "<tr id='tape_" + object.tapeID + "' style='background-color:rgb(187, 226, 217);' name='Extra'>";
                     tr += "<td>";
-                    tr += "<input type='checkbox' name='timeline_elements' class='button' value='" + object.tapeID + "#true#C' checked>";//onclick='manageElement(this, " + object.tapeID + ", " + (index - 1).toString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>";
+                    tr += "<input type='checkbox' name='timeline_elements' class='button' value='" + object.tapeID + "#true#C' checked>"; //onclick='manageElement(this, " + object.tapeID + ", " + (index - 1).toString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>";
                     tr += "<td>";
                     tr += "<h5>" + object.count + "</h5>";
                     tr += "<td>";
@@ -4511,6 +4564,16 @@ function confirmAddComment() {
         });
 
         $("#dialog p").text(hashMessages["ComentarioGuardado"]);
+        $("#dialog").dialog({
+            buttons: {
+                "Confirmar": function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    }
+    else {
+        $("#dialog p").text(hashMessages["SeleccioneFolioID"]);
         $("#dialog").dialog({
             buttons: {
                 "Confirmar": function () {

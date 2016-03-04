@@ -36,7 +36,7 @@
         $(settings['box2']).fadeOut("fast");
 
           // Clear values
-        $("#txbComment").val("");
+        //$("#txbComment").val("");
         $("input[id*='txbInputCameraNumber']").val("");
         $("input[id*='MyFileUpload']").val("");
 
@@ -52,7 +52,7 @@
 
     $(document).bind('click', function (event) {
         if (!$(event.target).closest(settings['selector']).length && !$(event.target).is('button') && !$(event.target).is('a') &&
-            !$(event.target).is('span') && !$(event.target).is('img') && $(event.target)[0].id != 'imgPointer') {
+            !$(event.target).is('span') && !$(event.target).is('img') && $(event.target)[0].id != 'imgPointer' && !$(event.target).is('input')) {
             //if (event.target.className.toLowerCase().indexOf('opened'))
             methods.close();
         }

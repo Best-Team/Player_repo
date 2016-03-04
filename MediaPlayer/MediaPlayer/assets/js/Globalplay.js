@@ -465,8 +465,13 @@ function globalplay_video_screenRecording(file_url, visual_size, flex_div, eleme
                         ok = true;
 
                         setTimeout(function () {
-                            if (html_player[0].currentTime != null) {
-                                html_player[0].currentTime = element_current_duration;
+                            try {
+                                if (html_player[0].currentTime != null) {
+                                    html_player[0].currentTime = element_current_duration;
+                                }
+                            } catch (err) {
+                                console.log("l:473 Error seeking HTML5 video");
+                                console.log(err);
                             }
                         }, 500);
                         seek = true;
@@ -654,7 +659,7 @@ function globalplay_video_screenRecording(file_url, visual_size, flex_div, eleme
                             }
 
                         } catch (err) {
-                            console.log("l:5101 Error loading webchimera");
+                            console.log("l:660 Error loading webchimera");
                             console.log(err);
 
                             webchimera_loaded = false;

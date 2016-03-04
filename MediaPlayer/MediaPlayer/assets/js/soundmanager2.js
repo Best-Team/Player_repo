@@ -69,7 +69,7 @@
             'flashVersion': 8,                  // flash build to use (8 or 9.) Some API features require 9.
             'debugMode': true,                  // enable debugging output (console.log() with HTML fallback)
             'debugFlash': false,                // enable debugging output inside SWF, troubleshoot Flash/browser issues
-            'useConsole': false,                 // use console.log() if available (otherwise, writes to #soundmanager-debug element)
+            'useConsole': true,                 // use console.log() if available (otherwise, writes to #soundmanager-debug element)
             'consoleOnly': true,                // if console is being used, do not create/write to #soundmanager-debug
             'waitForWindowLoad': false,         // force SM2 to wait for window.onload() before trying to call soundManager.onload()
             'bgColor': '#ffffff',               // SWF background color. N/A when wmode = 'transparent'
@@ -5439,7 +5439,7 @@
             if (sm2.html5Only) {
 
                 // 100% HTML5 mode
-                setVersionInfo();
+                //setVersionInfo();
 
                 initMsg();
                 sm2.oMC = id(sm2.movieID);
@@ -5472,7 +5472,7 @@
             }
 
             // safety check for legacy (change to Flash 9 URL)
-            setVersionInfo();
+            //setVersionInfo();
             sm2.url = normalizeMovieURL(overHTTP ? remoteURL : localURL);
             smURL = sm2.url;
 

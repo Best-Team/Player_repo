@@ -72,7 +72,6 @@
     </script>
 
 
-
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="ContentLoginStatus" runat="server">
     <div class="container-session">
@@ -141,7 +140,8 @@
                                         </asp:UpdatePanel>
 
                                     </div>
-                                    <asp:RegularExpressionValidator ID="RegularExpressionValidator1" ControlToValidate="txbSearchBox1" runat="server" ErrorMessage="Número inválido" ValidationExpression="\d+"></asp:RegularExpressionValidator>
+                                    <asp:TextBox runat="server" ID="txbDummy" Visible="false"/>
+                                    <asp:RegularExpressionValidator ID="RegularExpressionValidator1" ControlToValidate="txbDummy" runat="server" ErrorMessage="Número inválido" ValidationExpression="\d+"></asp:RegularExpressionValidator>
                                     <!-- /input-group -->
                                 </div>
                             </div>
@@ -478,7 +478,7 @@
                 <div class="row no-gutter">
                     <div class='popbox' style="margin-right: 6px; display: inline-block;"></div>
                     <!-- popbox: Add comment -->
-                    <div class='box popbox' style="width: 300px; height: 245px;">
+                    <div class='box popbox' style="width: 300px; min-height: 300px; max-height: 340px;">
                         <div class='arrow'></div>
                         <div class='arrow-border'></div>
                         <div class="row row-short" style="padding: 10px;">
@@ -491,18 +491,21 @@
                         </div>
                         <div class="form-group">
                             <div class="col-md-12" style="margin-top: 10px;">
-                                <!-- <input type="text" class="form-control" id="datetimepicker1" placeholder="Fecha" value="" required="required"/>  
-					  <input type="text" class="form-control" id="addCommentDatetime" required="required"/> -->
-
                                 <input id="commentDate" class="form-control" data-inputmask="'alias': 'date'">
-
-                                <!-- <input type="text" name="time" class="timepicker" /> -->
                                 <!--  http://jongsma.org/software/protoplasm/control/timepicker -->
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="col-md-12" style="margin-top: 12px;">
-                                <label class="control-label" style="margin-bottom: 20px;">Duración (seg)</label>
+
+                        <div class="row row-short">
+                                <label class="control-label" style="margin-top: 10px;">Folio destino</label>
+                             <div id="divFolioSelection_addComment">
+                            </div>
+                                <!--  -->
+                        </div>
+
+                        <div class="form-group" style="position:absolute; width:100%">
+                            <div class="col-md-12">
+                                <label class="control-label" style="margin-bottom: 12px;">Duración (seg)</label>
                                 <div class="layout-slider">
                                     <input id="sliderSingle1" type="slider" name="duracion" value="1" style="display: none;" />
                                 </div>
@@ -518,7 +521,7 @@
 
                     <div class='popbox2' style="margin-right: 6px; display: none;"></div>
                     <!-- popbox: Upload file -->
-                    <div class='box2 popbox2' style="width: 300px; height: 300px;">
+                    <div class='box2 popbox2' style="width: 300px; min-height: 300px; max-height: 330px;">
                         <div class='arrow'></div>
                         <div class='arrow-border'></div>
                         <div class="row row-short" style="padding: 10px;">
@@ -536,6 +539,12 @@
                             <div class="row row-short" style="padding: 10px;">
                                 <label class="control-label">Documentos, videos y audios</label>
                                 <input id="MyFileUpload" type="file" runat="server" class="file" style="width: 85%; margin: auto; margin-top: 8px; height: 24px;" />
+                                <!--  -->
+                            </div>
+                             <div class="row row-short">
+                                <label class="control-label">Folio destino</label>
+                             <div id="divFolioSelection_fileUpload">
+                            </div>
                                 <!--  -->
                             </div>
                             <div class="form-group">
@@ -750,6 +759,8 @@
         <asp:HiddenField ID="_hdnGlobalplay_defaultDuration" runat="server" ClientIDMode="Static" />
         <asp:HiddenField ID="_hdnGlobalplay_maxCollisionElements" runat="server" ClientIDMode="Static" />
 
+        <!-- -->
+        <asp:HiddenField ID="_hdnFolioID_selected" runat="server" ClientIDMode="Static" />
 
     </form>
 </asp:Content>
