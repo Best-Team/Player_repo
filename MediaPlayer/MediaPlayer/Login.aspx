@@ -10,7 +10,9 @@
 
             // Initial focus
             $("input[id*='_txbUser']").focus();
+
         });
+
 
         function enterKey(e) {
             if (e.keyCode == 13) {

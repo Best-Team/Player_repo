@@ -15,7 +15,7 @@ var previousSecs = 0;
 
 var MAX_DOWNLOAD_FILES = 6;
 var GLOBALPLAY_DEFAULT_DURATION = 6;
-var GLOBALPLAY_DEFAULT_DURATION_EXTRA = 2;
+var GLOBALPLAY_DEFAULT_DURATION_EXTRA = 1;
 var GLOBALPLAY_LABEL_DEFAULT_DURATION = 16; 
 var GLOBALPLAY_MAX_COLLISION_ELEMENTS = 6;
 var SVG_Height = 170;
@@ -582,7 +582,7 @@ function divTimelineProgress_SetWidth() {
 
         $('#divTimelineProgress').css("width", (x2 - x1 + 4) + "px");
         $("#divTimelineProgress").offset({
-            left: $("#svg_timeframe").offset().left + 42 //Fix Left Offset 
+            left: $("#svg_timeframe").offset().left + 42 
         })
     }
 }
@@ -655,7 +655,7 @@ function handleDragging(event, ui) {
     if (!globalplay_active) {
 
         $(".box4.popbox4").offset({
-            left: posXfinal - 6, // 28 Quitar?
+            left: posXfinal - 11, // 28 Quitar?
             top: posYfinal
         });
 
@@ -1469,6 +1469,7 @@ function timeframe_prepare(timeline_data, start, end) {
     // **** DRAW TIMELINE ****
     timeframe_draw(timeline_data, start, end);
 
+    // If timeline is already drawn, set to divTimelineProgress the main line real width 
     divTimelineProgress_SetWidth();
 
     // If there are elements loaded, show timeline pointer
@@ -1483,8 +1484,6 @@ function timeframe_prepare(timeline_data, start, end) {
         }
     }
 
-    // If timeline is already drawn, set to divTimelineProgress the main line real width 
-    //divTimelineProgress_SetWidth();
 }
 /* ************* Method: draw Timeline - CSS Custom Styles ************* */
 
