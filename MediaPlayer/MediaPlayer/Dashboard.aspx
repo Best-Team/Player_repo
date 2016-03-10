@@ -67,8 +67,8 @@
             if (e.keyCode == 13) {
                 __doPostBack('<%=btnSearchCandidate.UniqueID%>', "");
         }
-    }
-
+        }
+       
     </script>
 
 
@@ -92,7 +92,8 @@
                 <div class="row no-gutter" style="height: 100%; min-height: 600px; max-height: 600px;">
 
                     <!-- PANEL BÚSQUEDA -->
-                    <div id="divPanel_Busqueda" class="div-panel col-md-4 col-xs-12 img-rounded panel offset-2" style="max-height: 600px; min-height: 600px; border-radius: 13px;">
+                    <div id="divPanel_Busqueda" class="div-panel col-md-4 col-xs-12 img-rounded panel" style="max-height: 600px; min-height: 600px; border-radius: 13px;">
+
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
                         <div class="row" style="margin: 3px; margin-top: 25px; min-height: 110px;">
@@ -125,14 +126,14 @@
                                                 <asp:HiddenField ID="_hdnJSonEnd" runat="server" />
                                                 <asp:HiddenField ID="_hdnFolioID" runat="server" />
 
-                                                <span>
+                                                <span class="col-md-1 col-md-pull-1 col-xs-1 col-xs-pull-1 pull-right">
                                                     <button class="btn btn-default pull-left" type="button" runat="server" id="btnSearch1" onserverclick="btnSearch_ServerClick">
                                                         <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                                                     </button>
                                                 </span>
 
-                                                <span class="col-md-10">
-                                                    <asp:TextBox CssClass="form-control" placeholder="Buscar folios por número" runat="server" ID="txbSearchBox1" onkeypress="return enterSearchBox(event)" />
+                                                <span class="col-md-10 col-xs-10">
+                                                    <asp:TextBox CssClass="form-control txbSearchBox1" placeholder="Buscar folios por número" runat="server" ID="txbSearchBox1" onkeypress="return enterSearchBox(event)" />
                                                     <asp:Button ID="btnSearchCandidate" runat="server" Style="display: none" Text="" OnClick="btnSearchCandidate_Click" />
                                                 </span>
 
@@ -147,7 +148,7 @@
                             </div>
                             <br />
 
-                            <div class="pull-right" style="margin-bottom: 5px; margin-right: 0px; padding: 0px;">
+                            <div class="pull-right" style="margin-bottom: 5px; margin-right: 0; padding: 0;">
                                 <button id="btnDownloadAll" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onclick="downloadAll();">
                                     <span class="fa fa-download" aria-hidden="true"></span>
                                 </button>
@@ -222,7 +223,8 @@
                     <div id="fade" class="black_overlay"></div>
 
                     <!-- PANEL PLAYER -->
-                    <div id="divPanel_PlayerControl" class="div-panel col-md-8 col-xs-12 img-rounded disabled" style="float: right; max-height: 600px; min-height: 600px; border-radius: 13px; width: 66%;">
+                    <div id="divPanel_PlayerControl" class="div-panel col-md-8 col-xs-12 img-rounded disabled" style="float: right; max-height: 600px; min-height: 600px; border-radius: 13px;">
+
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal;">Reproductor</span></h1>
                         <button id="btnShowHideLeftPanel" class="btn btn-primary btn-xs" type="button" title="Mostrar / Ocultar panel" style="color: white; float: left; display: none;" onclick="showHideLeftPanel();">
                             <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
@@ -234,12 +236,10 @@
                         <div class="row row-short" style="margin-top: 1%; display: block;">
 
                             <!-- PLAYER VIDEO -->
-                            <div class="col-md-9" style="width: 79%;">
+                            <div class="col-md-9 col-xs-12" style="">
                                 <div class="row">
 
                                     <div id="playerBox" class="img-rounded playerBox" runat="server">
-
-
 
                                         <div id="divPlayer_VIDEO" style="display: none;" class='photobox'>
                                             <!-- Contiene el Applet -->
@@ -312,7 +312,7 @@
 
                                             <div id="audioContainer" class="row row-short" style="height: 80px;">
 
-                                                <div id="divControlsMask_AUDIO" class="sound_player_class sm2-bar-ui compact full-width" style="top: 0px; right: 0px; height: 54px">
+                                                <div id="divControlsMask_AUDIO" class="sound_player_class sm2-bar-ui compact full-width" style="top: 0; right: 0; height: 54px">
                                                     <div class="bd sm2-main-controls" style="height: 100%;">
                                                         <div class="sm2-inline-texture"></div>
                                                         <div class="sm2-inline-gradient"></div>
@@ -472,7 +472,6 @@
 
                         </div>
 
-
                     </div>
                 </div>
                 <div class="row no-gutter">
@@ -491,7 +490,7 @@
                         </div>
                         <div class="form-group">
                             <div class="col-md-12" style="margin-top: 10px;">
-                                <input id="commentDate" class="form-control" data-inputmask="'alias': 'date'">
+                                <input id="commentDate" class="form-control" data-inputmask="'alias': 'date'"/>
                                 <!--  http://jongsma.org/software/protoplasm/control/timepicker -->
                             </div>
                         </div>
@@ -624,7 +623,6 @@
                             </div>
                             </div>
                             <div class="flex">
-                                <!--min-height:100%;">-->
                             </div>
                         </div>
 
@@ -654,12 +652,12 @@
 
                                 <div id="playerContainer" class="playerContainer col-md-2 img-rounded">
                                     <!-- img-rounded -->
-                                    <div id="controlContainer">
+                                    <div id="controlContainer" style="width: 100%; position: relative; top: 50%; transform: translate(0, -50%);"> 
                                         <ul class="globalplay_controls controls">
 
-                                            <li id="globalplay_play_li" class="img-rounded globalplay_play_li">
+                                            <li id="globalplay_play_li" class="img-rounded globalplay_play_li" style="position: relative; padding: 8px;">
                                                 <a href="#divgp_sc" id="globalplay_play" class="globalplay_play" data-attr="playPauseAudio" 
-                                                    onclick="return globalplay_init()" style="padding: 25px;"></a>
+                                                    onclick="return globalplay_init()" style="position: relative;"></a>
                                                 <!-- Play/Pause button -->
                                                 <a href="#globalPlayer_popup" id="btnOpenFancybox" style="display: none;"></a>
                                             </li>

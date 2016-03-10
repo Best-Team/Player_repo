@@ -266,6 +266,35 @@ $(document).ready(function () {
 }); // END On Ready
 
 
+// EVENT: When viewport resized, resize timeline and locate pointer
+var resizeId;
+$(window).resize(function () {
+    clearTimeout(resizeId);
+    resizeId = setTimeout(doneResizing, 100);
+});
+
+
+function doneResizing() {
+    pre_timeframe_prepare();
+
+    setTimeout(function () {
+        divTimelineProgress_SetWidth();
+
+        // If there are elements loaded, show timeline pointer
+        var first_tapeID = 0;
+        if (elementsInMemory != null && elementsInMemory.length > 0) {
+            first_tapeID = elementsInMemory[0].tapeID;
+            var first_tapeID_int = parseInt(first_tapeID, 10);
+
+            if (first_tapeID_int > 0) {
+                TIMELINE_POINTER.show();
+                timeline_pointer_setLocation(first_tapeID_int);
+            }
+        }
+    }, 100);
+}
+
+
 /**** Load Folios ID to UploadFile and AddComment ****/
 function loadFoliosID() {
 
@@ -2032,7 +2061,7 @@ function timeline_pointer_setLocation(tapeID) {
             if (vElement != null && vElement.length && vElementRect != null && vElementRect.length) {
 
                 // Set progress bar width
-                var _width_int = parseInt(vElementRect.attr('width'), 10);
+                var _width_int = parseFloat(vElementRect.attr('width'), 10);
                 var _width_percentage = (5 / 100) * _width_int;
                 var _width = _width_int + _width_percentage + "px";
 
@@ -2050,7 +2079,7 @@ function timeline_pointer_setLocation(tapeID) {
 
                 sm2_progress_track.css('height', 15);
 
-                sm2_inline_element.offset({ top: $("#divTimelineProgress").offset().top })
+                sm2_inline_element.offset({ top: divTimelineProgress.offset().top })
 
             } else {
                 // TODO: Timeline is not drawn yet
