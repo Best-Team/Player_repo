@@ -797,7 +797,7 @@ namespace MediaPlayer
 
             htmlTable.AppendLine("<table class='table' id='tblLeftGridElements'>"); // style='display:none;'
             htmlTable.AppendLine("<thead>");
-            htmlTable.AppendLine("<tr style='background: transparent'>");
+            htmlTable.AppendLine("<tr style='background: #446e9b; color: whitesmoke;'>");
             htmlTable.AppendLine("<th width='3%' style='text-align: center;'><input type='checkbox' id='chbSelectAll' name='timeline_elements_checkAll' class='button' checked></th>");
             htmlTable.AppendLine("<th width='3%' style='text-align: center;'>#</th>");
             htmlTable.AppendLine("<th width='5%' style='text-align: center;'>Usuario</th>");
@@ -936,8 +936,7 @@ namespace MediaPlayer
                             }
 
                             string color_icon = "beige";
-
-                            string tr_color = isExtra ? "rgb(187, 226, 217)" : "inherit";
+                            string tr_color = isExtra ? "#D1E2F3" : "inherit";
                             string tr_name = isExtra ? "Extra" : "Oreka";
 
                             // Onclick event

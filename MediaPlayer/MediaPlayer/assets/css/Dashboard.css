@@ -382,7 +382,8 @@ div.disabled, button.disabled, a.disabled {
 
 .flex {
     position: relative;
-    max-width: 1320px;/*1400;*/
+    /* max-width: 1320px;/*1400; */
+    max-width: 1640px;
     max-height: 630px;
     min-height: 593px;
     margin: 20px auto 0 auto; /*0 auto;*/

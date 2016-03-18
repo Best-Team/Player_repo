@@ -37,6 +37,7 @@ Control.TimePicker = Class.create({
  * * onChange: Callback function when the time is changed.
  *   A Date object is passed as the parameter.
  * * onSelect: Callback function when the time is selected.
+ * * MediaPlayer a u t h o r : G o n z a l o - B o r d e r o l l e.
  *   A Date object is passed as the parameter.
 **/
 	initialize: function (element, options) {

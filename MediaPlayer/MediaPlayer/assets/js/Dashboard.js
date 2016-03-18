@@ -1953,8 +1953,10 @@ function clearAllStyleSettings(type_longStr) {
                 break;
             }
     }
-    /******** Paint timeline elements ********/
+    /******** Paint grid elements icons ********/
     $("#tblLeftGridElements button[name='btnTimelineElement']").css("background-color", color_str);
+
+    /******** Paint timeline elements ********/
     $("#svg_timeframe g[id^='tlTape_']").attr("fill", color_str);
 }
 
@@ -1964,9 +1966,11 @@ function paintSelectionClick(tapeID, timestamp) {
 
     // Left panel
     $("#tblLeftGridElements button[name='btnTimelineElement']").removeClass("active");
-    $("#tblLeftGridElements tr[id*='tape_'] > td > h5").attr("style", "color:black;");
-    $("#tblLeftGridElements tr[id*='tape_']").not("[name='Extra']").css("background-color", "inherit"); // white
-    $("#tblLeftGridElements tr[id*='tape_'][name='Extra']").css("background-color", "rgb(187, 226, 217)"); // white
+    $("#tblLeftGridElements tr[id*='tape_'] > td > h5").attr("style", "font-weight:normal;"); //
+    $("#tblLeftGridElements tr[id*='tape_']").attr("style", "border:inherit;"); //
+    //$("#tblLeftGridElements tr[id*='tape_']").not("[name='Extra']").css("background-color", "inherit"); 
+    $("#tblLeftGridElements tr[id*='tape_'][name='Extra']").css("background-color", "#D1E2F3");
+    $("#tblLeftGridElements tr[id*='tape_'][name='Oreka']").css("background-color", "inherit");
 
     // Bottom
     var vAllBottom_texts = $("g[id*='tlTape_'] > text");
@@ -1981,8 +1985,9 @@ function paintSelectionClick(tapeID, timestamp) {
     /******** Set new styles ********/
 
     // Left panel
-    $("#tblLeftGridElements #tape_" + tapeID + " > td > h5").attr("style", "color:DodgerBlue");
-    $("#tblLeftGridElements #tape_" + tapeID).css("background-color", "lightgray");
+    $("#tblLeftGridElements #tape_" + tapeID + " > td > h5").attr("style", "font-weight:bold"); 
+    $("#tblLeftGridElements #tape_" + tapeID).attr("style", "border:solid #446e9b "); 
+    $("#tblLeftGridElements #tape_" + tapeID + "[name='Extra']").css("background-color", "#D1E2F3");
 
 
     // Bottom
@@ -2754,6 +2759,10 @@ function loadElement_comment(divControlsMask_VIDEO, timestamp, fileName) {
     }
 
     if (PLAYER_BOX != null && PLAYER_BOX.length) {
+
+        // Clear previous comments
+        PLAYER_BOX.find("div[name='divComment']").remove();
+
         PLAYER_BOX.append(
             "<div name='divComment' class='col-md-12' style='margin: 30px; margin-top:20px;'><div class='row'><h1 style='font-weight: bold;float:left;'>" +
             timestamp +
@@ -2961,11 +2970,9 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
         if (getIsIE()) {
 
             // ActiveX video object
-
-            var video_player = "<div id='divVideo_object1' style='width:" + width + "px; " + "height:auto; margin:0 auto; display: inline;'> "; // height
+            var video_player = "<div id='divVideo_object1' style='width:" + width + "px; " + "height:auto; margin:0 auto; display:inline;'> "; // height
             video_player += "<object id='video_object1' data='" + file_url + "' ";
-            video_player += "width='" + width + "' height='" + height + "' ";
-            video_player += "style='margin-top:4px;' ";
+            video_player += "width='" + width + "' height='" + height + "' style='margin-top:4px;' ";
             video_player += "CLASSID='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
             video_player += "<PARAM name='URL' value='" + file_url + "'> ";
             video_player += "<PARAM name='autoStart' value='False'> ";
@@ -4184,7 +4191,8 @@ function multiDownload(objects) {
 
                         } else {
 
-                            filePath_str = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
+                            filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0";
+                            //filePath_str = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
                         }
                         $("#aDownloader").attr("href", filePath_str);
                         $("#aDownloader")[0].click();
@@ -4517,7 +4525,7 @@ function confirmAddComment() {
                     var username = globalUserName;
 
                     // Create new row to HTML table
-                    var tr = "<tr id='tape_" + object.tapeID + "' style='background-color:rgb(187, 226, 217);' name='Extra'>";
+                    var tr = "<tr id='tape_" + object.tapeID + "' style='background-color:#D1E2F3;' name='Extra'>";
                     tr += "<td>";
                     tr += "<input type='checkbox' name='timeline_elements' class='button' value='" + object.tapeID + "#true#C' checked>"; //onclick='manageElement(this, " + object.tapeID + ", " + (index - 1).toString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>";
                     tr += "<td>";

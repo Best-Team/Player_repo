@@ -242,12 +242,12 @@ function globalplay_loadElements() {
                             // Special case
                             file_url = tapeType === "S" ? WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0" : file_url;
 
-                            dynamic_id = globalplay_video_screenRecording(file_url, visual_size, flex_div, element_alreadyTaken, global_numberID, element_current_duration);
+                            dynamic_id = globalplay_video_screenRecording(file_url, visual_size.width, visual_size.height, flex_div, element_alreadyTaken, global_numberID, element_current_duration);
                             break;
                         }
 
                         case "I": {
-                            dynamic_id = globalplay_image(file_url, visual_size, flex_div, element_alreadyTaken, global_numberID);
+                            dynamic_id = globalplay_image(file_url, visual_size.width, visual_size.height, flex_div, element_alreadyTaken, global_numberID);
                             break;
                         }
 
@@ -309,8 +309,17 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
     var visual_alreadyAdded = $(".flex").find('[name="webchimera"], [name="fbsviewer"], [name="visual_element"]').length;
     var visual_count = visual_queue_length + visual_alreadyAdded;
 
-    // Case >= 4: elements to resize
-    var visual_size = 275;
+    // >= 4 visual elements
+    var width = 275;
+    var height = 275;
+
+    var current_screen = window.innerWidth;
+
+    // Wide Promad
+    if (current_screen >= 1920) {
+        width = 390;
+        height = 275;
+    }
 
     // MAX Amount of simultaneous elements 
     var max_amount = GLOBALPLAY_MAX_COLLISION_ELEMENTS;
@@ -319,23 +328,78 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
         // Element distinct types 
         switch (visual_count) {
             case 1:
+                {
+                    // Wide normal
+                    width = 1000;
+                    height = 550;
+
+                    // Wide extra
+                    if (current_screen >= 1920) {
+                        width = 1400;
+                        height = 600;
+                    }
+                    // Wide Promad
+                    else if (current_screen >= 1440) {
+                        width = 700;
+                        height = 600;
+                    }
+                    break;
+                }
             case 2:
                 {
-                    visual_size = 600;
+                    // Wide normal
+                    width = 600;
+                    height = 550;
+
+                    // Wide extra
+                    if (current_screen >= 1920) {
+                        width = 800;
+                        height = 600;
+                    }
+                    // Wide Promad
+                    else if (current_screen >= 1440) {
+                        width = 600;
+                        height = 600;
+                    }
                     break;
                 }
             case 3:
                 {
-                    visual_size = 400;
+                    // Wide normal
+                    width = 380;
+                    height = 400;
+
+                    // Wide extra
+                    if (current_screen >= 1920) {
+                        width = 500;
+                        height = 500;
+                    }
+                    // Wide Promad
+                    else if (current_screen >= 1440) {
+                        width = 400;
+                        height = 400;
+                    }
+                    
                     break;
                 }
         }
 
+        var visual_size = {
+            width: width,
+            height: height
+        }
+
+
         if (visual_alreadyAdded > 0) {
             $(".flex").find('*').not('.info-label, .info-label *').each(function (index, el) {
-                $(this).css("width", visual_size);
-                $(this).css("height", visual_size);
+                $(this).css("width", visual_size.width);
+                $(this).css("height", visual_size.height);
 
+            });
+
+            $(".flex").find('.divVideo video').each(function (index, el) { //
+                $(this).css("width", visual_size.width - 5);
+                $(this).css("height", visual_size.height - 5);
             });
         }
 
@@ -425,7 +489,7 @@ function globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_
 }
 
 // Play video or screen recording
-function globalplay_video_screenRecording(file_url, visual_size, flex_div, element_alreadyTaken, global_numberID, element_current_duration) {
+function globalplay_video_screenRecording(file_url, visual_size_width, visual_size_height, flex_div, element_alreadyTaken, global_numberID, element_current_duration) {
     var global_elementID = "";
     var duration = element_alreadyTaken[0].duration;
     var fileName = element_alreadyTaken[0].fileName;
@@ -448,8 +512,10 @@ function globalplay_video_screenRecording(file_url, visual_size, flex_div, eleme
 
                 // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
 
-                var js_player = '<div id="div' + global_elementID + '" class="divVideo" style="float:left;">';
-                js_player += '<video id="' + global_elementID + '" preload="none" style="width:' + visual_size + 'px; height:' + visual_size + 'px;" name="visual_element" autoplay>';
+                //var js_player = '<div id="div' + global_elementID + '" class="divVideo" style="float:left;">';
+                //js_player += '<video id="' + global_elementID + '" preload="none" style="width:' + visual_size_width + 'px; height:' + visual_size_height + 'px;" name="visual_element" autoplay>';
+                var js_player = '<div id="div' + global_elementID + '" class="divVideo" style="float:left; width:' + visual_size_width + 'px; height:' + visual_size_height + 'px;">';
+                js_player += '<video id="' + global_elementID + '" preload="none" style="width:' + (visual_size_width - 5) + 'px; height:' + (visual_size_height - 5) + 'px;" name="visual_element" autoplay>';
                 js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
                 js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
                 js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
@@ -494,8 +560,8 @@ function globalplay_video_screenRecording(file_url, visual_size, flex_div, eleme
 
                         var fileStatus = element_alreadyTaken[0].fileStatus;
 
-                        var applet = "<div id='div" + global_elementID + "' style='float:left;'><applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size + "px' " +
-                            "height='" + visual_size + "px;' name='fbsviewer' id='" + global_elementID + "' title='undefined'>";
+                        var applet = "<div id='div" + global_elementID + "' style='float:left;'><applet codebase='assets/applets/' code='OrkMP.class' archive='OrkMP.jar' width='" + visual_size_width + "px' " +
+                            "height='" + visual_size_height + "px;' name='fbsviewer' id='" + global_elementID + "' title='undefined'>";
 
                         applet += "<param name='HOST' value=''>";
                         applet += "<param name='PORT' value='5901'>";
@@ -600,9 +666,9 @@ function globalplay_video_screenRecording(file_url, visual_size, flex_div, eleme
                         // WMP IE Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
 
                         // ActiveX video object
-                        var js_player = "<div id='div" + global_elementID + "' name='visual_element' class='divVideo' style='float:left; width:" + visual_size + "px; " + "height:" + visual_size + "px;'> "; // TODO TEST style change
+                        var js_player = "<div id='div" + global_elementID + "' name='visual_element' class='divVideo' style='float:left; width:" + visual_size_width + "px; " + "height:" + visual_size_height + "px;'> "; 
                         js_player += "<object id='" + global_elementID + "' data='" + file_url + "' ";
-                        js_player += "width='" + (visual_size - 5) + "' height='" + (visual_size - 5) + "' ";
+                        js_player += "width='" + (visual_size_width - 5) + "' height='" + (visual_size_height - 5) + "' ";
                         js_player += "CLASSID='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
                         js_player += "<PARAM name='URL' value='" + file_url + "'> ";
                         js_player += "<PARAM name='uiMode' value='none'> ";
@@ -630,8 +696,8 @@ function globalplay_video_screenRecording(file_url, visual_size, flex_div, eleme
 
                         // Webchimera
                         var applet = "<div id='div" + global_elementID + "' class='divVideo' style='float:left;'>";
-                        applet += "<object id='" + global_elementID + "' type='application/x-chimera-plugin' width='" + (visual_size - 3) + "' ";
-                        applet += "height='" + (visual_size - 3) + "' name='visual_element' style='position:relative; float:left; margin: 10px;'>";
+                        applet += "<object id='" + global_elementID + "' type='application/x-chimera-plugin' width='" + (visual_size_width - 3) + "' ";
+                        applet += "height='" + (visual_size_height - 3) + "' name='visual_element' style='position:relative; float:left; margin: 10px;'>";
                         applet += "<param name='windowless' value='true' />";
                         applet += "</object>";
                         applet += "<div id='interface'></div></div>";
@@ -714,15 +780,15 @@ function globalplay_video_screenRecording(file_url, visual_size, flex_div, eleme
 }
 
 // Play image
-function globalplay_image(file_url, visual_size, flex_div, element_alreadyTaken, global_numberID) {
+function globalplay_image(file_url, visual_size_width, visual_size_height, flex_div, element_alreadyTaken, global_numberID) {
     var global_elementID = "image_" + global_numberID;
     var segmentID = element_alreadyTaken[0].segmentID;
     var fileName = element_alreadyTaken[0].fileName;
     var timestamp = element_alreadyTaken[0].timestamp;
 
-    $('<a name="visual_element" id="' + global_elementID + '" style="width:' + visual_size + 'px; height:' + visual_size + 'px;' +
+    $('<a name="visual_element" id="' + global_elementID + '" style="width:' + visual_size_width + 'px; height:' + visual_size_height + 'px;' +
        'background-image:url(' + file_url + '); float:left; position:relative; margin:8px 12px; background-size: auto 100%;"' +
-       'width="' + visual_size + '" height="' + visual_size + '">' + fileName + '</a>').appendTo(flex_div).fadeIn(2000);
+       'width="' + visual_size_width + '" height="' + visual_size_height + '">' + fileName + '</a>').appendTo(flex_div).fadeIn(2000);
 
     // Add Fullscreen click Event
     $("#" + global_elementID).attr("src", file_url).photobox();
@@ -1710,5 +1776,5 @@ function globalplay_setElementAlreadyTaken(elementID, value) {
     }
 }
 
-
+/******** @author: Gonzalo Borderolle - inConcert MVD/UY ********/
 /******** END: Media Player 2.0: Nuevo Requerimiento: Global Play ********/
