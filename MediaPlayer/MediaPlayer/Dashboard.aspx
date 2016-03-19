@@ -75,9 +75,9 @@
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="ContentLoginStatus" runat="server">
     <div class="container-session unselectable">
-        <div class="hidden-xs" style="color: #446e9b; margin-left: 15px; margin-right: 20px; cursor: default;">
-            <span class="fa fa-user pull-left" aria-hidden="true"></span>
-            <div class="usernameInfo" style="font: 11px/1.4em FontAwesome, Helvetica, Arial, sans-serif"></div>
+        <div class="hidden-xs" style="color: #446e9b; margin-left: 15px; margin-right: 20px; cursor: default; font-size: 12px !important">
+            <span class="fa fa-user pull-left" aria-hidden="true" style="margin-right: 7px;"></span>
+            <div class="usernameInfo"></div>
         </div>
         <button id="btn_close" class="btn btn-primary btn-xs" style="color: white; background-color: #446e9b; text-transform: none; letter-spacing: inherit;" runat="server" onserverclick="btn_close_ServerClick">
             <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>Salir 
