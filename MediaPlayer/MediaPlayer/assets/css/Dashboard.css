@@ -59,10 +59,7 @@
 
 .divTimeline {
     height: 100%;
-    /*left: 0;*/
     border-radius: 13px;
-    /*width: 101%;*/
-    /*margin-left: -13px;*/
     z-index: 1002;
 }
 
@@ -341,6 +338,7 @@ hr.style-one {
 
 .div-panel {
     background: linear-gradient(to bottom, whitesmoke, whitesmoke);
+    border-radius: 13px;
 }
 
 .div-panel2 {

@@ -92,7 +92,8 @@
                 <div class="row no-gutter" style="height: 100%; min-height: 600px; max-height: 600px;">
 
                     <!-- PANEL BÚSQUEDA -->
-                    <div id="divPanel_Busqueda" class="div-panel col-md-4 col-xs-12 img-rounded panel unselectable" style="max-height: 600px; min-height: 600px; border-radius: 13px;">
+                    <div class="col-md-4 col-xs-12 img-rounded" style="padding-right: 4px;">
+                    <div id="divPanel_Busqueda" class="div-panel panel unselectable" style="max-height: 600px; min-height: 600px;">
 
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
@@ -211,7 +212,7 @@
                         </div>
 
                     </div>
-
+                    </div>
                     <div id="light" class="white_content">
                         <div id="light_row" class="row">
                         </div>
@@ -223,7 +224,8 @@
                     <div id="fade" class="black_overlay"></div>
 
                     <!-- PANEL PLAYER -->
-                    <div id="divPanel_PlayerControl" class="div-panel col-md-8 col-xs-12 img-rounded disabled unselectable" style="float: right; max-height: 600px; min-height: 600px; border-radius: 13px;">
+                    <div id="divPanel_container" class="col-md-8 col-xs-12 img-rounded" style="padding-left: 8px;">
+                        <div id="divPanel_PlayerControl" class="div-panel unselectable disabled" style="float: right; max-height: 600px; min-height: 600px;">
 
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal;">Reproductor</span></h1>
                         <button id="btnShowHideLeftPanel" class="btn btn-primary btn-xs" type="button" title="Mostrar / Ocultar panel" style="color: white; float: left; display: none;" onclick="showHideLeftPanel();">
@@ -472,6 +474,7 @@
 
                         </div>
 
+                    </div>
                     </div>
                 </div>
                 <div class="row no-gutter">

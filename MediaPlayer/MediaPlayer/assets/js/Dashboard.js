@@ -38,7 +38,6 @@ var globalplay_playback_active = false;
 var TIMELINE_POINTER = $("#sm2-progress-ball_TIMELINE");
 var PLAYER_BOX = $("#divPanel_PlayerControl div[id*='playerBox']");
 
-
 // Get screen resolution
 var MONITOR_WIDTH = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 var MONITOR_HEIGHT = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
@@ -1584,7 +1583,6 @@ function timeframe_draw(timeline_data, start, end) {
             // Enable Globalplay
             $("#playerContainer").removeClass("disabled");
 
-
             // Loop into elements in memory
             for (var i = 0; i < elementsInMemory.length; i++) {
                 var element = elementsInMemory[i];
@@ -2392,7 +2390,7 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
         }
 
         case "D": {
-            loadElement_document(divControlsMask_VIDEO, divControlsMask_VIDEO);
+            loadElement_document(divControlsMask_VIDEO, divControlsMask_AUDIO, timestamp, fileName, filePath_str);
             break;
         }
 
@@ -2764,7 +2762,7 @@ function loadElement_comment(divControlsMask_VIDEO, timestamp, fileName) {
         PLAYER_BOX.find("div[name='divComment']").remove();
 
         PLAYER_BOX.append(
-            "<div name='divComment' class='col-md-12' style='margin: 30px; margin-top:20px;'><div class='row'><h1 style='font-weight: bold;float:left;'>" +
+            "<div name='divComment' class='col-md-12' style='margin: 30px; margin-top:20px; font-size:15px !important;'><div class='row'><h1 style='font-weight: bold;float:left;'>Comentario: " +
             timestamp +
             "</h1></div><div class='row'><p class='pull-left' style='margin-top:15px;'>" +
             fileName + "</p></div></div>");
@@ -2803,7 +2801,8 @@ function loadElement_image(file_url, divControlsMask_VIDEO, divControlsMask_AUDI
 }
 
 //************************************ 5. DOCUMENT Element **************************************
-function loadElement_document(divControlsMask_VIDEO, divControlsMask_VIDEO) {
+function loadElement_document(divControlsMask_VIDEO, divControlsMask_AUDIO, timestamp, fileName, filePath_str) {
+    /*
     loadPlayerBoxImage("url(assets/images/document.png)");
     if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
         divControlsMask_VIDEO.hide();
@@ -2812,6 +2811,31 @@ function loadElement_document(divControlsMask_VIDEO, divControlsMask_VIDEO) {
     if (divControlsMask_VIDEO != null && divControlsMask_AUDIO.length > 0) {
         divControlsMask_AUDIO.addClass("disabled");
     }
+    */
+
+    removeDivPlayerContentExcept();
+    if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
+        divControlsMask_VIDEO.hide();
+    }
+
+    if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length > 0) {
+        divControlsMask_AUDIO.addClass("disabled");
+    }
+
+    if (PLAYER_BOX != null && PLAYER_BOX.length) {
+
+        // Clear previous comments
+        PLAYER_BOX.find("div[name='divComment']").remove();
+
+        PLAYER_BOX.append(
+            "<div name='divComment' class='col-md-12' style='margin: 30px; margin-top:20px; font-size:15px !important;'><div class='row'><h1 style='font-weight: bold;float:left;'>Documento: " +
+            timestamp +
+            "</h1></div><div class='row'><p class='pull-left' style='margin-top:15px;'>" +
+            fileName + "</p></div>" +
+            "<div class='row'><p class='pull-left' style='margin-top:15px;'> Click <a href='" + filePath_str + "'>aquí</a> para descargar y visualizar el documento.</p></div></div>");
+    }
+    loadPlayerBoxImage("url(assets/images/document.png)");
+    $("#lnkElementDownload").removeClass("disabled");
 }
 
 
@@ -4026,7 +4050,6 @@ function callback2() {
         var divPanel_PlayerControl = $("#divPanel_PlayerControl");
         var divPanel_Busqueda = $('#divPanel_Busqueda');
         if (divPanel_Busqueda != null && divPanel_Busqueda.length) {
-            //divPanel_PlayerControl.css('width', '96%');
             divPanel_Busqueda.show("slide", {
                 direction: "left"
             }, 400, callback3);
