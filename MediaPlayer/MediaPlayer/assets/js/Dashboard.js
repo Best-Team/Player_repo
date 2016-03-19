@@ -1537,7 +1537,7 @@ function timeframe_draw(timeline_data, start, end) {
             video: "purple",
             audio: "red",
             documento: "green",
-            comentario: "orange",
+            comentario: "lightGoldenrodYellow", // orange 
             imagen: "Violet"
         }
 
@@ -1942,7 +1942,7 @@ function clearAllStyleSettings(type_longStr) {
             }
         case "Comentario":
             {
-                color_str = "orange";
+                color_str = "lightGoldenrodYellow"; // orange
                 break;
             }
         case "Imagen":
@@ -1965,16 +1965,14 @@ function paintSelectionClick(tapeID, timestamp) {
     // Left panel
     $("#tblLeftGridElements button[name='btnTimelineElement']").removeClass("active");
     $("#tblLeftGridElements tr[id*='tape_'] > td > h5").attr("style", "font-weight:normal;"); //
-    $("#tblLeftGridElements tr[id*='tape_']").attr("style", "border:inherit;"); //
-    //$("#tblLeftGridElements tr[id*='tape_']").not("[name='Extra']").css("background-color", "inherit"); 
+    $("#tblLeftGridElements tr[id*='tape_']").attr("style", "border: regular"); //
     $("#tblLeftGridElements tr[id*='tape_'][name='Extra']").css("background-color", "#D1E2F3");
-    $("#tblLeftGridElements tr[id*='tape_'][name='Oreka']").css("background-color", "inherit");
+    //$("#tblLeftGridElements tr[id*='tape_'][name='Oreka']").css("background-color", "inherit");
 
     // Bottom
     var vAllBottom_texts = $("g[id*='tlTape_'] > text");
     var vAllBottom_rects = $("g[id*='tlTape_'] > rect");
-    if (vAllBottom_texts != null && vAllBottom_texts.length &&
-        vAllBottom_rects != null && vAllBottom_rects.length) {
+    if (vAllBottom_texts != null && vAllBottom_texts.length && vAllBottom_rects != null && vAllBottom_rects.length) {
         vAllBottom_texts.attr("fill", "black");
         vAllBottom_rects.attr("stroke", "none");
         vAllBottom_rects.attr("stroke-width", 0);
@@ -1984,7 +1982,7 @@ function paintSelectionClick(tapeID, timestamp) {
 
     // Left panel
     $("#tblLeftGridElements #tape_" + tapeID + " > td > h5").attr("style", "font-weight:bold"); 
-    $("#tblLeftGridElements #tape_" + tapeID).attr("style", "border:solid #446e9b "); 
+    $("#tblLeftGridElements #tape_" + tapeID).attr("style", "border:4px solid rgba(0, 184, 255, 0.39)"); 
     $("#tblLeftGridElements #tape_" + tapeID + "[name='Extra']").css("background-color", "#D1E2F3");
 
 
@@ -1992,8 +1990,8 @@ function paintSelectionClick(tapeID, timestamp) {
     var vBottom_text = $("#tlTape_" + tapeID + " > text");
     var vBottom_rect = $("#tlTape_" + tapeID + " > rect");
     if (vBottom_text != null && vBottom_text.length && vBottom_rect != null && vBottom_rect.length) {
-        vBottom_text.attr("fill", "DodgerBlue ");
-        vBottom_rect.attr("stroke", "DodgerBlue ");
+        vBottom_text.attr("fill", "DodgerBlue");
+        vBottom_rect.attr("stroke", "DodgerBlue");
         vBottom_rect.attr("stroke-width", 4);
         vBottom_rect.attr("stroke-opacity", 0.9);
     }
@@ -2767,7 +2765,7 @@ function loadElement_comment(divControlsMask_VIDEO, timestamp, fileName) {
             "</h1></div><div class='row'><p class='pull-left' style='margin-top:15px;'>" +
             fileName + "</p></div></div>");
     }
-    loadPlayerBoxImage("url(assets/images/document.png)");
+    loadPlayerBoxImage("url(assets/images/comments.png)");
     $("#lnkElementDownload").addClass("disabled");
     $("#btnRemoveElement").removeClass("disabled");
 }
@@ -4560,7 +4558,7 @@ function confirmAddComment() {
                     tr += "<td>";
                     tr += "<h5>" + "" + "</h5>";
                     tr += "<td>";
-                    tr += "<button type='button' class='btn btn-default btn-sm' style='color:orange; opacity: 0.9; background-color: beige; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' ";
+                    tr += "<button type='button' class='btn btn-default btn-sm' style='color:lightGoldenrodYellow; opacity: 0.9; background-color: beige; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' "; // orange
                     tr += "title='C' onclick='clickTimelineElement2(\"" + object.tapeID + "\", \"" + object.count + "\", \"" + object.duration + "\", \"" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "\", \"Comentario\", \"" + object.tapeID + "\", \"true\", \"" + object.fileName + "\", \"" + object.filePath + "\", \"" + object.duration_formatStr + "\", \"C\", \"OK\"" + ")' ><span class='glyphicon glyphicon-comment' aria-hidden='true'></span></button>";
                     tr += "<td>";
                     tr += "<h5 id='timestamp'>" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "</h5>";
