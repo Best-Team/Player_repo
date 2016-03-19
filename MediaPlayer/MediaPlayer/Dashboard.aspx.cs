@@ -795,7 +795,7 @@ namespace MediaPlayer
 
             /****** Table headers ******/
 
-            htmlTable.AppendLine("<table class='table' id='tblLeftGridElements'>"); // style='display:none;'
+            htmlTable.AppendLine("<table class='table unselectable' id='tblLeftGridElements'>"); // style='display:none;'
             htmlTable.AppendLine("<thead>");
             htmlTable.AppendLine("<tr style='background: #446e9b; color: whitesmoke;'>");
             htmlTable.AppendLine("<th width='3%' style='text-align: center;'><input type='checkbox' id='chbSelectAll' name='timeline_elements_checkAll' class='button' checked></th>");

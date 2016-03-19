@@ -74,7 +74,7 @@
 
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="ContentLoginStatus" runat="server">
-    <div class="container-session">
+    <div class="container-session unselectable">
         <div class="hidden-xs" style="color: #446e9b; margin-left: 15px; margin-right: 20px; cursor: default;">
             <span class="fa fa-user pull-left" aria-hidden="true"></span>
             <div class="usernameInfo" style="font: 11px/1.4em FontAwesome, Helvetica, Arial, sans-serif"></div>
@@ -92,7 +92,7 @@
                 <div class="row no-gutter" style="height: 100%; min-height: 600px; max-height: 600px;">
 
                     <!-- PANEL BÚSQUEDA -->
-                    <div id="divPanel_Busqueda" class="div-panel col-md-4 col-xs-12 img-rounded panel" style="max-height: 600px; min-height: 600px; border-radius: 13px;">
+                    <div id="divPanel_Busqueda" class="div-panel col-md-4 col-xs-12 img-rounded panel unselectable" style="max-height: 600px; min-height: 600px; border-radius: 13px;">
 
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
@@ -100,7 +100,7 @@
 
                             <div class="row row-short" id="divFolios">
 
-                                <div class="pull-right" style="margin-right: 8px; margin-top: -20px;">
+                                <div class="pull-right unselectable" style="margin-right: 8px; margin-top: -20px;">
                                     <h6># Resultados: 
 						                <asp:Label Text="0" ID="lblResultsCount" runat="server" />
                                     </h6>
@@ -223,7 +223,7 @@
                     <div id="fade" class="black_overlay"></div>
 
                     <!-- PANEL PLAYER -->
-                    <div id="divPanel_PlayerControl" class="div-panel col-md-8 col-xs-12 img-rounded disabled" style="float: right; max-height: 600px; min-height: 600px; border-radius: 13px;">
+                    <div id="divPanel_PlayerControl" class="div-panel col-md-8 col-xs-12 img-rounded disabled unselectable" style="float: right; max-height: 600px; min-height: 600px; border-radius: 13px;">
 
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal;">Reproductor</span></h1>
                         <button id="btnShowHideLeftPanel" class="btn btn-primary btn-xs" type="button" title="Mostrar / Ocultar panel" style="color: white; float: left; display: none;" onclick="showHideLeftPanel();">
@@ -231,7 +231,7 @@
                         </button>
 
                         <div class="row row-short">
-                            <label id="lblElementName" class="pull-left" style="margin-left: 40px;">Video Player</label>
+                            <label id="lblElementName" class="pull-left unselectable" style="margin-left: 20px; font-size: 20px;">Video Player</label>
                         </div>
                         <div class="row row-short" style="margin-top: 1%; display: block;">
 
@@ -306,7 +306,7 @@
                                     <!-- PLAYER AUXILIAR - AUDIO -->
                                     <div id="divPlayer_AUDIO" style="display: block;">
                                         <div class="row row-short">
-                                            <label class="pull-left" style="margin-top: 15px; margin-bottom: -3px; margin-left: 40px;">Audio Player</label>
+                                            <label class="pull-left unselectable" style="margin-top: 15px; margin-bottom: -3px; margin-left: 20px; font-size: 20px;">Audio Player</label>
                                         </div>
                                         <div class="row row-short" style="margin-top: 1%; margin-left: 20px;">
 
@@ -374,7 +374,7 @@
                             </div>
 
                             <!-- Right slide - Element details info -->
-                            <div class="col-md-2 img-rounded" style="height: 70%; padding-right: 5px; width: 20%;">
+                            <div class="col-md-2 img-rounded unselectable" style="height: 70%; padding-right: 5px; width: 20%;">
                                 <div class="row row-short">
                                     <label id="lblDetalles" class="pull-left" style="margin-top: 5px; margin-bottom: -3px">Detalles:</label>
                                 </div>
@@ -384,7 +384,7 @@
                                 </div>
                                 <div class="row row-short" style="margin-bottom: 10px;">
                                     <div class="form-group form-group-sm">
-                                        <input id="lblName" type="text" readonly="true" class="form-control form-group-sm" />
+                                        <input id="lblName" type="text" readonly="true" class="form-control form-group-sm unselectable" style="cursor: default;" />
                                     </div>
                                 </div>
                                 <div class="row row-short" style="margin-left: 10px; margin-top: -8px;">
@@ -392,7 +392,7 @@
                                 </div>
                                 <div class="row row-short" style="margin-bottom: 10px;">
                                     <div class="form-group form-group-sm">
-                                        <input id="lblType" type="text" readonly="true" class="form-control form-group-sm" />
+                                        <input id="lblType" type="text" readonly="true" class="form-control form-group-sm unselectable" style="cursor: default;" />
                                     </div>
                                 </div>
                                 <div class="row row-short" style="margin-left: 10px;">
@@ -400,7 +400,7 @@
                                 </div>
                                 <div class="row row-short" style="margin-bottom: 10px;">
                                     <div class="form-group form-group-sm">
-                                        <input id="lblTimestamp" type="text" readonly="true" class="form-control form-group-sm" />
+                                        <input id="lblTimestamp" type="text" readonly="true" class="form-control form-group-sm unselectable" style="cursor: default;" />
                                     </div>
                                 </div>
                                 <div class="row row-short" style="margin-left: 10px;">
@@ -408,7 +408,7 @@
                                 </div>
                                 <div class="row row-short" style="margin-bottom: 10px;">
                                     <div class="form-group form-group-sm">
-                                        <input id="lblDuration" type="text" readonly="true" class="form-control form-group-sm" />
+                                        <input id="lblDuration" type="text" readonly="true" class="form-control form-group-sm unselectable" style="cursor: default;" />
                                     </div>
                                 </div>
                                 <div class="row row-short" style="margin-left: 10px;">
@@ -416,7 +416,7 @@
                                 </div>
                                 <div class="row row-short" style="margin-bottom: 10px;">
                                     <div class="form-group form-group-sm">
-                                        <input id="lblStatus" type="text" readonly="true" class="form-control form-group-sm" />
+                                        <input id="lblStatus" type="text" readonly="true" class="form-control form-group-sm unselectable" style="cursor: default;" />
                                     </div>
                                 </div>
                                 <br />
@@ -592,7 +592,7 @@
                 <div class="row no-gutter">
 
                     <!-- PANEL TIMELINE -->
-                    <div id="globalPlayer_popup">
+                    <div id="globalPlayer_popup" class="unselectable">
 
                         <!-- GLOBALPLAY SCREEN -->
                         <div id="divgp_sc" class="globalplayBox img-rounded" style="display: none;">

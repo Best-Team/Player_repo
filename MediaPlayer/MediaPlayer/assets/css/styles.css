@@ -1,4 +1,11 @@
-﻿@charset "utf-8";
+﻿.iclogo {
+    width: 30px;
+    display: inline-block !important;
+    margin-bottom: 5px;
+    margin-right: 5px;    
+}
+
+@charset "utf-8";
 /* CSS Document  --------------------------------------------------------------------------------------------*/
 a, abbr, acronym, address, applet, article, aside, audio,
 b, blockquote, big, body,
@@ -447,3 +454,5 @@ ul li p {
 	background-image:url(../images/footerPoweredByIC.png);
     margin-top: -15px;
 }
+
+
