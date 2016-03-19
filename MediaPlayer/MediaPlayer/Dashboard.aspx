@@ -678,7 +678,7 @@
 
                                 <div id="divTimelineProgress" style="height: 8px; position: absolute;"></div> <!-- margin-top: 10px; -->
                                 <!-- Contenedor draggable para el Progress Pointer -margin-top: -5px -->
-                                <div id="timeframe" class="timeframe col-md-10">
+                                <div id="timeframe" class="timeframe col-md-10" style="margin-top:-10px;">
                                 </div>
 
                                 <div id="sm2-inline-element" class="sm2-inline-element sm2-inline-status" style="position: absolute;">

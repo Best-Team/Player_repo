@@ -511,10 +511,7 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
             case "ogg": {
 
                 // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
-
-                //var js_player = '<div id="div' + global_elementID + '" class="divVideo" style="float:left;">';
-                //js_player += '<video id="' + global_elementID + '" preload="none" style="width:' + visual_size_width + 'px; height:' + visual_size_height + 'px;" name="visual_element" autoplay>';
-                var js_player = '<div id="div' + global_elementID + '" class="divVideo" style="float:left; width:' + visual_size_width + 'px; height:' + visual_size_height + 'px;">';
+                var js_player = '<div id="div' + global_elementID + '" class="divVideo" style="float:left; width:' + visual_size_width + 'px; height:' + visual_size_height + 'px; background:aliceblue;">';
                 js_player += '<video id="' + global_elementID + '" preload="none" style="width:' + (visual_size_width - 5) + 'px; height:' + (visual_size_height - 5) + 'px;" name="visual_element" autoplay>';
                 js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
                 js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
@@ -666,7 +663,7 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
                         // WMP IE Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
 
                         // ActiveX video object
-                        var js_player = "<div id='div" + global_elementID + "' name='visual_element' class='divVideo' style='float:left; width:" + visual_size_width + "px; " + "height:" + visual_size_height + "px;'> "; 
+                        var js_player = "<div id='div" + global_elementID + "' name='visual_element' class='divVideo' style='float:left; width:" + visual_size_width + "px; " + "height:" + visual_size_height + "px; background:aliceblue;'> ";
                         js_player += "<object id='" + global_elementID + "' data='" + file_url + "' ";
                         js_player += "width='" + (visual_size_width - 5) + "' height='" + (visual_size_height - 5) + "' ";
                         js_player += "CLASSID='CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6'> ";
@@ -787,7 +784,7 @@ function globalplay_image(file_url, visual_size_width, visual_size_height, flex_
     var timestamp = element_alreadyTaken[0].timestamp;
 
     $('<a name="visual_element" id="' + global_elementID + '" style="width:' + visual_size_width + 'px; height:' + visual_size_height + 'px;' +
-       'background-image:url(' + file_url + '); float:left; position:relative; margin:8px 12px; background-size: auto 100%;"' +
+       'background-image:url(' + file_url + '); float:left; position:relative; margin:8px 12px; background-size: auto 100%; background-color: aliceblue;"' +
        'width="' + visual_size_width + '" height="' + visual_size_height + '">' + fileName + '</a>').appendTo(flex_div).fadeIn(2000);
 
     // Add Fullscreen click Event
