@@ -888,7 +888,8 @@ function checkRolesAndTypesFilters() {
 
 function openFullscreen() {
 
-    if (oldPlayer_activeElement_type != null && oldPlayer_activeElement_type.length > 0) {
+    if (oldPlayer_activeElement_type != null && oldPlayer_activeElement_type.length > 0 &&
+        oldPlayer_activeElement_extension != null && oldPlayer_activeElement_extension.length > 0) {
 
         if (oldPlayer_activeElement_type === "I") {
 
@@ -899,8 +900,17 @@ function openFullscreen() {
             // Remove all images but first
             $("#photobox-container img").not(":first").remove();
         } else {
+
+            // HTML5 video tag
+            var video_object = $("#html_video")[0];
+            if (oldPlayer_activeElement_extension === "avi") {
+
+                // IE object tag
+                video_object = $("object")[0];
+            }
+
             // Native video tag fullscreen function
-            goFullscreen();
+            goFullscreen(video_object);
         }
     }
 }
@@ -3097,40 +3107,40 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
     return ok;
 }
 
-function goFullscreen() {
+// Video tag fullscreen API - Source: https://msdn.microsoft.com/en-us/library/dn265028%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
+// Source: http://www.thecssninja.com/demo/fullscreen/
+
+function goFullscreen(video_object) {
 
     // Must be called as a result of user interaction to work
-    var video_element1 = $("#html_video")[0];
-    try {
-        if (
-	        document.fullscreenEnabled ||
-	        document.webkitFullscreenEnabled ||
-	        document.mozFullScreenEnabled ||
-	        document.msFullscreenEnabled
-        ) {
-            if (video_element1.requestFullscreen) {
-                video_element1.requestFullscreen();
-            } else if (video_element1.webkitRequestFullscreen) {
-                video_element1.webkitRequestFullscreen();
-            } else if (video_element1.mozRequestFullScreen) {
-                video_element1.mozRequestFullScreen();
-            } else if (video_element1.msRequestFullscreen) {
-                video_element1.msRequestFullscreen();
+    if (video_object != null) {
+        try {
+            if (document.fullscreenEnabled ||
+                document.webkitFullscreenEnabled ||
+                document.mozFullScreenEnabled ||
+                document.msFullscreenEnabled) {
+                if (video_object.requestFullscreen) {
+                    video_object.requestFullscreen();
+                } else if (video_object.webkitRequestFullscreen) {
+                    video_object.webkitRequestFullscreen();
+                } else if (video_object.mozRequestFullScreen) {
+                    video_object.mozRequestFullScreen();
+                } else if (video_object.msRequestFullscreen) {
+                    video_object.msRequestFullscreen();
+                }
             }
+        } catch (err) {
+            console.log("l:3173 Error going Fullscreen");
+            console.log(err);
         }
-    } catch (err) {
-        console.log("l:3173 Error going Fullscreen");
-        console.log(err);
     }
 }
+
 function fullscreenChanged() {
     if (document.webkitFullscreenElement == null) {
-        $("video")[0].style.display = "none";
+        //$("video")[0].style.display = "none";
     }
 }
-//document.onwebkitfullscreenchange = fullscreenChanged;
-//document.documentElement.onclick = goFullscreen;
-//document.onkeydown = goFullscreen;
 
 // HTML5 support:
 function loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divControlsMask_VIDEO) {
