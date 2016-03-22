@@ -225,7 +225,7 @@
 
                     <!-- PANEL PLAYER -->
                     <div id="divPanel_container" class="col-md-8 col-xs-12 img-rounded" style="padding-left: 8px;">
-                        <div id="divPanel_PlayerControl" class="div-panel unselectable disabled" style="float: right; max-height: 600px; min-height: 600px;">
+                        <div id="divPanel_PlayerControl" class="div-panel unselectable disabled" style="float: right; max-height: 600px; min-height: 600px; width: 100%;">
 
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal;">Reproductor</span></h1>
                         <button id="btnShowHideLeftPanel" class="btn btn-primary btn-xs" type="button" title="Mostrar / Ocultar panel" style="color: white; float: left; display: none;" onclick="showHideLeftPanel();">

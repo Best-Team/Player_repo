@@ -335,15 +335,17 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
     var max_amount = GLOBALPLAY_MAX_COLLISION_ELEMENTS;
     if (visual_count <= max_amount) {
 
+
+        // Vertically center visual elements 
         if (visual_count > 0 && visual_count <= 4) {
             $(".flex").css("display", "flex");
             $(".flex").css("align-items", "center");
-            $(".flex").css("height", "100%");
+            $(".flex").css("height", "100%"); // For IE
         }
         else {
             $(".flex").css("display", "inline-block");
             $(".flex").css("align-items", "inherit");
-            $(".flex").css("height", "inherit");
+            $(".flex").css("height", "inherit"); // For IE
         }
 
         // Element distinct types 
