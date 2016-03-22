@@ -309,21 +309,42 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
     var visual_alreadyAdded = $(".flex").find('[name="webchimera"], [name="fbsviewer"], [name="visual_element"]').length;
     var visual_count = visual_queue_length + visual_alreadyAdded;
 
+    var flex_max_width = 1175;
+
     // >= 4 visual elements
     var width = 275;
-    var height = 275;
+    var height = 260; 
 
     var current_screen = window.innerWidth;
 
-    // Wide Promad
+    // Wide extra
     if (current_screen >= 1920) {
         width = 390;
-        height = 275;
+        height = 290;
+        flex_max_width = 1639;
     }
+    // Wide Promad
+    else if (current_screen >= 1440) {
+        width = 305; 
+        height = 290;
+        flex_max_width = 1299; 
+    }
+
 
     // MAX Amount of simultaneous elements 
     var max_amount = GLOBALPLAY_MAX_COLLISION_ELEMENTS;
     if (visual_count <= max_amount) {
+
+        if (visual_count > 0 && visual_count <= 4) {
+            $(".flex").css("display", "flex");
+            $(".flex").css("align-items", "center");
+            $(".flex").css("height", "100%");
+        }
+        else {
+            $(".flex").css("display", "inline-block");
+            $(".flex").css("align-items", "inherit");
+            $(".flex").css("height", "inherit");
+        }
 
         // Element distinct types 
         switch (visual_count) {
@@ -331,58 +352,66 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
                 {
                     // Wide normal
                     width = 1000;
-                    height = 550;
+                    height = 500;
 
                     // Wide extra
                     if (current_screen >= 1920) {
-                        width = 1400;
+                        width = 1550;
                         height = 600;
+                        flex_max_width = 1600;
                     }
                     // Wide Promad
                     else if (current_screen >= 1440) {
-                        width = 700;
+                        width = 1300;
                         height = 600;
+                        flex_max_width = 1440;
                     }
                     break;
                 }
             case 2:
                 {
                     // Wide normal
-                    width = 600;
-                    height = 550;
+                    width = 500;
+                    height = 500;
+                    flex_max_width = 1200;
 
                     // Wide extra
                     if (current_screen >= 1920) {
-                        width = 800;
+                        width = 760;
                         height = 600;
+                        flex_max_width = 1600;
                     }
                     // Wide Promad
                     else if (current_screen >= 1440) {
-                        width = 600;
+                        width = 650;
                         height = 600;
+                        flex_max_width = 1440;
                     }
                     break;
                 }
             case 3:
                 {
                     // Wide normal
-                    width = 380;
-                    height = 400;
+                    width = 350;
+                    height = 500;
 
                     // Wide extra
                     if (current_screen >= 1920) {
-                        width = 500;
+                        width = 510;
                         height = 500;
                     }
                     // Wide Promad
                     else if (current_screen >= 1440) {
-                        width = 400;
+                        width = 415;
                         height = 400;
+                        flex_max_width = 1440;
                     }
                     
                     break;
                 }
         }
+
+        $(".flex").css("max-width", flex_max_width + "px");
 
         var visual_size = {
             width: width,
@@ -513,8 +542,8 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
                 // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
                 var js_player = '<div id="div' + global_elementID + '" class="divVideo" style="float:left; width:' + visual_size_width + 'px; height:' + visual_size_height + 'px; background:aliceblue;">';
                 js_player += '<video id="' + global_elementID + '" preload="none" style="width:' + (visual_size_width - 5) + 'px; height:' + (visual_size_height - 5) + 'px;" name="visual_element" autoplay>';
-                js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
-                js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
+                js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4; codecs=\'avc1.42E01E, mp4a.40.2\'">';
+                js_player += '<source id="webm" src="' + file_url + '" type="video/webm; codecs=\'vp8, vorbis\'">';
                 js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
                 js_player += '</video></div>';
 

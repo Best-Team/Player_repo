@@ -461,7 +461,7 @@
                                         </div>
                                     </div>
 
-                                    <button id="btnFullscreen" class="btn btn-default" type="button" title="Maximizar video" onclick="openFullscreen();">
+                                    <button id="btnFullscreen" class="btn btn-default" type="button" title="Maximizar video" onclick="openFullscreen();"> <!-- goFullscreen() -->
                                         <span class="fa fa-arrows-alt" aria-hidden="true"></span>
                                     </button>
 
@@ -621,7 +621,7 @@
 
                             <div id="flex-messages-bottom">
                                 <div id="globalplay_divComments" class="info-label" style="bottom: 16px;">
-                                    <h2 class="flex-messages-top-h2 label label-warning" style="z-index: 1001; background-color: orange; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto;"></h2>
+                                    <h2 class="flex-messages-top-h2 label label-warning" style="z-index: 1001; color: #474747; background-color:#FDFDF0; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto; text-shadow: none;"></h2> <!-- orange - #E8E86D-->
                                 </div>
                             </div>
                             </div>

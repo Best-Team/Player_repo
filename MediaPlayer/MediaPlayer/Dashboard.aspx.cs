@@ -778,7 +778,7 @@ namespace MediaPlayer
 
         private void SearchFolioElements(string qs_folioID = "")
         {
-            //Prepare to run the search after loading & event handling stage in page lifecycle:
+            // Prepare to run the search after loading & event handling stage in page lifecycle:
             _signalSearchFolioElements = true;
             _argSearchFolioElements = qs_folioID;
         }

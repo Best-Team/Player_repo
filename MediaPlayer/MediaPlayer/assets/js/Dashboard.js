@@ -866,7 +866,6 @@ function loadHiddenFields() {
 }
 
 
-
 function getFormattedDate(date) {
     var day = date.getDate();
     var month = date.getMonth() + 1;
@@ -880,65 +879,30 @@ function getFormattedDate(date) {
 
 // Change Roles and Types filter checkboxes to checked value 
 function checkRolesAndTypesFilters() {
-    $("#divTypes input:not(:checked)").click()
-    $("#divRoles input:not(:checked)").click()
+    if (!globalplay_active) {
+        $("#divTypes input:not(:checked)").click()
+        $("#divRoles input:not(:checked)").click()
+    }
 }
 
 
 function openFullscreen() {
 
     if (oldPlayer_activeElement_type != null && oldPlayer_activeElement_type.length > 0) {
-        switch (oldPlayer_activeElement_type) {
-            case "I": {
 
-                /* ------------------  IMAGE CASE ------------------ */
-                $("#imgPlayer").photobox();
-                $("#imgPlayer").click();
+        if (oldPlayer_activeElement_type === "I") {
 
-                // Remove all images but first
-                $("#photobox-container img").not(":first").remove();
+            /* ------------------  IMAGE CASE ------------------ */
+            $("#imgPlayer").photobox();
+            $("#imgPlayer").click();
 
-                break;
-            }
-
-            case "S":
-            case "V": {
-
-                if (oldPlayer_activeElement_extension != null && oldPlayer_activeElement_extension.length > 0) {
-                    switch (oldPlayer_activeElement_extension) {
-
-                        // HTML5 support:
-                        case "mp4":
-                        case "webm":
-                        case "ogg": {
-
-                            openFullscreen_video(true, "html_video");
-
-                            break;
-                        }
-
-                            // Webchimera Plugin Player or else:
-                        case "avi":
-                        case "crypt":
-                        case "bin":
-                        default: {
-
-                            if (getIsIE()) {
-                                openFullscreen_video(true, "video_object1");
-                            } else {
-                                openFullscreen_video(false, null);
-                            }
-
-                            break;
-                        }
-                    }
-                }
-
-                break;
-            }
+            // Remove all images but first
+            $("#photobox-container img").not(":first").remove();
+        } else {
+            // Native video tag fullscreen function
+            goFullscreen();
         }
     }
-
 }
 
 function openFullscreen_video(isHTML5, videoID) {
@@ -1014,59 +978,16 @@ function closeFullscreen() {
     var divPlayer_VIDEO = $("#divPlayer_VIDEO");
 
     if (oldPlayer_activeElement_type != null && oldPlayer_activeElement_type.length > 0) {
-        switch (oldPlayer_activeElement_type) {
-            case "I": {
 
-                if (light != null && light.length && fade != null && fade.length && PLAYER_BOX != null && PLAYER_BOX.length && divControlsMask_VIDEO != null && divControlsMask_VIDEO.length && divPlayer_VIDEO != null && divPlayer_VIDEO.length) {
+        if (oldPlayer_activeElement_type === "I") {
+            // Move player and banner to div container
+            divControlsMask_VIDEO.appendTo(PLAYER_BOX);
+            divPlayer_VIDEO.appendTo(PLAYER_BOX);
 
-                    // Move player and banner to div container
-                    divControlsMask_VIDEO.appendTo(PLAYER_BOX);
-                    divPlayer_VIDEO.appendTo(PLAYER_BOX);
-
-                    // styles
-                    light.css('display', 'none');
-                    fade.css('display', 'none');
-                    divControlsMask_VIDEO.css('height', '54px');
-                }
-                break;
-            }
-
-            case "S":
-            case "V": {
-
-                if (oldPlayer_activeElement_extension != null && oldPlayer_activeElement_extension.length > 0) {
-                    switch (oldPlayer_activeElement_extension) {
-
-                        // HTML5 support:
-                        case "mp4":
-                        case "webm":
-                        case "ogg": {
-
-                            closeFullscreen_video(true, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade, "html_video");
-
-                            break;
-                        }
-
-                        // Webchimera Plugin Player or else:
-                        case "avi":
-                        case "crypt":
-                        case "bin":
-                        default: {
-
-                            if (getIsIE()) {
-                                closeFullscreen_video(true, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade, "video_object1");
-                            } else {
-                                closeFullscreen_video(false, divControlsMask_VIDEO, divPlayer_VIDEO, light, fade, null);
-                            }
-
-                            break;
-                        }
-                    }
-                }
-
-                break;
-            }
-
+            // styles
+            light.css('display', 'none');
+            fade.css('display', 'none');
+            divControlsMask_VIDEO.css('height', '54px');
         }
     }
 }
@@ -1444,50 +1365,60 @@ function clear_timeline() {
 }
 
 function pre_timeframe_prepare() {
-    var hdnJSonList = $("input[id*='_hdnJSonList']").val();
-    var hdnJSonStart = $("input[id*='_hdnJSonStart']").val();
-    var hdnJSonEnd = $("input[id*='_hdnJSonEnd']").val();
 
-    if (hdnJSonList != null && hdnJSonList.length && hdnJSonStart != null && hdnJSonStart.length && hdnJSonEnd != null && hdnJSonEnd.length) {
-        timeframe_prepare(JSON.parse(hdnJSonList), hdnJSonStart, hdnJSonEnd);
+    if (!globalplay_active) {
+
+        var hdnJSonList = $("input[id*='_hdnJSonList']").val();
+        var hdnJSonStart = $("input[id*='_hdnJSonStart']").val();
+        var hdnJSonEnd = $("input[id*='_hdnJSonEnd']").val();
+
+        if (hdnJSonList != null && hdnJSonList.length && hdnJSonStart != null && hdnJSonStart.length && hdnJSonEnd != null && hdnJSonEnd.length) {
+            timeframe_prepare(JSON.parse(hdnJSonList), hdnJSonStart, hdnJSonEnd);
+        }
+
+        // Show timeline pointer
+        TIMELINE_POINTER.show();
+
+        // Re Load all grid button events, because Ajax call removes them
+
+        /**** Event: OnClick check all elements at left grid ****/
+        loadGridCheckboxAll_event();
+
+        /**** Event: OnClick Load on click event remove button ****/
+        loadClickRemoveElementSelected_event();
+
+        /**** Event: OnClick Load on click event fullscreen button for Screen recording elements ****/
+        loadClickFullscreen_event();
+
+        /**** Load Globalplay settings ****/
+        loadGlobalplay_settings();
+
+        /**** Load Folios ID to UploadFile and AddComment ****/
+        loadFoliosID();
+
+        /**** Slider control: comment duration ****/
+        $("#sliderSingle1").slider({
+            from: 1,
+            to: GLOBALPLAY_seconds_total, // 3600 seg
+            step: 1,
+            round: 1,
+            format: {
+                format: '##',
+                locale: 'de'
+            },
+            dimension: '&nbsp;',
+            skin: "round"
+        });
     }
+}
 
-    // Show timeline pointer
-    TIMELINE_POINTER.show();
-
-    // Re Load all grid button events, because Ajax call removes them
-
-    /**** Event: OnClick check all elements at left grid ****/
-    loadGridCheckboxAll_event();
-
-    /**** Event: OnClick Load on click event remove button ****/
-    loadClickRemoveElementSelected_event();
-
-    /**** Event: OnClick Load on click event fullscreen button for Screen recording elements ****/
-    loadClickFullscreen_event();
-
-    /**** Load Globalplay settings ****/
-    loadGlobalplay_settings();
-
-    /**** Load Folios ID to UploadFile and AddComment ****/
-    loadFoliosID();
-
-    /**** Slider control: comment duration ****/
-    $("#sliderSingle1").slider({
-        from: 1,
-        to: GLOBALPLAY_seconds_total, // 3600 seg
-        step: 1,
-        round: 1,
-        format: {
-            format: '##',
-            locale: 'de'
-        },
-        dimension: '&nbsp;',
-        skin: "round"
-    });
+// Clear comment tooltip popups already added 
+function clearQTip() {
+    $(".qtip").remove();
 }
 
 function timeframe_prepare(timeline_data, start, end) {
+
     getElementsInMemory();
 
     _TL_DATA = timeline_data;
@@ -1522,6 +1453,9 @@ function timeframe_draw(timeline_data, start, end) {
         $("#timeframe").empty();
         $("#timeframe").hide();
 
+        // Clear comment tooltip popups already added 
+        clearQTip();
+
         // Create timeframe object
         var t = Timeframe("#timeframe").addCategory(timeline_data).start(start).end(end).draw();
 
@@ -1537,7 +1471,7 @@ function timeframe_draw(timeline_data, start, end) {
             video: "purple",
             audio: "red",
             documento: "green",
-            comentario: "lightGoldenrodYellow", // orange 
+            comentario: "lightGoldenrodYellow", // orange - lightGoldenrodYellow - #E8E86D
             imagen: "Violet"
         }
 
@@ -1699,7 +1633,7 @@ function timeframe_draw(timeline_data, start, end) {
                                 }
                             },
                             style: {
-                                name: 'cream',
+                                name: 'cream', // cream
                                 padding: '7px 13px',
                                 width: {
                                     max: 210,
@@ -1942,7 +1876,7 @@ function clearAllStyleSettings(type_longStr) {
             }
         case "Comentario":
             {
-                color_str = "lightGoldenrodYellow"; // orange
+                color_str = "lightGoldenrodYellow"; // orange - lightGoldenrodYellow - #E8E86D
                 break;
             }
         case "Imagen":
@@ -3162,6 +3096,41 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
     return ok;
 }
 
+function goFullscreen() {
+
+    // Must be called as a result of user interaction to work
+    var video_element1 = $("#html_video")[0];
+    try {
+        if (
+	        document.fullscreenEnabled ||
+	        document.webkitFullscreenEnabled ||
+	        document.mozFullScreenEnabled ||
+	        document.msFullscreenEnabled
+        ) {
+            if (video_element1.requestFullscreen) {
+                video_element1.requestFullscreen();
+            } else if (video_element1.webkitRequestFullscreen) {
+                video_element1.webkitRequestFullscreen();
+            } else if (video_element1.mozRequestFullScreen) {
+                video_element1.mozRequestFullScreen();
+            } else if (video_element1.msRequestFullscreen) {
+                video_element1.msRequestFullscreen();
+            }
+        }
+    } catch (err) {
+        console.log("l:3173 Error going Fullscreen");
+        console.log(err);
+    }
+}
+function fullscreenChanged() {
+    if (document.webkitFullscreenElement == null) {
+        $("video")[0].style.display = "none";
+    }
+}
+//document.onwebkitfullscreenchange = fullscreenChanged;
+//document.documentElement.onclick = goFullscreen;
+//document.onkeydown = goFullscreen;
+
 // HTML5 support:
 function loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divControlsMask_VIDEO) {
 
@@ -3172,8 +3141,8 @@ function loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divContro
     var height = parseInt(divPlayer_VIDEO.css("height"), 10);
 
     var js_player = '<video id="html_video" preload="none" style="width: ' + width + 'px; height: ' + height + 'px; margin: 0 auto;">';
-    js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4">';
-    js_player += '<source id="webm" src="' + file_url + '" type="video/webm">';
+    js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4; codecs=\'avc1.42E01E, mp4a.40.2\'">';
+    js_player += '<source id="webm" src="' + file_url + '" type="video/webm; codecs=\'vp8, vorbis\'">';
     js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
     js_player += '</video>';
 
@@ -4558,7 +4527,7 @@ function confirmAddComment() {
                     tr += "<td>";
                     tr += "<h5>" + "" + "</h5>";
                     tr += "<td>";
-                    tr += "<button type='button' class='btn btn-default btn-sm' style='color:lightGoldenrodYellow; opacity: 0.9; background-color: beige; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' "; // orange
+                    tr += "<button type='button' class='btn btn-default btn-sm' style='color:orange; opacity: 0.9; background-color: beige; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' "; // orange
                     tr += "title='C' onclick='clickTimelineElement2(\"" + object.tapeID + "\", \"" + object.count + "\", \"" + object.duration + "\", \"" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "\", \"Comentario\", \"" + object.tapeID + "\", \"true\", \"" + object.fileName + "\", \"" + object.filePath + "\", \"" + object.duration_formatStr + "\", \"C\", \"OK\"" + ")' ><span class='glyphicon glyphicon-comment' aria-hidden='true'></span></button>";
                     tr += "<td>";
                     tr += "<h5 id='timestamp'>" + object.timestamp.toString("dd'-'MM'-'yyyy HH':'mm':'ss") + "</h5>";
