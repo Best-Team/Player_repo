@@ -1900,8 +1900,8 @@ function paintSelectionClick(tapeID, timestamp) {
     $("#tblLeftGridElements button[name='btnTimelineElement']").removeClass("active");
     $("#tblLeftGridElements tr[id*='tape_'] > td > h5").attr("style", "font-weight:normal;"); //
     $("#tblLeftGridElements tr[id*='tape_']").attr("style", "border: regular"); //
-    $("#tblLeftGridElements tr[id*='tape_'][name='Extra']").css("background-color", "#D1E2F3");
-    //$("#tblLeftGridElements tr[id*='tape_'][name='Oreka']").css("background-color", "inherit");
+    //$("#tblLeftGridElements tr[id*='tape_'][name='Extra']").css("background-color", "inherit"); // #D1E2F3
+    $("#tblLeftGridElements tr[id*='tape_'][name='Oreka']").css("background-color", "#D1E2F3");
 
     // Bottom
     var vAllBottom_texts = $("g[id*='tlTape_'] > text");
@@ -1917,7 +1917,8 @@ function paintSelectionClick(tapeID, timestamp) {
     // Left panel
     $("#tblLeftGridElements #tape_" + tapeID + " > td > h5").attr("style", "font-weight:bold"); 
     $("#tblLeftGridElements #tape_" + tapeID).attr("style", "border:4px solid rgba(0, 184, 255, 0.39)"); 
-    $("#tblLeftGridElements #tape_" + tapeID + "[name='Extra']").css("background-color", "#D1E2F3");
+    //$("#tblLeftGridElements #tape_" + tapeID + "[name='Extra']").css("background-color", "inherit"); //#D1E2F3
+    $("#tblLeftGridElements #tape_" + tapeID + "[name='Oreka']").css("background-color", "#D1E2F3"); //#D1E2F3
 
 
     // Bottom
@@ -4515,7 +4516,7 @@ function confirmAddComment() {
                     var username = globalUserName;
 
                     // Create new row to HTML table
-                    var tr = "<tr id='tape_" + object.tapeID + "' style='background-color:#D1E2F3;' name='Extra'>";
+                    var tr = "<tr id='tape_" + object.tapeID + "' style='background-color:inherit;' name='Extra'>"; // #D1E2F3
                     tr += "<td>";
                     tr += "<input type='checkbox' name='timeline_elements' class='button' value='" + object.tapeID + "#true#C' checked>"; //onclick='manageElement(this, " + object.tapeID + ", " + (index - 1).toString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>";
                     tr += "<td>";

@@ -936,7 +936,7 @@ namespace MediaPlayer
                             }
 
                             string color_icon = "beige";
-                            string tr_color = isExtra ? "#D1E2F3" : "inherit";
+                            string tr_color = isExtra ? "inherit" : "#D1E2F3";
                             string tr_name = isExtra ? "Extra" : "Oreka";
 
                             // Onclick event

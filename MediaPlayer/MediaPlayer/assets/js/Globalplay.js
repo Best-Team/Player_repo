@@ -351,8 +351,9 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
             case 1:
                 {
                     // Wide normal
-                    width = 1000;
+                    width = 1180;
                     height = 500;
+                    flex_max_width = 1200;
 
                     // Wide extra
                     if (current_screen >= 1920) {
@@ -371,7 +372,7 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
             case 2:
                 {
                     // Wide normal
-                    width = 500;
+                    width = 585;
                     height = 500;
                     flex_max_width = 1200;
 
@@ -392,8 +393,9 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
             case 3:
                 {
                     // Wide normal
-                    width = 350;
-                    height = 500;
+                    width = 390;
+                    height = 390;
+                    flex_max_width = 1200;
 
                     // Wide extra
                     if (current_screen >= 1920) {
