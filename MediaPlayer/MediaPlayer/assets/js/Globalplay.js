@@ -323,7 +323,7 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
         height = 290;
         flex_max_width = 1639;
     }
-    // Wide Promad
+    // Wide site
     else if (current_screen >= 1440) {
         width = 305; 
         height = 290;
@@ -361,8 +361,8 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
                         height = 600;
                         flex_max_width = 1600;
                     }
-                    // Wide Promad
                     else if (current_screen >= 1440) {
+                        // Wide site
                         width = 1300;
                         height = 600;
                         flex_max_width = 1440;
@@ -382,8 +382,8 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
                         height = 600;
                         flex_max_width = 1600;
                     }
-                    // Wide Promad
                     else if (current_screen >= 1440) {
+                        // Wide site
                         width = 650;
                         height = 600;
                         flex_max_width = 1440;
@@ -402,8 +402,8 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
                         width = 510;
                         height = 500;
                     }
-                    // Wide Promad
                     else if (current_screen >= 1440) {
+                        // Wide site
                         width = 415;
                         height = 400;
                         flex_max_width = 1440;
