@@ -127,16 +127,20 @@
 }
 
 div#playerBox {
-    background: #333;
     margin: 0 auto;
+    background: #333;    
 }
 
 .playerBox {
     min-height: 440px;
     margin-left: 20px;
-    /*margin-right: 20px;*/
     border: solid 0.17em;
     position: relative;
+    background-image: url(../images/library.png);
+    background-position-x: center;
+    background-position-y: center;
+    background-repeat: no-repeat;
+    background-size: 350px 350px;
 }
 
 .globalplayBox {
