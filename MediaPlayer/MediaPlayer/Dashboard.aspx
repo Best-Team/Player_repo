@@ -80,7 +80,7 @@
             <div class="usernameInfo"></div>
         </div>
         <button id="btn_close" class="btn btn-primary btn-xs" style="color: white; background-color: #446e9b; text-transform: none; letter-spacing: inherit;" runat="server" onserverclick="btn_close_ServerClick">
-            <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>Salir 
+            <span class="" aria-hidden="true" style='font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;'></span>Logout 
         </button>
     </div>
 </asp:Content>
@@ -97,17 +97,10 @@
 
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
-                        <div class="row" style="margin: 3px; margin-top: 25px; min-height: 110px;">
+                        <div class="row" style="margin: 3px; margin-top: 17px; min-height: 110px;">
 
                             <div class="row row-short" id="divFolios">
-
-                                <div class="pull-right unselectable" style="margin-right: 8px; margin-top: -20px;">
-                                    <h6># Resultados: 
-						                <asp:Label Text="0" ID="lblResultsCount" runat="server" />
-                                    </h6>
-                                </div>
-
-                                <div class="col-md-12" style="margin-bottom: -20px;">
+                                <div class="col-md-12" style="margin-bottom: -10px;">
                                     <div style="z-index: 0; display: inline;">
                                         <div>
                                             <asp:Timer ID="Timer1" OnTick="Timer1_Tick" runat="server" Interval="300000">
@@ -136,6 +129,12 @@
                                                 <span class="col-md-10 col-xs-10">
                                                     <asp:TextBox CssClass="form-control txbSearchBox1" placeholder="Buscar folios por número" runat="server" ID="txbSearchBox1" onkeypress="return enterSearchBox(event)" />
                                                     <asp:Button ID="btnSearchCandidate" runat="server" Style="display: none" Text="" OnClick="btnSearchCandidate_Click" />
+
+                                                    <div class="pull-right unselectable" style="margin-right: 20px; margin-top: 2px; cursor: default; position: absolute; right: 0;">
+                                                        <h6># Resultados: 
+					                	                    <asp:Label Text="0" ID="lblResultsCount" runat="server" />
+                                                        </h6>
+                                                    </div>
                                                 </span>
 
                                             </ContentTemplate>
@@ -149,7 +148,7 @@
                             </div>
                             <br />
 
-                            <div class="pull-right" style="margin-bottom: 5px; margin-right: 0; padding: 0;">
+                            <div class="pull-right" style="margin-bottom: 5px; margin-right: 0; padding: 0; margin-top:5px;">
                                 <button id="btnDownloadAll" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onclick="downloadAll();">
                                     <span class="fa fa-download" aria-hidden="true"></span>
                                 </button>
@@ -169,7 +168,7 @@
                             </div>
 
 
-                            <div class="row row-short">
+                            <div class="row row-short" style="margin-top:5px;">
                                 <ul id="nav_tabs1" class="nav nav-tabs">
                                     <li id="liFolio" onclick="return changeTab1(this);" class="active"><a name="nav_tabs" style="background: transparent;" href="#">Folio</a></li>
                                     <li id="liRoles" onclick="return changeTab1(this);"><a style="background: transparent;" href="#">Roles</a></li>
@@ -314,7 +313,7 @@
 
                                             <div id="audioContainer" class="row row-short" style="height: 80px;">
 
-                                                <div id="divControlsMask_AUDIO" class="sound_player_class sm2-bar-ui compact full-width" style="top: 0; right: 0; height: 54px">
+                                                <div id="divControlsMask_AUDIO" class="sound_player_class sm2-bar-ui compact full-width" style="top: 0; right: 0; height: 54px; border: 1px solid #CCC;">
                                                     <div class="bd sm2-main-controls" style="height: 100%;">
                                                         <div class="sm2-inline-texture"></div>
                                                         <div class="sm2-inline-gradient"></div>

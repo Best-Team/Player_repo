@@ -37,6 +37,7 @@ var globalplay_playback_active = false;
 // Timeline Global Pointer
 var TIMELINE_POINTER = $("#sm2-progress-ball_TIMELINE");
 var PLAYER_BOX = $("#divPanel_PlayerControl div[id*='playerBox']");
+var PLAYER_BOX_original_top = 0;
 
 // Get screen resolution
 var MONITOR_WIDTH = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
@@ -249,6 +250,10 @@ $(document).ready(function () {
     $("#globalplay_stop").click(function () {
         $(this).effect("scale", {}, 10);
     });
+
+    // Load player box original top
+    PLAYER_BOX_original_top = PLAYER_BOX.offset().top;
+    
 
     /*
     // Locate Popbox3 - Remove element TODO
@@ -2169,6 +2174,9 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     // Clear Player box images
     loadPlayerBoxImage("");
 
+    // Remove default background image on Playerbox
+    PLAYER_BOX.css("background-image", "none");
+
     // Enable functions logic
     divPanel_PlayerControl.removeClass("disabled");
     divControlsMask_AUDIO.removeClass("disabled");
@@ -2375,12 +2383,12 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
                 $("#aBtnFullscreen").hide(); // FBS Fullscreen
                 $("#aBtnFullscreen").addClass("disabled"); 
 
-                loadPlayer_HTML5_Webchimera_Styles1(divPlayer_VIDEO, divControlsMask_VIDEO);
+                loadPlayer_video_styles1(divPlayer_VIDEO, divControlsMask_VIDEO);
 
                 // HTML5 support:
                 ok = loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divControlsMask_VIDEO);
 
-                loadPlayer_HTML5_Webchimera_Styles2(fileName, duration, divControlsMask_AUDIO, fileStatus, ok);
+                loadPlayer_video_styles2(fileName, duration, divControlsMask_AUDIO, fileStatus, ok);
 
                 break;
             }
@@ -2400,14 +2408,14 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
             case "bin":
             default: {
 
-                loadPlayer_HTML5_Webchimera_Styles1(divPlayer_VIDEO, divControlsMask_VIDEO);
+                loadPlayer_video_styles1(divPlayer_VIDEO, divControlsMask_VIDEO);
 
                 // Webchimera plugin - Source: https://github.com/LukasBombach/nw-webchimera-demos
 
                 // Webchimera Plugin Player or else:
                 ok = loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divControlsMask_VIDEO, duration, fileName);
 
-                loadPlayer_HTML5_Webchimera_Styles2(fileName, duration, divControlsMask_AUDIO, fileStatus, ok);
+                loadPlayer_video_styles2(fileName, duration, divControlsMask_AUDIO, fileStatus, ok);
 
                 break;
             }
@@ -2782,7 +2790,7 @@ function loadElement_document(divControlsMask_VIDEO, divControlsMask_AUDIO, time
 }
 
 
-function loadPlayer_HTML5_Webchimera_Styles1(divPlayer_VIDEO, divControlsMask_VIDEO) {
+function loadPlayer_video_styles1(divPlayer_VIDEO, divControlsMask_VIDEO) {
     /************************ Styles START ************************/
     var manual_offset = 50;
     divPlayer_VIDEO.show();
@@ -2790,12 +2798,17 @@ function loadPlayer_HTML5_Webchimera_Styles1(divPlayer_VIDEO, divControlsMask_VI
 
     divControlsMask_VIDEO.show();
 
-    divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top + manual_offset + 2 });
+    divPlayer_VIDEO.offset({ top: PLAYER_BOX_original_top + manual_offset + 2 });
 
+    // Issue hotfix
+    setTimeout(function () {
+        divPlayer_VIDEO.offset({ top: PLAYER_BOX_original_top + manual_offset + 2 });
+    }, 100);
+    
     /************************ Styles END ************************/
 }
 
-function loadPlayer_HTML5_Webchimera_Styles2(fileName, duration, divControlsMask_AUDIO, fileStatus, ok) {
+function loadPlayer_video_styles2(fileName, duration, divControlsMask_AUDIO, fileStatus, ok) {
 
     /************************ Styles START ************************/
     // Set mask title
