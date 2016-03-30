@@ -212,7 +212,7 @@ div#playerBox {
     margin-left: 20px;
     border: solid 0.17em;
     position: relative;
-    background-image: url(../images/library.png);
+    /*background-image: url(../images/library.png);*/
     background-position-x: center;
     background-position-y: center;
     background-repeat: no-repeat;

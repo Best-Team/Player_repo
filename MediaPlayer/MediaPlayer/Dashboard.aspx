@@ -237,10 +237,9 @@
                         <div class="row row-short" style="margin-top: 1%; display: block;">
 
                             <!-- PLAYER VIDEO -->
-                            <div class="col-md-9 col-xs-12" style="">
+                            <div class="col-md-9 col-xs-12">
                                 <div class="row">
-
-                                    <div id="playerBox" class="img-rounded playerBox" runat="server">
+                                    <div runat="server" id="playerBox" class="img-rounded playerBox" style="background: repeating-linear-gradient( -55deg, #999, #999 23px, #474949 25px, #333 20px );">
 
                                         <div id="divPlayer_VIDEO" style="display: none;" class='photobox'>
                                             <!-- Contiene el Applet -->

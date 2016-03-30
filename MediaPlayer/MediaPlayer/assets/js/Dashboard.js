@@ -1915,7 +1915,6 @@ function paintSelectionClick(tapeID, timestamp) {
     $("#tblLeftGridElements button[name='btnTimelineElement']").removeClass("active");
     $("#tblLeftGridElements tr[id*='tape_'] > td > h5").attr("style", "font-weight:normal;"); //
     $("#tblLeftGridElements tr[id*='tape_']").attr("style", "border: regular"); //
-    //$("#tblLeftGridElements tr[id*='tape_'][name='Extra']").css("background-color", "inherit"); // #D1E2F3
     $("#tblLeftGridElements tr[id*='tape_'][name='Oreka']").css("background-color", "#D1E2F3");
 
     // Bottom
@@ -2172,10 +2171,7 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     $("#aBtnFullscreen").hide();
 
     // Clear Player box images
-    loadPlayerBoxImage("");
-
-    // Remove default background image on Playerbox
-    PLAYER_BOX.css("background-image", "none");
+    loadPlayerBoxImage("");    
 
     // Enable functions logic
     divPanel_PlayerControl.removeClass("disabled");
@@ -2240,6 +2236,9 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
         clearInterval(playPauseInterval);
     }
 
+    // Remove default background image on Playerbox
+    PLAYER_BOX.css("background-image", "none");
+    PLAYER_BOX.css("background", "none");
 
     /************************ General styles END ************************/
 
@@ -2909,7 +2908,7 @@ function loadPlayer_OrekaPlayer(tapeID, fileStatus, duration, divControlsMask_AU
             divControlsMask_VIDEO.removeClass("paused");
             TimeRefreshLoop(duration);
 
-            // Coloca los controles en top = 0, por si antes fue usado el Video player (webchimera player)
+            // Coloca los controles en top = 0, por si antes se movió el contenedor de video (caso activeX player o webchimera player)
             divPlayer_VIDEO.offset({ top: PLAYER_BOX.offset().top });
 
         }
