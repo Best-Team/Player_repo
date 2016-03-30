@@ -650,22 +650,20 @@
 
                             <div class="row" style="display: inline">
 
-                                <!-- -->
-
                                 <div id="playerContainer" class="playerContainer col-md-2 img-rounded">
                                     <!-- img-rounded -->
                                     <div id="controlContainer" style="width: 100%; position: relative; top: 50%; transform: translate(0, -50%);"> 
                                         <ul class="globalplay_controls controls">
 
-                                            <li id="globalplay_play_li" class="img-rounded globalplay_play_li" style="position: relative; padding: 8px;">
-                                                <a href="#divgp_sc" id="globalplay_play" class="globalplay_play" data-attr="playPauseAudio" 
-                                                    onclick="return globalplay_init()" style="position: relative;"></a>
+                                            <li id="globalplay_play_li" class="img-rounded globalplay_play_li blue" style="position: relative; padding: 8px;">
+                                                <a href="#divgp_sc" id="globalplay_play" class="push_button globalplay_play" data-attr="playPauseAudio" 
+                                                    onclick="return globalplay_init()" style="position: relative; border: none; vertical-align:top;"></a>
                                                 <!-- Play/Pause button -->
                                                 <a href="#globalPlayer_popup" id="btnOpenFancybox" style="display: none;"></a>
                                             </li>
-                                            <li id="globalplay_stop_li" class="img-rounded">
+                                            <li id="globalplay_stop_li" class="img-rounded blue">
                                                 <a href="#divgp_sc" id="globalplay_stop" class="globalplay_stop" data-attr="nextAudio" 
-                                                    onclick="return globalplay_stop()" style="padding: 14px;">
+                                                    onclick="return globalplay_stop()" style="padding: 14px; border: none; vertical-align:top;">
                                                     <!-- Stop button -->
                                                 </a>
                                             </li>
