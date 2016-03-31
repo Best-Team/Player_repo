@@ -58,41 +58,6 @@
         }
 
    </script>
-   <style>
-
-    .loginFormInput {height: 35px;}
-
-    div.loginTitleBread {
-    font-family: Arial;
-    font-size: 14px;
-    color: #999999;
-    width: 410px;
-    padding-left: 55px;
-    text-align: left;
-    margin-top: 13px;
-}
-
-    div.loginTitleText {
-    font-family: Arial;
-    font-size: 18px;
-    font-weight: bold;
-    width: 410px;
-    padding-left: 55px;
-    text-align: left;
-    margin-top: 2px;
-}
-    #content {
-       
-    }
-
-    #inboxMainFooter {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-    }
-
-   </style>
-
 
 
     </asp:content>
@@ -107,18 +72,18 @@
 	<div class="loginFormContainer">
 		<div class="loginFormElements">
 
-            <div class="loginTitleArea">
+            <div class="loginTitleArea unselectable">
 				<img class="loginTitleImage pull-left" src="assets/images/login_Titleimage.png"/>
-				<div class="loginTitleBread">MediaPlayer</div>
+				<div class="loginTitleBread">Multimedia Player</div> 
 				<div class="loginTitleText">Sistema de autenticación</div>
 			</div>
 
 			<div class="loginFormContent">
 
-				<label class="loginFormLabel" style="float: left; width: auto; margin-left: 15px;">Usuario:</label>
+				<label class="loginFormLabel unselectable" style="float: left; width: auto; margin-left: 15px;">Usuario:</label>
                 <asp:TextBox CssClass="form-control loginFormInput" placeholder="" runat="server" ID="txbUser" onkeypress="return enterKey(event)" CausesValidation="true"/>
 
-				<label class="loginFormLabel" style="float: left; width: auto; margin-left: 15px;">Clave:</label>
+				<label class="loginFormLabel unselectable" style="float: left; width: auto; margin-left: 15px;">Clave:</label>
                 <asp:TextBox TextMode="password" CssClass="form-control loginFormInput" placeholder="" runat="server" ID="txbPassword" onkeypress="return enterKey(event)" CausesValidation="true"/>
 
 			</div>

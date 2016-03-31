@@ -1,6 +1,8 @@
-﻿NOTES
+﻿@Author: Gonzalo Borderolle, 2015 Montevideo, Uruguay.
 
-1] Multimdia compatibility applications by formats:
+GENERAL NOTES
+
+1] Multimdia compatibility applications by formats: - TESTED
 
 Audio:
 .mp3 - html5 - sound manager js
@@ -22,7 +24,6 @@ Video:
 
 Image:
 .jpg - html5
-.jepg - html5
 .png - html5
 .bmp - html5
 
@@ -45,9 +46,4 @@ Ejemplo:
 *.sln
 *.suo
 
--> Para remover archivo que es ignorado pero ya fue uploaded al repo:
-git rm --cached web.config
 
---
-
-Desligar timeline_pointer del player_box ? OK

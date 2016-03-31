@@ -28,7 +28,7 @@
     <link href="assets/css/jquery-ui.structure.css" rel="stylesheet" />
     <link href="assets/css/jquery-ui.theme.css" rel="stylesheet" />
 
-    <title>inConcert - MediaPlayer</title>
+    <title>Multimedia Player</title>
 
     <style>
         body, html {
