@@ -2948,7 +2948,7 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
 
         if (getIsIE()) {
 
-            // ActiveX video object
+            // ActiveX IE WMP video object
             var video_player = "<div id='divVideo_object1' style='width:" + width + "px; " + "height:auto; margin:0 auto; display:inline;'> "; // height
             video_player += "<object id='video_object1' data='" + file_url + "' ";
             video_player += "width='" + width + "' height='" + height + "' style='margin-top:4px;' ";
@@ -2958,7 +2958,7 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
             video_player += "<PARAM name='uiMode' value='none'> ";
             video_player += "</object></div>";
 
-            $("#divPlayer_VIDEO object").remove(); // revisar no solo objetos
+            $("#divPlayer_VIDEO object").remove(); 
             divPlayer_VIDEO.append(video_player);
 
 

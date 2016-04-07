@@ -693,9 +693,8 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
 
                     if (getIsIE()) {
 
-                        // WMP IE Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
-
-                        // ActiveX video object
+                        // IE WMP Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
+                        // ActiveX IE WMP video object
                         var js_player = "<div id='div" + global_elementID + "' name='visual_element' class='divVideo' style='float:left; width:" + visual_size_width + "px; " + "height:" + visual_size_height + "px; background:aliceblue;'> ";
                         js_player += "<object id='" + global_elementID + "' data='" + file_url + "' ";
                         js_player += "width='" + (visual_size_width - 5) + "' height='" + (visual_size_height - 5) + "' ";
@@ -1149,7 +1148,8 @@ function globalplay_pausePlayingElements(isStop) {
 
                                         if (getIsIE()) {
 
-                                            // ActiveX video object
+                                            // IE WMP Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
+                                            // ActiveX IE WMP video object
                                             if (video_player[0].controls != null) {
 
                                                 if (isStop) {
@@ -1294,7 +1294,8 @@ function globalplay_resumeAllCurrentMedia() {
 
                                         if (getIsIE()) {
 
-                                            // ActiveX video object
+                                            // IE WMP Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
+                                            // ActiveX IE WMP video object
                                             if (video_player[0].controls != null) {
 
                                                 try {
@@ -1514,7 +1515,8 @@ function globalplay_loadElementSeek(pointer_current_duration) {
 
                                                 if (getIsIE()) {
 
-                                                    // ActiveX video object
+                                                    // IE WMP Object Source: https://msdn.microsoft.com/en-us/library/windows/desktop/dd564080(v=vs.85).aspx
+                                                    // ActiveX IE WMP video object
                                                     if (video_player[0].controls != null) {
 
                                                         try {
