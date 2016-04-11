@@ -183,8 +183,6 @@
     <Content Include="assets\swf\soundmanager2_flash9_debug.swf" />
     <Content Include="Dashboard.aspx" />
     <Content Include="ExternalResources\Alert_Messages.js" />
-    <Content Include="fill_container.html" />
-    <Content Include="split_screen.aspx" />
     <Content Include="Fullscreen.aspx" />
     <Content Include="Login.aspx" />
     <Content Include="Scripts\jquery-1.7.1.intellisense.js" />
@@ -201,7 +199,6 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Service References\RecordingIntegration\OperacionesGrabacion1.disco" />
-    <Content Include="TestCenterASPX.aspx" />
     <Content Include="assets\css\globalplay.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -221,13 +218,6 @@
     <Compile Include="Data Objects\UserDAO.cs" />
     <Compile Include="Domain\Folio.cs" />
     <Compile Include="Domain\User.cs" />
-    <Compile Include="split_screen.aspx.cs">
-      <DependentUpon>split_screen.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="split_screen.aspx.designer.cs">
-      <DependentUpon>split_screen.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Extras\BCrypt.cs" />
     <Compile Include="Extras\DownloadFile.ashx.cs">
       <DependentUpon>DownloadFile.ashx</DependentUpon>
@@ -266,13 +256,6 @@
     </Compile>
     <Compile Include="Site.Master.designer.cs">
       <DependentUpon>Site.Master</DependentUpon>
-    </Compile>
-    <Compile Include="TestCenterASPX.aspx.cs">
-      <DependentUpon>TestCenterASPX.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="TestCenterASPX.aspx.designer.cs">
-      <DependentUpon>TestCenterASPX.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
