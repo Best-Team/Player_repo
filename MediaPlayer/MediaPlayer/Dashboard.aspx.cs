@@ -487,6 +487,8 @@ namespace MediaPlayer
                 case "jpg":
                 case "jepg":
                 case "bmp":
+                case "tiff":
+                case "gif":
                     {
                         mediaType = "I";
                         break;
