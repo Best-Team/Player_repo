@@ -449,12 +449,14 @@ function globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_
     var tapeID = element_alreadyTaken[0].tapeID;
     var duration = element_alreadyTaken[0].duration;
     var timestamp = element_alreadyTaken[0].timestamp;
+    var userName = element_alreadyTaken[0].userName;
     
     var object = new Array();
     object[0] = global_elementID;
 
     var label = $("#globalplay_divAudioName h2");
-    label.text(fileName);
+    //label.text(fileName); //new requeriment
+    label.text(userName + " - " + timestamp);
     label.show();
 
     // Get file extension
@@ -527,6 +529,7 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
     var duration = element_alreadyTaken[0].duration;
     var fileName = element_alreadyTaken[0].fileName;
     var timestamp = element_alreadyTaken[0].timestamp;
+    var userName = element_alreadyTaken[0].userName;
 
     var ok = false;
 
@@ -619,7 +622,8 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
                             try {
 
                                 var label = $("#globalplay_divVideoName h2");
-                                label.text(fileName);
+                                //label.text(fileName);
+                                label.text(userName + " - " + timestamp);
 
                                 // FBS Special case
                                 label.css("background-color", "blue");
@@ -793,7 +797,8 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
     if (ok) {
 
         var label = $("#globalplay_divVideoName h2");
-        label.text(fileName);
+        //label.text(fileName);
+        label.text(userName + " - " + timestamp);
 
         // Remove FBS Special case
         label.css("background-color", "purple");
@@ -814,10 +819,11 @@ function globalplay_image(file_url, visual_size_width, visual_size_height, flex_
     var segmentID = element_alreadyTaken[0].segmentID;
     var fileName = element_alreadyTaken[0].fileName;
     var timestamp = element_alreadyTaken[0].timestamp;
+    var userName = element_alreadyTaken[0].userName;
 
     $('<a name="visual_element" id="' + global_elementID + '" style="width:' + visual_size_width + 'px; height:' + visual_size_height + 'px;' +
        'background-image:url(' + file_url + '); float:left; position:relative; margin:8px 12px; background-size: auto 100%; background-color: aliceblue;"' +
-       'width="' + visual_size_width + '" height="' + visual_size_height + '">' + fileName + '</a>').appendTo(flex_div).fadeIn(2000);
+       'width="' + visual_size_width + '" height="' + visual_size_height + '">' + userName + " - " + timestamp /* fileName */ + '</a>').appendTo(flex_div).fadeIn(2000);
 
     // Add Fullscreen click Event
     $("#" + global_elementID).attr("src", file_url).photobox();

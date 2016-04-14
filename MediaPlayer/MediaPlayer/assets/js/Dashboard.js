@@ -4260,7 +4260,7 @@ function getTime(msec, useString) {
 
 // Load elements from folio selected - Get data from server
 function getElementsInMemory() {
-    var hdnElements = $("input[id*='_hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus']").val();
+    var hdnElements = $("input[id*='_hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName']").val();
     if (hdnElements != null && hdnElements.length) {
         var tapes_array = hdnElements.split("$"); // Elements
         if (tapes_array.length > 0) {
@@ -4284,6 +4284,7 @@ function getElementsInMemory() {
                         var filePath = tape_values[9];
                         var duration_formatStr = tape_values[10];
                         var fileStatus = tape_values[11];
+                        var userName = tape_values[12];
 
                         var element = {
                             tapeID: tapeID,
@@ -4298,7 +4299,8 @@ function getElementsInMemory() {
                             filePath: filePath,
                             duration_formatStr: duration_formatStr,
                             isPlaying: "false",
-                            fileStatus: fileStatus
+                            fileStatus: fileStatus,
+                            userName: userName
                         };
                         elementsInMemory.push(element);
 

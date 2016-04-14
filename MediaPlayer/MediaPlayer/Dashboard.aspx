@@ -114,7 +114,7 @@
                                             </Triggers>
                                             <ContentTemplate>
 
-                                                <asp:HiddenField ID="_hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus" runat="server" />
+                                                <asp:HiddenField ID="_hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName" runat="server" />
                                                 <asp:HiddenField ID="_hdnJSonList" runat="server" />
                                                 <asp:HiddenField ID="_hdnJSonStart" runat="server" />
                                                 <asp:HiddenField ID="_hdnJSonEnd" runat="server" />

@@ -830,7 +830,7 @@ namespace MediaPlayer
                     this.folio_filteredList = this.folio_list.FindAll(x => x.deleted == 0);
                     ViewState["folio_filteredList"] = this.folio_filteredList;
 
-                    string hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus = string.Empty;
+                    string hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName = string.Empty;
                     string hdnElementsIDChecked = string.Empty;
 
                     // Json object
@@ -860,9 +860,9 @@ namespace MediaPlayer
                             string duration_formatStr = time.ToString(@"hh\:mm\:ss");
 
                             /****** Hidden fields ******/
-                            hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus
+                            hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName
                                 += folio.tapeID + "#" + folio.groupName + "#" + folio.mediaType.ToString() + "#" + folio.duration + "#" + folio.timestamp.ToString("dd'-'MM'-'yyyy HH':'mm':'ss")
-                                + "#" + folio.segmentID + "#" + index + "#" + folio.fileName + "#" + end_date + "#" + folio.filePath + "#" + duration_formatStr + "#" + folio.fileStatus + "$";
+                                + "#" + folio.segmentID + "#" + index + "#" + folio.fileName + "#" + end_date + "#" + folio.filePath + "#" + duration_formatStr + "#" + folio.fileStatus + "#" + folio.userName + "$";
 
                             // Get max and min value
                             folio_start = folio_start > folio.timestamp ? folio.timestamp : folio_start;
@@ -955,7 +955,7 @@ namespace MediaPlayer
                             htmlTable.AppendLine("<td>");
                             htmlTable.AppendLine("<h5>" + index + "</h5>");
                             htmlTable.AppendLine("<td>");
-                            htmlTable.AppendLine("<h5>" + folio.userName + "</h5>");
+                            htmlTable.AppendLine("<h5>" + folio.userName + "</h5>"); // ??
                             htmlTable.AppendLine("<td>");
                             htmlTable.AppendLine("<h5>" + folio.localParty + "</h5>");
                             htmlTable.AppendLine("<td>");
@@ -973,10 +973,10 @@ namespace MediaPlayer
                         }
                     }
 
-                    if (hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus.Length > 0)
+                    if (hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Length > 0)
                     {
-                        hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus = hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus.Remove(hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus.Length - 1);
-                        _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus.Value = hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus;
+                        hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName = hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Remove(hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Length - 1);
+                        _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Value = hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName;
                     }
 
                     /****** Load bottom Timeline ******/
@@ -997,7 +997,7 @@ namespace MediaPlayer
                     ViewState["FolioID"] = "0";
                     _hdnJSonEnd.Value = "0";
 
-                    _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus.Value = string.Empty;
+                    _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Value = string.Empty;
                     ScriptManager.RegisterStartupScript(this, typeof(Page), "clear_timeline", "clear_timeline();", true);
                 }
             }
@@ -1007,7 +1007,7 @@ namespace MediaPlayer
                 ViewState["FolioID"] = "0";
                 _hdnJSonEnd.Value = "0";
 
-                _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus.Value = string.Empty;
+                _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Value = string.Empty;
                 ScriptManager.RegisterStartupScript(this, typeof(Page), "clear_timeline", "clear_timeline();", true);
             }
             htmlTable.AppendLine("</tbody>");

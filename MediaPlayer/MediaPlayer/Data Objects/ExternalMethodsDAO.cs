@@ -80,7 +80,6 @@ namespace MediaPlayer.Data_Objects
             query += "JOIN ( ";
             query += "	SELECT taggedSegment_id, t.text ";
             query += "	FROM orktag as t JOIN orktagtype as tt ON t.tagType_id = tt.id ";
-            //query += "	AND tt.name = 'folio' AND t.text = '" + folio_textID + "' ";
             query += " AND tt.name = 'folio' AND t.text in ('" + folio_textID.Replace(" ", "").Replace(",", "','") + "') ";
             query += "	) as tag ";
             query += "	ON seg.id = tag.taggedSegment_id ";
@@ -290,7 +289,7 @@ namespace MediaPlayer.Data_Objects
                 param.Add("@expiryTimestamp", "");
                 param.Add("@filename", fileName); // Comentario acá
                 param.Add("@filePath", relativeLocalPath);
-                param.Add("@localParty", "");
+                param.Add("@localParty", userID);
                 param.Add("@mediaType", mediaType);
                 param.Add("@remoteParty", "");
                 param.Add("@timestamp", date);
