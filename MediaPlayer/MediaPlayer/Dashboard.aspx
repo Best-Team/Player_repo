@@ -92,11 +92,12 @@
                 <div class="row no-gutter" style="height: 100%; min-height: 600px; max-height: 600px;">
 
                     <!-- PANEL BÚSQUEDA -->
-                    <div class="col-md-4 col-xs-12 img-rounded" style="padding-right: 4px;">
-                    <div id="divPanel_Busqueda" class="div-panel panel unselectable" style="max-height: 600px; min-height: 600px;">
+                    <div id="divPanel_Busqueda_pre" class="col-md-4 col-xs-12 img-rounded" style="padding-right: 4px;">
+                    <div id="divPanel_Busqueda" class="div-panel panel " style="max-height: 600px; min-height: 600px;"> <%--unselectable--%>
 
-                        <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
+                        <h1 style="margin-top: 5px;"><span id="h1-busqueda" class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
+                         
                         <div class="row" style="margin: 3px; margin-top: 17px; min-height: 110px;">
 
                             <div class="row row-short" id="divFolios">
@@ -227,9 +228,10 @@
                         <div id="divPanel_PlayerControl" class="div-panel unselectable disabled" style="float: right; max-height: 600px; min-height: 600px; width: 100%;">
 
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal;">Reproductor</span></h1>
-                        <button id="btnShowHideLeftPanel" class="btn btn-primary btn-xs" type="button" title="Mostrar / Ocultar panel" style="color: white; float: left; display: none;" onclick="showHideLeftPanel();">
-                            <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span>
-                        </button>
+
+                        <button class="glyphicon glyphicon-minus panel-minus" type="button" title="Ocultar panel" onclick="javascript: panel_show(true);"></button>
+                         <button class="glyphicon glyphicon-plus panel-plus" type="button" title="Mostrar panel" onclick="javascript: panel_show(false);"></button>
+
 
                         <div class="row row-short">
                             <label id="lblElementName" class="pull-left unselectable" style="margin-left: 20px; font-size: 20px;">Video Player</label>
@@ -237,11 +239,28 @@
                         <div class="row row-short" style="margin-top: 1%; display: block;">
 
                             <!-- PLAYER VIDEO -->
-                            <div class="col-md-9 col-xs-12">
+                            <div id="playerControl_sub1" class="col-md-9 col-xs-12">
                                 <div class="row">
                                     <div runat="server" id="playerBox" class="img-rounded playerBox" style="background: repeating-linear-gradient( -55deg, #999, #999 23px, #474949 25px, #333 20px );">
 
-                                        <div id="divPlayer_VIDEO" style="display: none;" class='photobox'>
+                                        <section class="gradient position-controls row">
+                                            <button class="glyphicon glyphicon-zoom-in zoom-button" type="button" title="Zoom aumentar" >
+                                            </button>
+                                            <button class="glyphicon glyphicon-zoom-out zoom-button" type="button" title="Zoom reducir" >
+                                            </button>
+                                            <button class="fa fa-arrow-left zoom-button" type="button" title="Mover izquierda" >
+                                            </button>
+                                            <button class="fa fa-arrow-right zoom-button" type="button" title="Mover derecha" >
+                                            </button>
+                                             <button class="fa fa-arrow-up zoom-button" type="button" title="Mover arriba" >
+                                            </button>
+                                            <button class="fa fa-arrow-down zoom-button" type="button" title="Mover abajo" >
+                                            </button>
+                                            <button class="fa fa-refresh zoom-button" type="button" title="Reiniciar" onclick="javascript: doReset();">
+                                            </button>
+                                        </section>
+
+                                        <div id="divPlayer_VIDEO" style="display: none; overflow: hidden;" class='photobox'>
                                             <!-- Contiene el Applet -->
                                         </div>
                                         <img id="imgPlayer" class='photobox' style='max-width: 100%; margin: auto; display: none;' alt='' />
@@ -374,7 +393,7 @@
                             </div>
 
                             <!-- Right slide - Element details info -->
-                            <div class="col-md-2 img-rounded unselectable" style="height: 70%; padding-right: 5px; width: 20%;">
+                            <div id="playerControl_sub2" class="col-md-3 img-rounded unselectable" style="height: 70%; padding-right: 20px;"> <%--width: 20%--%>
                                 <div class="row row-short">
                                     <label id="lblDetalles" class="pull-left" style="margin-top: 5px; margin-bottom: -3px">Detalles:</label>
                                 </div>
@@ -382,7 +401,7 @@
                                 <div class="row row-short" style="margin-left: 10px; margin-top: -8px;">
                                     <label class="pull-left" style="font-size: 12px; font-weight: normal;">Nombre:</label>
                                 </div>
-                                <div class="row row-short" style="margin-bottom: 10px;">
+                                <div class="row row-short" style="margin-bottom: 4px;">
                                     <div class="form-group form-group-sm">
                                         <input id="lblName" type="text" readonly="true" class="form-control form-group-sm unselectable" style="cursor: default;" />
                                     </div>
@@ -390,7 +409,7 @@
                                 <div class="row row-short" style="margin-left: 10px; margin-top: -8px;">
                                     <label class="pull-left" style="font-size: 12px; font-weight: normal;">Tipo:</label>
                                 </div>
-                                <div class="row row-short" style="margin-bottom: 10px;">
+                                <div class="row row-short" style="margin-bottom: 4px;">
                                     <div class="form-group form-group-sm">
                                         <input id="lblType" type="text" readonly="true" class="form-control form-group-sm unselectable" style="cursor: default;" />
                                     </div>
@@ -398,7 +417,7 @@
                                 <div class="row row-short" style="margin-left: 10px;">
                                     <label class="pull-left" style="font-size: 12px; font-weight: normal;">Inicio:</label>
                                 </div>
-                                <div class="row row-short" style="margin-bottom: 10px;">
+                                <div class="row row-short" style="margin-bottom: 4px;">
                                     <div class="form-group form-group-sm">
                                         <input id="lblTimestamp" type="text" readonly="true" class="form-control form-group-sm unselectable" style="cursor: default;" />
                                     </div>
@@ -406,7 +425,7 @@
                                 <div class="row row-short" style="margin-left: 10px;">
                                     <label class="pull-left" style="font-size: 12px; font-weight: normal;">Duración:</label>
                                 </div>
-                                <div class="row row-short" style="margin-bottom: 10px;">
+                                <div class="row row-short" style="margin-bottom: 4px;">
                                     <div class="form-group form-group-sm">
                                         <input id="lblDuration" type="text" readonly="true" class="form-control form-group-sm unselectable" style="cursor: default;" />
                                     </div>
@@ -414,17 +433,20 @@
                                 <div class="row row-short" style="margin-left: 10px;">
                                     <label class="pull-left" style="font-size: 12px; font-weight: normal;">Estado:</label>
                                 </div>
-                                <div class="row row-short" style="margin-bottom: 10px;">
+                                <div class="row row-short" style="margin-bottom: 0;">
                                     <div class="form-group form-group-sm">
                                         <input id="lblStatus" type="text" readonly="true" class="form-control form-group-sm unselectable" style="cursor: default;" />
                                     </div>
                                 </div>
+
+
                                 <br />
                                 <div class="row row-short" style="margin-top: -10px;">
                                     <label id="lblAcciones" class="pull-left" style="margin-bottom: -3px;">Acciones:</label>
                                 </div>
                                 <hr style="margin-top: 4px;" />
                                 <div class="row row-short">
+
                                     <a id="lnkElementDownload" class="btn btn-default" type="button" style="margin-right: 4px;" href="#" onclick="javascript: $('#dialog p').text(hashMessages['SeleccioneElemento']); $('#dialog').dialog({ buttons: {'Confirmar': function () { $(this).dialog('close'); }} });">
                                         <span class="fa fa-download" aria-hidden="true"></span>
                                     </a>
@@ -458,7 +480,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <button id="btnFullscreen" class="btn btn-default" type="button" title="Maximizar video" onclick="openFullscreen();"> <!-- goFullscreen() -->
                                         <span class="fa fa-arrows-alt" aria-hidden="true"></span>
                                     </button>
@@ -466,7 +487,6 @@
                                     <a id="aBtnFullscreen" class="btn btn-default" type="button" title="Maximizar video" style="margin-right: 4px; display: none;" href="Fullscreen.aspx">
                                         <span class="fa fa-arrows-alt" aria-hidden="true"></span>
                                     </a>
-
                                 </div>
                             </div>
 
@@ -630,18 +650,6 @@
                         <div id="divGlobalplay_timer" style="display: none;"></div>
                         <div id="divTimeline" class="divTimeline div-panel2 col-md-12 col-xs-12 img-rounded">
                             <h1 style="margin-top: 5px;">
-
-                                <!-- TEST CONTROL
-					<label id="lblGlobalplay_timer_current_longFormat" class="label" style="font-size:100%; color:black;">00:00:00</label>
-				   <label id="lblGlobalplay_timer_total_longFormat" class="label" style="font-size:100%; color:black;">00:00:00</label>
-				   <label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label>
-				   <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label>
-
-                                Cantidad:
-                        <label id="lblGlobalplay_element_count" class="label" style="font-size: 100%; color: black;">0</label>: IDs:
-                        <label id="lblGlobalplay_element_ids" class="label" style="font-size: 100%; color: black;">0</label>
-
-				   -->
 
                                 <span class="special-title label label-primary" style="font-weight: normal;">Timeline</span>
 

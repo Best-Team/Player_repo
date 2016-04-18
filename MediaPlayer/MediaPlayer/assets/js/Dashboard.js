@@ -34,6 +34,14 @@ var globalplay_remove_elements = [];
 var globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
 var globalplay_playback_active = false;
 
+//var html5video_zoom = 1;
+var html5video_zoom = 100;
+var html5video_zoom_h = 100;
+
+var html5video_left = 1;
+var html5video_top = 1;
+
+
 // Timeline Global Pointer
 var TIMELINE_POINTER = $("#sm2-progress-ball_TIMELINE");
 var PLAYER_BOX = $("#divPanel_PlayerControl div[id*='playerBox']");
@@ -253,19 +261,80 @@ $(document).ready(function () {
 
     // Load player box original top
     PLAYER_BOX_original_top = PLAYER_BOX.offset().top;
-    
+   
 
-    /*
-    // Locate Popbox3 - Remove element TODO
-    var divPopbox3 = $("#divPopbox3");
-    var btn_left = $("#btnRemoveElement").offset().left;
-    var width_int = parseInt(divPopbox3.css("width"), 10);
-    var left_final = btn_left - width_int;
-    divPopbox3.offset({ left: left_final });
+    var zoom_timeout, zoom_clicker_in = $('.glyphicon-zoom-in');
+    zoom_clicker_in.mousedown(function () {
+        doZoom(true);
+        zoom_timeout = setInterval(function () {
+            // Do something continuously 
+            doZoom(true);
+        }, 100);
+
+        return false;
+    });
+
+    var zoom_clicker_out = $('.glyphicon-zoom-out');
+    zoom_clicker_out.mousedown(function () {
+        doZoom(false);
+        zoom_timeout = setInterval(function () {
+            // Do something continuously 
+            doZoom(false);
+        }, 100);
+
+        return false;
+    });
 
 
-    $("#divPopbox3").offset({ left: $("#btnRemoveElement").offset().left - parseInt($("#divPopbox3").css("width"), 10) });
-    */
+    var zoom_clicker_left = $('.fa-arrow-left');
+    zoom_clicker_left.mousedown(function () {
+        doMove(1);
+        zoom_timeout = setInterval(function () {
+            // Do something continuously 
+            doMove(1);
+        }, 100);
+
+        return false;
+    });
+
+    var zoom_clicker_right = $('.fa-arrow-right');
+    zoom_clicker_right.mousedown(function () {
+        doMove(2);
+        zoom_timeout = setInterval(function () {
+            // Do something continuously 
+            doMove(2);
+        }, 100);
+
+        return false;
+    });
+
+    var zoom_clicker_up = $('.fa-arrow-up');
+    zoom_clicker_up.mousedown(function () {
+        doMove(3);
+        zoom_timeout = setInterval(function () {
+            // Do something continuously 
+            doMove(3);
+        }, 100);
+
+        return false;
+    });
+
+    var zoom_clicker_down = $('.fa-arrow-down');
+    zoom_clicker_down.mousedown(function () {
+        doMove(4);
+        zoom_timeout = setInterval(function () {
+            // Do something continuously 
+            doMove(4);
+        }, 100);
+
+        return false;
+    });
+
+
+    $(document).mouseup(function () {
+        clearInterval(zoom_timeout);
+        return false;
+    });
 
 }); // END On Ready
 
@@ -2240,6 +2309,9 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     PLAYER_BOX.css("background-image", "none");
     PLAYER_BOX.css("background", "none");
 
+    // Hide video position controls
+    $(".position-controls").hide();
+
     /************************ General styles END ************************/
 
     /************************ General info START ************************/
@@ -2804,6 +2876,10 @@ function loadPlayer_video_styles1(divPlayer_VIDEO, divControlsMask_VIDEO) {
         divPlayer_VIDEO.offset({ top: PLAYER_BOX_original_top + manual_offset + 2 });
     }, 100);
     
+
+    // Show video position controls
+    $(".position-controls").show();
+
     /************************ Styles END ************************/
 }
 
@@ -3160,10 +3236,13 @@ function loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divContro
     // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
 
     // Create video player
-    var width = parseInt(divPlayer_VIDEO.css("width"), 10);
-    var height = parseInt(divPlayer_VIDEO.css("height"), 10);
+    var width = parseInt(divPlayer_VIDEO.css("width"), 10) + "px";
+    var height = parseInt(divPlayer_VIDEO.css("height"), 10) + "px";
 
-    var js_player = '<video id="html_video" preload="none" style="width: ' + width + 'px; height: ' + height + 'px; margin: 0 auto;">';
+    width = "100%";
+    height = "100%";
+
+    var js_player = '<video id="html_video" preload="none" style="width: ' + width + '; height: ' + height + '; margin: 0 auto; position:absolute;">';
     js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4; codecs=\'avc1.42E01E, mp4a.40.2\'">';
     js_player += '<source id="webm" src="' + file_url + '" type="video/webm; codecs=\'vp8, vorbis\'">';
     js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
@@ -3820,8 +3899,8 @@ function loadPlayerBoxImage(image_path) {
     if (PLAYER_BOX != null && PLAYER_BOX.length) {
         PLAYER_BOX.css("background-image", image_path);
         PLAYER_BOX.css("background-repeat", "no-repeat");
-        PLAYER_BOX.css("background-position", "center");
-        PLAYER_BOX.css("background-size", "250px 250px");
+        PLAYER_BOX.css("background-position", "left 90% top 90%");
+        PLAYER_BOX.css("background-size", "180px 180px");
     }
     $("#imgPlayer").hide();
 }
@@ -4609,5 +4688,122 @@ function confirmAddComment() {
         });
     }
 }
-/******** Event: Enter Key listener ********/
+
+function doZoom(increase) {
+    var video = $("video");
+    if (video) {
+        if (increase) {
+            html5video_zoom += 8;
+            html5video_zoom_h += 4;
+
+        } else {
+            html5video_zoom -= 8;
+            html5video_zoom_h -= 4;
+        }
+
+        video.css("width", html5video_zoom + "%");
+        video.css("height", html5video_zoom_h + "%");
+    }
+}
+
+
+function doMove(num) {
+    var video = $("video")[0];
+    if (video) {
+        switch (num) {
+            case 1: {
+                html5video_left += 14;
+                video.style.left = html5video_left + 'px';
+                break;
+            }
+            case 2: {
+                html5video_left -= 14;
+                video.style.left = html5video_left + 'px';
+                break;
+            }
+            case 3: {
+                html5video_top += 14;
+                video.style.top = html5video_top + 'px';
+                break;
+            }
+            case 4: {
+                html5video_top -= 14;
+                video.style.top = html5video_top + 'px';
+                break;
+            }
+        }
+    }
+}
+
+
+function doReset() {
+    var video = $("video");
+    if (video) {
+        html5video_zoom = 100;
+        html5video_zoom_h = 100;
+
+        html5video_left = 1;
+        html5video_top = 1;
+
+        rotate = 0;
+        video[0].style.top = 0 + 'px';
+        video[0].style.left = 0 + 'px';
+
+        video.css("width", "100%");
+        video.css("height", "100%");
+    }
+}
+
+function panel_show(show) {
+    var panel_show_minus = $(".panel-minus");
+    var panel_show_plus = $(".panel-plus");
+    if (show) {
+        panel_show_minus.hide();
+        panel_show_plus.show();
+
+        $("#divPanel_Busqueda_pre").toggle("slide", {}, 300);
+        setTimeout(function () {
+            $("#divPanel_container").css("right", "inherit");
+            $("#divPanel_container").css("position", "relative");
+            $("#divPanel_container").removeClass("col-md-12");
+            $("#divPanel_container").addClass("col-md-8");
+
+            // sub
+            $("#playerControl_sub1").removeClass("col-md-10");
+            $("#playerControl_sub1").addClass("col-md-9")
+            $("#playerControl_sub2").removeClass("col-md-2");
+            $("#playerControl_sub2").addClass("col-md-3");
+
+            doReset();
+        }, 500);
+    }
+    else {
+        // Se expande
+        panel_show_plus.hide();
+        panel_show_minus.show();
+
+        $("#divPanel_container").css("right", 0);
+        $("#divPanel_container").css("position", "absolute");
+        $("#divPanel_Busqueda_pre").toggle("slide", {}, 300);
+
+        setTimeout(function () {
+            $("#divPanel_container").css("left", 0);
+            $("#divPanel_container").css("right", 0);
+            $("#divPanel_container").css("margin", "0 auto");
+            $("#divPanel_container").removeClass("col-md-8");
+            $("#divPanel_container").addClass("col-md-12");
+
+
+            // sub
+            $("#playerControl_sub1").removeClass("col-md-9")
+            $("#playerControl_sub1").addClass("col-md-10");
+            $("#playerControl_sub2").removeClass("col-md-3");
+            $("#playerControl_sub2").addClass("col-md-2");
+
+            doReset();
+        }, 500);
+    }
+}
+
+
 

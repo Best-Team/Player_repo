@@ -123,24 +123,20 @@
 
         </script>
 
-        </head>
-        <body>
-
-  <form id="form1" runat="server" enctype="multipart/form-data">
-
-            <div id="container"></div>
-
-            <asp:HiddenField ID="_hdnSegID" runat="server" />
-            <asp:HiddenField ID="_hdnWidth" runat="server" />
-            <asp:HiddenField ID="_hdnHeight" runat="server" />
-            <asp:HiddenField ID="_hdnCurrentSecs" runat="server" />
-            <asp:HiddenField ID="_hdnWS_Oreka_Server" runat="server" />
-            <asp:HiddenField ID="_hdnWS_Oreka_Port" runat="server" />
-            <asp:HiddenField ID="_hdnWS_Oreka_URL" runat="server" />
-
+    </head>
+<body>
+    <form id="form1" runat="server" enctype="multipart/form-data">
+        <div id="container"></div>
+        <asp:HiddenField ID="_hdnSegID" runat="server" />
+        <asp:HiddenField ID="_hdnWidth" runat="server" />
+        <asp:HiddenField ID="_hdnHeight" runat="server" />
+        <asp:HiddenField ID="_hdnCurrentSecs" runat="server" />
+        <asp:HiddenField ID="_hdnWS_Oreka_Server" runat="server" />
+        <asp:HiddenField ID="_hdnWS_Oreka_Port" runat="server" />
+        <asp:HiddenField ID="_hdnWS_Oreka_URL" runat="server" />
     </form>
 
-        </body>
-        </html>
+</body>
+</html>
 
 
