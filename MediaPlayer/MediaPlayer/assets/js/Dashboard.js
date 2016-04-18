@@ -336,6 +336,7 @@ $(document).ready(function () {
         return false;
     });
 
+
 }); // END On Ready
 
 
@@ -2460,6 +2461,12 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
                 ok = loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divControlsMask_VIDEO);
 
                 loadPlayer_video_styles2(fileName, duration, divControlsMask_AUDIO, fileStatus, ok);
+
+                // Load drag and drop event
+                $("#html_video").draggable({
+                    //containment: '.playerBox',
+                    cursor: 'move'
+                });
 
                 break;
             }
