@@ -315,16 +315,14 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
     var width = 275;
     var height = 260; 
 
-    var current_screen = window.innerWidth;
-
     // Wide extra
-    if (current_screen >= 1920) {
+    if (MONITOR_WIDTH >= 1920) {
         width = 390;
         height = 290;
         flex_max_width = 1639;
     }
     // Wide site
-    else if (current_screen >= 1440) {
+    else if (MONITOR_WIDTH >= 1440) {
         width = 305; 
         height = 290;
         flex_max_width = 1299; 
@@ -334,7 +332,6 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
     // MAX Amount of simultaneous elements 
     var max_amount = GLOBALPLAY_MAX_COLLISION_ELEMENTS;
     if (visual_count <= max_amount) {
-
 
         // Vertically center visual elements 
         if (visual_count > 0 && visual_count <= 4) {

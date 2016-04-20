@@ -217,8 +217,8 @@ div#playerBox {
     background-size: 300px 300px;
 }
 .globalplayBox {
-    min-width: 1000px;
-    height: 660px;
+    min-width: 1000px; 
+    height: 660px; /* ? */
     border: solid 0.17em;
     background: linear-gradient(to bottom, #9EA7B1, #9EA7B1);
     position: relative;
@@ -500,16 +500,9 @@ a.disabled {
 .panel-minus {
     position: absolute;
     top: 0;
-    left: 0;
+    right: 0;
     margin: 15px;
-    display: none;
-}
-
-.panel-plus {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 15px;
+    display: block;
 }
 
 

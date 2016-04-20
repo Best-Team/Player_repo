@@ -1197,6 +1197,19 @@
 			F.transitions[ F.isOpened ? current.nextMethod : current.openMethod ]();
 
 			F._preloadImages();
+
+            /* Multimedia Player */
+		    // Check smaller screens globalplay resolution
+			if (MONITOR_HEIGHT < 750) { // 800
+			    $(".globalplayBox").css("height", "450px");
+			    $(".flex").css("margin-top", "-30px");
+			    $("#timeframe").css("margin-top", "-25px");
+			} else {
+			    $(".globalplayBox").css("height", "660px");
+			    $(".flex").css("margin-top", "-20px");
+			    $("#timeframe").css("margin-top", "-10px");
+			}
+
 		},
 
 		_setDimension: function () {

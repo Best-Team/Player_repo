@@ -34,8 +34,7 @@ var globalplay_remove_elements = [];
 var globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
 var globalplay_playback_active = false;
 
-//var html5video_zoom = 1;
-var html5video_zoom = 100;
+var html5video_zoom_w = 100;
 var html5video_zoom_h = 100;
 
 var html5video_left = 1;
@@ -229,7 +228,12 @@ $(document).ready(function () {
         afterClose: function () {
             $("#divgp_sc").hide();
             $("#divgp_sc #timer-labels").remove();
-            $("#globalPlayer_popup").show();            
+            $("#globalPlayer_popup").show();
+
+            // Check smaller screens globalplay resolution
+            $(".globalplayBox").css("height", "660px");
+            $(".flex").css("margin-top", "-20px");
+            $("#timeframe").css("margin-top", "-10px");
         },
 
         helpers: {
@@ -336,6 +340,7 @@ $(document).ready(function () {
         return false;
     });
 
+   
 
 }); // END On Ready
 
@@ -2313,6 +2318,9 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     // Hide video position controls
     $(".position-controls").hide();
 
+    // Set default cursor
+    divPlayer_VIDEO.css('cursor', 'default');
+
     /************************ General styles END ************************/
 
     /************************ General info START ************************/
@@ -2453,7 +2461,7 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
                 $("#btnFullscreen").removeClass("disabled"); 
 
                 $("#aBtnFullscreen").hide(); // FBS Fullscreen
-                $("#aBtnFullscreen").addClass("disabled"); 
+                $("#aBtnFullscreen").addClass("disabled");
 
                 loadPlayer_video_styles1(divPlayer_VIDEO, divControlsMask_VIDEO);
 
@@ -2464,9 +2472,19 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
 
                 // Load drag and drop event
                 $("#html_video").draggable({
-                    //containment: '.playerBox',
                     cursor: 'move'
                 });
+
+                $('#html_video').mousewheel(function(event, delta) {
+                    if (delta > 0) {
+                        doZoom(true);
+                    } else {
+                        doZoom(false);
+                    }
+                });
+
+                // Change cursor
+                divPlayer_VIDEO.css("cursor", "move");
 
                 break;
             }
@@ -2791,9 +2809,9 @@ function loadElement_comment(divControlsMask_VIDEO, timestamp, fileName) {
         PLAYER_BOX.find("div[name='divComment']").remove();
 
         PLAYER_BOX.append(
-            "<div name='divComment' class='col-md-12' style='margin: 30px; margin-top:20px; font-size:15px !important;'><div class='row'><h1 style='font-weight: bold;float:left;'>Comentario: " +
+            "<div name='divComment' class='col-md-12' style='margin: 30px; margin-top:20px; font-size:15px !important; padding-right:30px;'><div class='row'><h1 style='font-weight: bold;float:left;'>Comentario: " +
             timestamp +
-            "</h1></div><div class='row'><p class='pull-left' style='margin-top:15px;'>" +
+            "</h1></div><div class='row'><p class='pull-left' style='margin-top:15px; text-align:left;'>" +
             fileName + "</p></div></div>");
     }
     loadPlayerBoxImage("url(assets/images/comments.png)");
@@ -4698,25 +4716,43 @@ function confirmAddComment() {
 
 function doZoom(increase) {
     var video = $("video");
-    if (video) {
+    if (video != null) {
         if (increase) {
-            html5video_zoom += 8;
+            html5video_zoom_w += 8;
             html5video_zoom_h += 4;
-
         } else {
-            html5video_zoom -= 8;
+            html5video_zoom_w -= 8;
             html5video_zoom_h -= 4;
         }
 
-        video.css("width", html5video_zoom + "%");
+        var old_w = parseInt(video.css("width"), 10);
+        var old_h = parseInt(video.css("height"), 10);
+
+        // Making zoom
+        video.css("width", html5video_zoom_w + "%");
         video.css("height", html5video_zoom_h + "%");
+
+        var new_w = parseInt(video.css("width"), 10);
+        var new_h = parseInt(video.css("height"), 10);
+
+        var prom_w = (Math.abs(new_w - old_w)) / 2;
+        var prom_h = (Math.abs(new_h - old_h)) / 2;
+
+        // Centering zoom
+        if (increase) {
+            video.offset({ top: video.offset().top - prom_h });
+            video.offset({ left: video.offset().left - prom_w });
+        } else {
+            video.offset({ top: video.offset().top + prom_h });
+            video.offset({ left: video.offset().left + prom_w });
+        }
     }
 }
 
 
 function doMove(num) {
     var video = $("video")[0];
-    if (video) {
+    if (video != null) {
         switch (num) {
             case 1: {
                 html5video_left += 14;
@@ -4745,16 +4781,18 @@ function doMove(num) {
 
 function doReset() {
     var video = $("video");
-    if (video) {
-        html5video_zoom = 100;
+    if (video != null) {
+        html5video_zoom_w = 100;
         html5video_zoom_h = 100;
 
         html5video_left = 1;
         html5video_top = 1;
 
         rotate = 0;
-        video[0].style.top = 0 + 'px';
-        video[0].style.left = 0 + 'px';
+        if (video[0] != null) {
+            video[0].style.top = 0 + 'px';
+            video[0].style.left = 0 + 'px';
+        }
 
         video.css("width", "100%");
         video.css("height", "100%");
@@ -4763,10 +4801,8 @@ function doReset() {
 
 function panel_show(show) {
     var panel_show_minus = $(".panel-minus");
-    var panel_show_plus = $(".panel-plus");
     if (show) {
         panel_show_minus.hide();
-        panel_show_plus.show();
 
         $("#divPanel_Busqueda_pre").toggle("slide", {}, 300);
         setTimeout(function () {
@@ -4786,8 +4822,7 @@ function panel_show(show) {
     }
     else {
         // Se expande
-        panel_show_plus.hide();
-        panel_show_minus.show();
+        panel_show_minus.hide();
 
         $("#divPanel_container").css("right", 0);
         $("#divPanel_container").css("position", "absolute");
@@ -4800,7 +4835,6 @@ function panel_show(show) {
             $("#divPanel_container").removeClass("col-md-8");
             $("#divPanel_container").addClass("col-md-12");
 
-
             // sub
             $("#playerControl_sub1").removeClass("col-md-9")
             $("#playerControl_sub1").addClass("col-md-10");
@@ -4809,6 +4843,30 @@ function panel_show(show) {
 
             doReset();
         }, 500);
+
+        // Feedback me - Source: http://www.jqueryscript.net/other/Simple-jQuery-Plugin-For-Slide-Out-Tab-Feedback-Widget-Feedback-Me.html
+        //set up some basic options for the feedback_me plugin
+        fm_options = {
+            position: "left-top",
+            name_required: true,
+            message_placeholder: "Go ahead, type your feedback here...",
+            message_required: true,
+            show_asterisk_for_required: true,
+            feedback_url: "send_feedback_clean",
+            // Label for open/close (trigger) button
+            trigger_label: "Búsqueda",
+
+            custom_params: {
+                csrf: "my_secret_token",
+                user_id: "john_doe",
+                feedback_type: "clean"
+            }
+        };
+        //init feedback_me plugin
+        fm.init(fm_options);
+
+
+
     }
 }
 

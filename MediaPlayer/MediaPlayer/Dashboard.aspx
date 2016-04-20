@@ -32,8 +32,10 @@
     <script src="assets/js/jquery.maskedinput.js"></script>
     <script src="assets/js/jquery.fancybox.js"></script>
     <script src="assets/js/timer.jquery.js"></script>
+    <script src="assets/js/jquery.feedback_me.js"></script>
     <script src="assets/js/Dashboard.js"></script>
     <script src="assets/js/Globalplay.js"></script>
+
 
     <!-- Styles -->
     <link href="assets/css/datetimepicker.css" type="text/css" rel="stylesheet" />
@@ -45,9 +47,10 @@
     <link href="assets/css/qtip.css" rel="stylesheet" />
     <link href="assets/css/highlight.css" rel="stylesheet" />
     <link href="assets/css/jslider.css" rel="stylesheet" />
-    <link href="assets/css/globalplay.css" type="text/css" rel="stylesheet" />
     <link href="assets/css/jquery.fancybox.css" type="text/css" rel="stylesheet" />
+    <link href="assets/css/jquery.feedback_me.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/Dashboard.css" type="text/css" rel="stylesheet" />
+    <link href="assets/css/globalplay.css" type="text/css" rel="stylesheet" />
 
     <!--<script src="assets/js/bootstrap-confirmation.js"></script>-->
     <script src="assets/js/jquery.darktooltip.js"></script>
@@ -87,6 +90,9 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentBody" runat="server">
     <form id="form1" runat="server" enctype="multipart/form-data">
         <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
+
+        <div id="feedback_trigger" onclick="fm.stopPropagation(event);fm.triggerAction(event);" class="left-bottom fm_clean feedback_trigger_closed"><span class="feedback_trigger_text">Búsqueda</span></div>
+
         <div style="width: 100%; margin-top: 11px; margin-bottom: 15px;">
             <div style="width: 98%; min-height: 360px; height: 100%; margin: 8px auto;">
                 <div class="row no-gutter" style="height: 100%; min-height: 600px; max-height: 600px;">
@@ -97,6 +103,7 @@
 
                         <h1 style="margin-top: 5px;"><span id="h1-busqueda" class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
+        <button class="glyphicon glyphicon-minus panel-minus" type="button" title="Ocultar panel" onclick="javascript: panel_show(false);"></button>
                          
                         <div class="row" style="margin: 3px; margin-top: 17px; min-height: 110px;">
 
@@ -229,10 +236,6 @@
 
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal;">Reproductor</span></h1>
 
-                        <button class="glyphicon glyphicon-minus panel-minus" type="button" title="Ocultar panel" onclick="javascript: panel_show(true);"></button>
-                         <button class="glyphicon glyphicon-plus panel-plus" type="button" title="Mostrar panel" onclick="javascript: panel_show(false);"></button>
-
-
                         <div class="row row-short">
                             <label id="lblElementName" class="pull-left unselectable" style="margin-left: 20px; font-size: 20px;">Video Player</label>
                         </div>
@@ -248,16 +251,18 @@
                                             </button>
                                             <button class="glyphicon glyphicon-zoom-out zoom-button" type="button" title="Zoom reducir" >
                                             </button>
-                                            <button class="fa fa-arrow-left zoom-button" type="button" title="Mover izquierda" >
-                                            </button>
-                                            <button class="fa fa-arrow-right zoom-button" type="button" title="Mover derecha" >
-                                            </button>
-                                             <button class="fa fa-arrow-up zoom-button" type="button" title="Mover arriba" >
-                                            </button>
-                                            <button class="fa fa-arrow-down zoom-button" type="button" title="Mover abajo" >
-                                            </button>
                                             <button class="fa fa-refresh zoom-button" type="button" title="Reiniciar" onclick="javascript: doReset();">
                                             </button>
+                                            <div style="display:none;">
+                                                <button class="fa fa-arrow-left zoom-button" type="button" title="Mover izquierda" >
+                                                </button>
+                                                <button class="fa fa-arrow-right zoom-button" type="button" title="Mover derecha" >
+                                                </button>
+                                                 <button class="fa fa-arrow-up zoom-button" type="button" title="Mover arriba" >
+                                                </button>
+                                                <button class="fa fa-arrow-down zoom-button" type="button" title="Mover abajo" >
+                                                </button>
+                                            </div>
                                         </section>
 
                                         <div id="divPlayer_VIDEO" style="display: none; overflow: hidden;" class='photobox'>
@@ -461,7 +466,7 @@
                                         <div class='arrow' style="left: 250px;"></div>
                                         <div class='arrow-border' style="left: 250px;"></div>
                                         <div class="row row-short" style="padding: 10px;">
-                                            <label class="label" style="font-size: 100%; color: black;">Borrar elemento seleccionado</label>
+                                            <label class="label" style="font-size: 100%; color: rgba(68, 89, 156, 1); font-size: 16px;">Borrar elemento seleccionado</label>
                                         </div>
                                         <div class="form-group">
                                             <div class="row row-short" style="padding: 10px;">
@@ -502,7 +507,7 @@
                         <div class='arrow'></div>
                         <div class='arrow-border'></div>
                         <div class="row row-short" style="padding: 10px;">
-                            <label class="label" style="font-size: 100%; color: black;">Agregar un comentario al folio</label>
+                            <label class="label" style="font-size: 100%; color: rgba(68, 89, 156, 1); font-size: 16px;">Agregar un comentario al folio</label>
                         </div>
                         <div class="form-group">
                             <div class="col-md-12">
@@ -545,7 +550,7 @@
                         <div class='arrow'></div>
                         <div class='arrow-border'></div>
                         <div class="row row-short" style="padding: 10px;">
-                            <label id="popbox2_title" class="label" style="font-size: 100%; color: black;">Subir elemento al folio</label>
+                            <label id="popbox2_title" class="label" style="font-size: 100%; color: rgba(68, 89, 156, 1); font-size: 16px;">Subir elemento al folio</label>
                         </div>
 
                         <div class="row row-short">
@@ -619,7 +624,7 @@
                         <div id="divgp_sc" class="globalplayBox img-rounded" style="display: none;">
                             <div id="flex_messages">                                
 
-                            <div id="flex-messages-top">
+                            <div id="flex-messages-top" style="cursor:default;">
                                 <div id="globalplay_divDocumentsName" class="flex-messages-top info-label">
                                     <h2 class="flex-messages-top-h2 label label-success"></h2>
                                 </div>
@@ -637,9 +642,9 @@
                                 </div>
                             </div>
 
-                            <div id="flex-messages-bottom">
-                                <div id="globalplay_divComments" class="info-label" style="bottom: 16px;">
-                                    <h2 class="flex-messages-top-h2 label label-warning" style="z-index: 1001; color: #474747; background-color:#FDFDF0; text-transform: none; font-size: 20px; width: 50%; margin: 0 auto; text-shadow: none;"></h2> <!-- orange - #E8E86D-->
+                            <div id="flex-messages-bottom" style="cursor:default;">
+                                <div id="globalplay_divComments" class="info-label" style="bottom: 16px; word-wrap: break-word;">
+                                    <h2 class="flex-messages-top-h2 label label-warning" style="z-index: 1001; color: #474747; background-color:#FDFDF0; text-transform: none; font-size: 17px; width: 50%; margin: 0 auto; text-shadow: none;"></h2> 
                                 </div>
                             </div>
                             </div>
@@ -662,16 +667,16 @@
                                     <div id="controlContainer" style="width: 100%; position: relative; top: 50%; transform: translate(0, -50%);"> 
                                         <ul class="globalplay_controls controls">
 
+                                            <!-- Play/Pause button -->
                                             <li id="globalplay_play_li" class="img-rounded globalplay_play_li blue" style="position: relative; padding: 8px;">
                                                 <a href="#divgp_sc" id="globalplay_play" class="push_button globalplay_play" data-attr="playPauseAudio" 
                                                     onclick="return globalplay_init()" style="position: relative; border: none; vertical-align:top;"></a>
-                                                <!-- Play/Pause button -->
                                                 <a href="#globalPlayer_popup" id="btnOpenFancybox" style="display: none;"></a>
                                             </li>
+                                            <!-- Stop button -->
                                             <li id="globalplay_stop_li" class="img-rounded blue">
                                                 <a href="#divgp_sc" id="globalplay_stop" class="globalplay_stop" data-attr="nextAudio" 
                                                     onclick="return globalplay_stop()" style="padding: 14px; border: none; vertical-align:top;">
-                                                    <!-- Stop button -->
                                                 </a>
                                             </li>
                                         </ul>

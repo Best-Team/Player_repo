@@ -105,6 +105,7 @@
     <Content Include="assets\css\jquery-ui.structure.css" />
     <Content Include="assets\css\jquery-ui.theme.css" />
     <Content Include="assets\css\jquery.fancybox.css" />
+    <Content Include="assets\css\jquery.feedback_me.css" />
     <Content Include="assets\css\jquery.photobox.css" />
     <Content Include="assets\css\jslider.css" />
     <Content Include="assets\css\login-styles.css" />
@@ -143,6 +144,7 @@
     <Content Include="assets\js\inputmask.js" />
     <Content Include="assets\js\jquery.darktooltip.js" />
     <Content Include="assets\js\jquery.fancybox.js" />
+    <Content Include="assets\js\jquery.feedback_me.js" />
     <Content Include="assets\js\jquery.inputmask.bundle.js" />
     <Content Include="assets\js\jquery-ui.js" />
     <Content Include="assets\js\jquery.ba-dotimeout.js" />
