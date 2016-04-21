@@ -220,9 +220,18 @@ $(document).ready(function () {
         closeEffect: 'elastic',
         closeSpeed: 150,
 
+        /* - INIT globalplay popup - */
         beforeShow: function () {
             $("#divgp_sc").show();
             $('<div id="timer-labels"><label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label> / <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label></div>').appendTo("#divgp_sc");
+
+            // Init video zoom arrays
+            zoom_w_arraylist = [];
+            zoom_h_arraylist = [];
+
+            // Hide comment tooltip popups during globalplay
+            $("body .qtip").css("visibility", "hidden");
+
         },
 
         afterClose: function () {
@@ -231,9 +240,18 @@ $(document).ready(function () {
             $("#globalPlayer_popup").show();
 
             // Check smaller screens globalplay resolution
+            /*
             $(".globalplayBox").css("height", "660px");
             $(".flex").css("margin-top", "-20px");
             $("#timeframe").css("margin-top", "-10px");
+            */
+
+            // Clear audio tooltip popups already added 
+            clearAll_darktooltip();
+
+            // Show again comment tooltip popups 
+            $("body .qtip").css("visibility", "visible");
+
         },
 
         helpers: {
@@ -267,6 +285,7 @@ $(document).ready(function () {
     PLAYER_BOX_original_top = PLAYER_BOX.offset().top;
    
 
+    // Hold click effect on video zoom Logic *****************************
     var zoom_timeout, zoom_clicker_in = $('.glyphicon-zoom-in');
     zoom_clicker_in.mousedown(function () {
         doZoom(true);
@@ -340,7 +359,8 @@ $(document).ready(function () {
         return false;
     });
 
-   
+    // Hold click effect on video zoom Logic *****************************
+
 
 }); // END On Ready
 
@@ -1503,8 +1523,13 @@ function pre_timeframe_prepare() {
 }
 
 // Clear comment tooltip popups already added 
-function clearQTip() {
-    $(".qtip").remove();
+function clearAll_QTip() {
+    $("body .qtip").remove();
+}
+
+// Clear audio tooltip popups already added 
+function clearAll_darktooltip() {
+    $("body .darktooltip-modal-layer, body .dark-tooltip").remove();
 }
 
 function timeframe_prepare(timeline_data, start, end) {
@@ -1544,7 +1569,7 @@ function timeframe_draw(timeline_data, start, end) {
         $("#timeframe").hide();
 
         // Clear comment tooltip popups already added 
-        clearQTip();
+        clearAll_QTip();
 
         // Create timeframe object
         var t = Timeframe("#timeframe").addCategory(timeline_data).start(start).end(end).draw();
@@ -3267,7 +3292,7 @@ function loadPlayer_HTML5(file_url, divPlayer_VIDEO, aPlayPause_VIDEO, divContro
     width = "100%";
     height = "100%";
 
-    var js_player = '<video id="html_video" preload="none" style="width: ' + width + '; height: ' + height + '; margin: 0 auto; position:absolute;">';
+    var js_player = '<video id="html_video" preload="none" style="width: ' + width + '; height: ' + height + '; margin: 0 auto; position: absolute;">';
     js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4; codecs=\'avc1.42E01E, mp4a.40.2\'">';
     js_player += '<source id="webm" src="' + file_url + '" type="video/webm; codecs=\'vp8, vorbis\'">';
     js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';

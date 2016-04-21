@@ -328,7 +328,6 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
         flex_max_width = 1299; 
     }
 
-
     // MAX Amount of simultaneous elements 
     var max_amount = GLOBALPLAY_MAX_COLLISION_ELEMENTS;
     if (visual_count <= max_amount) {
@@ -355,12 +354,12 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
                     flex_max_width = 1200;
 
                     // Wide extra
-                    if (current_screen >= 1920) {
+                    if (MONITOR_WIDTH >= 1920) {
                         width = 1550;
                         height = 600;
                         flex_max_width = 1600;
                     }
-                    else if (current_screen >= 1440) {
+                    else if (MONITOR_WIDTH >= 1440) {
                         // Wide site
                         width = 1300;
                         height = 600;
@@ -376,12 +375,12 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
                     flex_max_width = 1200;
 
                     // Wide extra
-                    if (current_screen >= 1920) {
+                    if (MONITOR_WIDTH >= 1920) {
                         width = 760;
                         height = 600;
                         flex_max_width = 1600;
                     }
-                    else if (current_screen >= 1440) {
+                    else if (MONITOR_WIDTH >= 1440) {
                         // Wide site
                         width = 650;
                         height = 600;
@@ -397,11 +396,11 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
                     flex_max_width = 1200;
 
                     // Wide extra
-                    if (current_screen >= 1920) {
+                    if (MONITOR_WIDTH >= 1920) {
                         width = 510;
                         height = 500;
                     }
-                    else if (current_screen >= 1440) {
+                    else if (MONITOR_WIDTH >= 1440) {
                         // Wide site
                         width = 415;
                         height = 400;
@@ -419,18 +418,20 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
             height: height
         }
 
-
         if (visual_alreadyAdded > 0) {
-            $(".flex").find('*').not('.info-label, .info-label *').each(function (index, el) {
+
+            $(".flex").find('*').not('.info-label, .info-label *, section, button').each(function (index, el) {
                 $(this).css("width", visual_size.width);
                 $(this).css("height", visual_size.height);
-
             });
 
-            $(".flex").find('.divVideo video').each(function (index, el) { //
+            $(".flex").find('.divVideo video').not('.info-label, .info-label *, section, button').each(function (index, el) { 
                 $(this).css("width", visual_size.width - 5);
                 $(this).css("height", visual_size.height - 5);
             });
+
+            // Reset zoom to HTML5 videos
+            globalplay_doReset_all();
         }
 
         return visual_size;
@@ -544,14 +545,41 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
             case "ogg": {
 
                 // HTML5 video tag Source: https://www.w3.org/2010/05/video/mediaevents.html
-                var js_player = '<div id="div' + global_elementID + '" class="divVideo" style="float:left; width:' + visual_size_width + 'px; height:' + visual_size_height + 'px; background:aliceblue;">';
+                var js_player = '<div id="div' + global_elementID + '" class="globalplay-divVideoHTML5 divVideo" style="width:' + visual_size_width + 'px; height:' + visual_size_height + 'px;">';
                 js_player += '<video id="' + global_elementID + '" preload="none" style="width:' + (visual_size_width - 5) + 'px; height:' + (visual_size_height - 5) + 'px;" name="visual_element" autoplay>';
                 js_player += '<source id="mp4" src="' + file_url + '" type="video/mp4; codecs=\'avc1.42E01E, mp4a.40.2\'">';
                 js_player += '<source id="webm" src="' + file_url + '" type="video/webm; codecs=\'vp8, vorbis\'">';
                 js_player += '<source id="ogv" src="' + file_url + '" type="video/ogg">';
-                js_player += '</video></div>';
+                js_player += '</video>';
+
+                //
+                var html5video_zoom_w = 100;
+                var html5video_zoom_h = 100;
+                //
+
+                var zoom_count = zoom_w_arraylist.length;
+                zoom_w_arraylist.push(100);
+                zoom_h_arraylist.push(100);
+
+                // Global zoom variable
+
+                // Zoom controls
+                js_player += '<section class="gradient globalplay-position-controls">';
+                js_player += '<button class="glyphicon glyphicon-zoom-in zoom-in_' + global_elementID + ' globalplay-zoom-button" type="button" title="Zoom aumentar" onclick="javascript: globalplay_doZoom(true, \'' + global_elementID + '\', ' + zoom_count + ');">';
+                js_player += '</button>';
+                js_player += '<button class="glyphicon glyphicon-zoom-out zoom-out_' + global_elementID + ' globalplay-zoom-button" type="button" title="Zoom reducir" onclick="javascript: globalplay_doZoom(false, ' + global_elementID + '\', ' + zoom_count + ');">';
+                js_player += '</button>';
+                js_player += '<button class="fa fa-refresh globalplay-zoom-button" type="button" title="Reiniciar" onclick="javascript: globalplay_doReset(\'' + global_elementID + '\', ' + zoom_count + ');">';
+                js_player += '</button>';
+                js_player += '</section>';
+
+                js_player += '</div>';
 
                 flex_div.append(js_player);
+
+                // Hold click effect on video zoom logic 
+                AddZoomEffects(global_elementID, zoom_count);
+                AddDragAndDropEvent(global_elementID, zoom_count);
 
                 var html_player = $("#" + global_elementID);
                 if (html_player != null && html_player[0] != null) {
@@ -819,7 +847,7 @@ function globalplay_image(file_url, visual_size_width, visual_size_height, flex_
     var userName = element_alreadyTaken[0].userName;
 
     $('<a name="visual_element" id="' + global_elementID + '" style="width:' + visual_size_width + 'px; height:' + visual_size_height + 'px;' +
-       'background-image:url(' + file_url + '); float:left; position:relative; margin:8px 12px; background-size: auto 100%; background-color: aliceblue;"' +
+       'background-image:url(' + file_url + '); float:left; position:relative; margin-left:8px; margin-right:8px; background-size: auto 100%; background-color: aliceblue;"' + 
        'width="' + visual_size_width + '" height="' + visual_size_height + '">' + userName + " - " + timestamp /* fileName */ + '</a>').appendTo(flex_div).fadeIn(2000);
 
     // Add Fullscreen click Event
@@ -1810,6 +1838,159 @@ function globalplay_setElementAlreadyTaken(elementID, value) {
         }
     }
 }
+
+
+function globalplay_doZoom(increase, element_ID, index) {
+    if (increase != null && element_ID != null && index != null) {
+        var video = $(".divVideo #" + element_ID);
+        if (video != null) {
+
+            var zoom_w = zoom_w_arraylist[index];
+            var zoom_h = zoom_h_arraylist[index];
+
+            if (increase) {
+                zoom_w += 8;
+                zoom_h += 4;
+            } else {
+                zoom_w -= 8;
+                zoom_h -= 4;
+            }
+
+            var old_w = parseInt(video.css("width"), 10);
+            var old_h = parseInt(video.css("height"), 10);
+
+            // Making zoom
+            video.css("width", zoom_w + "%");
+            video.css("height", zoom_h + "%");
+
+            var new_w = parseInt(video.css("width"), 10);
+            var new_h = parseInt(video.css("height"), 10);
+
+            var prom_w = (Math.abs(new_w - old_w)) / 2;
+            var prom_h = (Math.abs(new_h - old_h)) / 2;
+
+            // Centering zoom
+            if (increase) {
+                video.offset({ top: video.offset().top - prom_h });
+                video.offset({ left: video.offset().left - prom_w });
+            } else {
+                video.offset({ top: video.offset().top + prom_h });
+                video.offset({ left: video.offset().left + prom_w });
+            }
+
+            // Save new values
+            zoom_w_arraylist[index] = zoom_w;
+            zoom_h_arraylist[index] = zoom_h;
+        }
+    }
+}
+
+
+function globalplay_doReset(element_ID, index) {
+    if (element_ID != null && index != null) {
+        var video = $(".divVideo #" + element_ID);
+        if (video != null) {
+
+            var zoom_w = zoom_w_arraylist[index];
+            var zoom_h = zoom_h_arraylist[index];
+
+            zoom_w = 100;
+            zoom_h = 100;
+
+            if (video[0] != null) {
+                video[0].style.top = 0 + 'px';
+                video[0].style.left = 0 + 'px';
+            }
+
+            video.css("width", "100%");
+            video.css("height", "100%");
+
+            // Save new values
+            zoom_w_arraylist[index] = zoom_w;
+            zoom_h_arraylist[index] = zoom_h;
+        }
+    }
+}
+
+function globalplay_doReset_all() {
+    for (var i = 0; i < zoom_w_arraylist.length; i++) {
+        var zoom_w = zoom_w_arraylist[i];
+        var zoom_h = zoom_h_arraylist[i];
+
+        zoom_w = 100;
+        zoom_h = 100;
+
+        $(".flex").find('.divVideo video').each(function (index, el) { 
+            $(this)[0].style.top = 0 + 'px';
+            $(this)[0].style.left = 0 + 'px';
+
+            $(this).css("width", "100%");
+            $(this).css("height", "100%");
+        });
+
+        // Save new values
+        zoom_w_arraylist[i] = zoom_w;
+        zoom_h_arraylist[i] = zoom_h;
+    }
+}
+
+function AddDragAndDropEvent(element_ID, index) {
+    if (element_ID != null && index != null) {
+
+        // Load drag and drop event
+        $("#" + element_ID).draggable({
+            cursor: 'move'
+        });
+
+        $("#" + element_ID).mousewheel(function (event, delta) {
+            if (delta > 0) {
+                globalplay_doZoom(true, element_ID, index);
+            } else {
+                globalplay_doZoom(false, element_ID, index);
+            }
+        });
+
+        // Change cursor
+        if ($("#" + element_ID).parent() != null) {
+            $("#" + element_ID).parent().css("cursor", "move");
+        }
+    }
+}
+
+// Hold click effect on video zoom logic 
+function AddZoomEffects(element_ID, index) {
+    if (element_ID != null && index != null) {
+        var zoom_timeout, zoom_clicker_in = $('.zoom-in_' + element_ID);
+        zoom_clicker_in.mousedown(function () {
+            globalplay_doZoom(true, element_ID, index);
+            zoom_timeout = setInterval(function () {
+                // Do something continuously 
+                globalplay_doZoom(true, element_ID, index);
+            }, 100);
+
+            return false;
+        });
+
+        var zoom_clicker_out = $('.zoom-out_' + element_ID);
+        zoom_clicker_out.mousedown(function () {
+            globalplay_doZoom(false, element_ID, index);
+            zoom_timeout = setInterval(function () {
+                // Do something continuously 
+                globalplay_doZoom(false, element_ID, index);
+            }, 100);
+
+            return false;
+        });
+
+
+        $(document).mouseup(function () {
+            clearInterval(zoom_timeout);
+            return false;
+        });
+    }
+}
+
+// Hold click effect on video zoom Logic *****************************
 
 /******** @author: Gonzalo Borderolle - inConcert MVD/UY ********/
 /******** END: Media Player 2.0: Nuevo Requerimiento: Global Play ********/

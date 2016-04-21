@@ -36,7 +36,6 @@
     <script src="assets/js/Dashboard.js"></script>
     <script src="assets/js/Globalplay.js"></script>
 
-
     <!-- Styles -->
     <link href="assets/css/datetimepicker.css" type="text/css" rel="stylesheet" />
     <link href="assets/css/jquery.photobox.css" type="text/css" rel="stylesheet" />
@@ -56,9 +55,7 @@
     <script src="assets/js/jquery.darktooltip.js"></script>
     <link href="assets/css/darktooltip.css" type="text/css" rel="stylesheet" />
 
-
     <script type="text/javascript">
-
 
         /*** global variables ***/
 
@@ -69,7 +66,7 @@
         function enterSearchBox(e) {
             if (e.keyCode == 13) {
                 __doPostBack('<%=btnSearchCandidate.UniqueID%>', "");
-        }
+            }
         }
        
     </script>
@@ -265,7 +262,7 @@
                                             </div>
                                         </section>
 
-                                        <div id="divPlayer_VIDEO" style="display: none; overflow: hidden;" class='photobox'>
+                                        <div id="divPlayer_VIDEO" class='photobox' style="display: none; overflow: hidden; background-color:black;" >
                                             <!-- Contiene el Applet -->
                                         </div>
                                         <img id="imgPlayer" class='photobox' style='max-width: 100%; margin: auto; display: none;' alt='' />

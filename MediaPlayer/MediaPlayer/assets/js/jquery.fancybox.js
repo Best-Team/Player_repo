@@ -1200,6 +1200,7 @@
 
             /* Multimedia Player */
 		    // Check smaller screens globalplay resolution
+            /*
 			if (MONITOR_HEIGHT < 750) { // 800
 			    $(".globalplayBox").css("height", "450px");
 			    $(".flex").css("margin-top", "-30px");
@@ -1209,6 +1210,7 @@
 			    $(".flex").css("margin-top", "-20px");
 			    $("#timeframe").css("margin-top", "-10px");
 			}
+            */
 
 		},
 

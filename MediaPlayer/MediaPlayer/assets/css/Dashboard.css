@@ -27,7 +27,7 @@ section.gradient button.active {
 .push_button:before {
     /*background:#f0f0f0;
 	background-image:-webkit-gradient(linear, 0% 0%, 0% 100%, from(#D0D0D0), to(#f0f0f0));
-        */
+    */
     
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
@@ -476,7 +476,6 @@ a.disabled {
     text-decoration: none;
 }
 .flex .divVideo {
-    background-color: white;
     display: block;
     border-radius: 8px;
     background-repeat: no-repeat;

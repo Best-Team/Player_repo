@@ -1,3 +1,9 @@
+.globalplay-divVideoHTML5 {
+    float: left;
+    overflow: hidden;
+    position: relative;
+    background-color: black;
+}
 .mainContainer {
     margin: 0 auto;
     width: 800px
@@ -278,4 +284,19 @@ input[type="range"] {
     background-size: 120%;
     background-position: 40% 15%;
     /*40% 53%; */
+}
+
+.globalplay-position-controls {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 15px;
+    margin-right: 20px;
+    z-index: 1001;
+}
+
+.globalplay-zoom-button {
+    width: 32px;
+    height: 16px;
+    margin-right: 4px;
 }
