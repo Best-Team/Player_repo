@@ -496,12 +496,27 @@ a.disabled {
     display: none;
 }
 
-.panel-minus {
+/*.panel-minus {
     position: absolute;
     top: 0;
     right: 0;
     margin: 15px;
     display: block;
+}*/
+
+.panel-minus {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 15px;
+    display: none;
 }
 
-
+.panel-plus {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 15px;
+    display: block;
+}

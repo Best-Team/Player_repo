@@ -100,7 +100,7 @@
 
                         <h1 style="margin-top: 5px;"><span id="h1-busqueda" class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
-        <button class="glyphicon glyphicon-minus panel-minus" type="button" title="Ocultar panel" onclick="javascript: panel_show(false);"></button>
+        <%--<button class="glyphicon glyphicon-minus panel-minus" type="button" title="Ocultar panel" onclick="javascript: panel_show(false);"></button>--%>
                          
                         <div class="row" style="margin: 3px; margin-top: 17px; min-height: 110px;">
 
@@ -232,6 +232,10 @@
                         <div id="divPanel_PlayerControl" class="div-panel unselectable disabled" style="float: right; max-height: 600px; min-height: 600px; width: 100%;">
 
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal;">Reproductor</span></h1>
+
+                        <button class="glyphicon glyphicon-minus panel-minus" type="button" title="Ocultar panel" onclick="javascript: panel_show(true);"></button>
+                        <button class="glyphicon glyphicon-plus panel-plus" type="button" title="Mostrar panel" onclick="javascript: panel_show(false);"></button>
+
 
                         <div class="row row-short">
                             <label id="lblElementName" class="pull-left unselectable" style="margin-left: 20px; font-size: 20px;">Video Player</label>

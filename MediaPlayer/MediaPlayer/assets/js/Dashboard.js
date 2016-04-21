@@ -4824,6 +4824,7 @@ function doReset() {
     }
 }
 
+/*
 function panel_show(show) {
     var panel_show_minus = $(".panel-minus");
     if (show) {
@@ -4869,6 +4870,7 @@ function panel_show(show) {
             doReset();
         }, 500);
 
+        /*
         // Feedback me - Source: http://www.jqueryscript.net/other/Simple-jQuery-Plugin-For-Slide-Out-Tab-Feedback-Widget-Feedback-Me.html
         //set up some basic options for the feedback_me plugin
         fm_options = {
@@ -4889,11 +4891,64 @@ function panel_show(show) {
         };
         //init feedback_me plugin
         fm.init(fm_options);
+        */
 
 
+    //}
+//}
 
+function panel_show(show) {
+    var panel_show_minus = $(".panel-minus");
+    var panel_show_plus = $(".panel-plus");
+    if (show) {
+
+        $("#divPanel_Busqueda_pre").toggle("slide", {}, 300);
+        setTimeout(function () {
+            $("#divPanel_container").css("right", "inherit");
+            $("#divPanel_container").css("position", "relative");
+            $("#divPanel_container").removeClass("col-md-12");
+            $("#divPanel_container").addClass("col-md-8");
+
+            // sub
+            $("#playerControl_sub1").removeClass("col-md-10");
+            $("#playerControl_sub1").addClass("col-md-9")
+            $("#playerControl_sub2").removeClass("col-md-2");
+            $("#playerControl_sub2").addClass("col-md-3");
+
+            panel_show_minus.hide();
+            panel_show_plus.show();
+
+            doReset();
+        }, 500);
+    }
+    else {
+        // Se expande
+        $("#divPanel_container").css("right", 0);
+        $("#divPanel_container").css("position", "absolute");
+        $("#divPanel_Busqueda_pre").toggle("slide", {}, 300);
+
+        setTimeout(function () {
+            $("#divPanel_container").css("left", 0);
+            $("#divPanel_container").css("right", 0);
+            $("#divPanel_container").css("margin", "0 auto");
+            $("#divPanel_container").removeClass("col-md-8");
+            $("#divPanel_container").addClass("col-md-12");
+
+
+            // sub
+            $("#playerControl_sub1").removeClass("col-md-9")
+            $("#playerControl_sub1").addClass("col-md-10");
+            $("#playerControl_sub2").removeClass("col-md-3");
+            $("#playerControl_sub2").addClass("col-md-2");
+
+            panel_show_plus.hide();
+            panel_show_minus.show();
+
+            doReset();
+        }, 500);
     }
 }
+
 
 
 
