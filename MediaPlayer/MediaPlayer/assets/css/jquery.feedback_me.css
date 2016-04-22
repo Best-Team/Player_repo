@@ -26,7 +26,10 @@
 
 .feedback_trigger.left-top, .feedback_trigger.left-bottom , .feedback_trigger.right-top, .feedback_trigger.right-bottom { 
 	width: 40px;
-	height: 100px;
+	/*height: 100px;*/
+
+    min-height: 600px; 
+    max-height: 600px; 
 }
 
 .feedback_trigger.bottom-left{ 
@@ -121,7 +124,7 @@
 }
 
 .fm_clean .feedback_trigger_text { 
-	right: -25px;
+	right: -45px;
 }
 
 .fm_clean .feedback_title {

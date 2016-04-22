@@ -88,9 +88,9 @@
     <form id="form1" runat="server" enctype="multipart/form-data">
         <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
 
-        <div id="feedback_trigger" onclick="fm.stopPropagation(event);fm.triggerAction(event);" class="left-bottom fm_clean feedback_trigger_closed"><span class="feedback_trigger_text">Búsqueda</span></div>
+        <div id="feedback_trigger" class="left-bottom fm_clean feedback_trigger_closed" style="display:none;"><span class="feedback_trigger_text"></span></div>
 
-        <div style="width: 100%; margin-top: 11px; margin-bottom: 15px;">
+        <div id="divFather" style="width: 100%; margin-top: 11px; margin-bottom: 15px;">
             <div style="width: 98%; min-height: 360px; height: 100%; margin: 8px auto;">
                 <div class="row no-gutter" style="height: 100%; min-height: 600px; max-height: 600px;">
 
@@ -100,8 +100,8 @@
 
                         <h1 style="margin-top: 5px;"><span id="h1-busqueda" class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
-        <%--<button class="glyphicon glyphicon-minus panel-minus" type="button" title="Ocultar panel" onclick="javascript: panel_show(false);"></button>--%>
-                         
+                        <%--<button class="glyphicon glyphicon-hand-left panel-minus" type="button" title="Ocultar panel" onclick="javascript: busqueda_panel_show(false);"></button>--%>                        
+
                         <div class="row" style="margin: 3px; margin-top: 17px; min-height: 110px;">
 
                             <div class="row row-short" id="divFolios">
@@ -125,13 +125,17 @@
                                                 <asp:HiddenField ID="_hdnJSonEnd" runat="server" />
                                                 <asp:HiddenField ID="_hdnFolioID" runat="server" />
 
-                                                <span class="col-md-1 col-md-pull-1 col-xs-1 col-xs-pull-1 pull-right">
-                                                    <button class="btn btn-default pull-left" type="button" runat="server" id="btnSearch1" onserverclick="btnSearch_ServerClick">
+                                                <span class="col-md-3 col-xs-3 pull-right" style="padding-right:0;">
+                                                    <button class="btn btn-default pull-left" style="margin:0;" type="button" title="Hacer búsqueda" runat="server" id="btnSearch1" onserverclick="btnSearch_ServerClick">
                                                         <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                                    </button>
+
+                                                     <button class="btn btn-default panel-minus pull-right" type="button" title="Ocultar panel" style="position:relative; margin:0;" onclick="javascript: busqueda_panel_show(false);">
+                                                        <span class="glyphicon glyphicon-hand-left" aria-hidden="true"></span>
                                                     </button>
                                                 </span>
 
-                                                <span class="col-md-10 col-xs-10">
+                                                <span class="col-md-9 col-xs-9" style="padding:0; padding-left:8px; ">
                                                     <asp:TextBox CssClass="form-control txbSearchBox1" placeholder="Buscar folios por número" runat="server" ID="txbSearchBox1" onkeypress="return enterSearchBox(event)" />
                                                     <asp:Button ID="btnSearchCandidate" runat="server" Style="display: none" Text="" OnClick="btnSearchCandidate_Click" />
 
@@ -232,10 +236,6 @@
                         <div id="divPanel_PlayerControl" class="div-panel unselectable disabled" style="float: right; max-height: 600px; min-height: 600px; width: 100%;">
 
                         <h1 style="margin-top: 5px;"><span class="special-title label label-primary" style="font-weight: normal;">Reproductor</span></h1>
-
-                        <button class="glyphicon glyphicon-minus panel-minus" type="button" title="Ocultar panel" onclick="javascript: panel_show(true);"></button>
-                        <button class="glyphicon glyphicon-plus panel-plus" type="button" title="Mostrar panel" onclick="javascript: panel_show(false);"></button>
-
 
                         <div class="row row-short">
                             <label id="lblElementName" class="pull-left unselectable" style="margin-left: 20px; font-size: 20px;">Video Player</label>
