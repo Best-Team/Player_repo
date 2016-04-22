@@ -10,34 +10,36 @@
 a, abbr, acronym, address, applet, article, aside, audio,
 b, blockquote, big, body,
 center, canvas, caption, cite, code, command,
-datalist, dd, del, details, dfn, dl, div, dt, 
+datalist, dd, del, details, dfn, dl, div, dt,
 em, embed,
-fieldset, figcaption, figure, font, footer, form, 
+fieldset, figcaption, figure, font, footer, form,
 h1, h2, h3, h4, h5, h6, header, hgroup, html,
 i, iframe, img, ins,
-kbd, 
+kbd,
 keygen,
-label, legend, li, 
+label, legend, li,
 meter,
 nav,
 object, ol, output,
 p, pre, progress,
-q, 
+q,
 s, samp, section, small, span, source, strike, strong, sub, sup,
 table, tbody, tfoot, thead, th, tr, tdvideo, tt,
-u, ul, 
-var{
-	background: transparent;
-	border: 0 none;
-	font-size: 100%;
-	margin: 0;
-	padding: 0;
-	vertical-align:baseline;
+u, ul,
+var {
+    background: transparent;
+    border: 0 none;
+    font-size: 100%;
+    margin: 0;
+    padding: 0;
+    vertical-align: baseline;
 }
 img { vertical-align:middle; }
 
 /* Getting the new tags to behave  --------------------------------------------------------------------------------------------*/
-article, aside, audio, canvas, command, datalist, details, embed, figcaption, figure, footer, header, hgroup, keygen, meter, nav, output, progress, section, source, video{ display: block; }
+article, aside, audio, canvas, command, datalist, details, embed, figcaption, figure, footer, header, hgroup, keygen, meter, nav, output, progress, section, source, video {
+    display: block;
+}
 mark, rp, rt, ruby, summary, time{ display: inline }
 a{ color:#1792e7; text-decoration:none; }
 li { list-style-type:none; }
@@ -45,10 +47,12 @@ li { list-style-type:none; }
 .clear { clear:both; }
 .highlight { color:#2390db; }
 .show { display:block!important; }
-input:-webkit-autofill { background-color: #fff!important; color: #a3a3a3; }
+input:-webkit-autofill {
+    background-color: #fff !important;
+    color: #a3a3a3;
+}
 /* Fonts Face Define  --------------------------------------------------------------------------------------------*/
 /* Trade Gothic Bold  --------------------------------------------------------------------------------------------*/
-
 
 
 @font-face {
@@ -381,39 +385,27 @@ ul li p {
 
 /* FOOTER CONTAINER */
 
-	.skinLight #inboxMainContainerTop {
-		background-color:#f8f8f8
-		}
+.skinLight #inboxMainContainerTop {
+    background-color: #f8f8f8;
+}
 
 
 #inboxMainFooter {
+    z-index: 2000;
     background-image: -webkit-gradient(linear, left top, left bottom, from(#373737), to(#1c1c1c)) !important;
-	/*position:absolute !important;
-	bottom:0px !important;
-	left:0px;
-	right:0px;*/
-	height:40px;
-	padding-left:9px;
-	padding-right:9px;
-	/* min-width:1270px */
-	}
+    height: 40px;
+    padding-left: 9px;
+    padding-right: 9px;
+}
 
-	.skinLight #inboxMainFooter {
-		background-color:#373737;
-		background-image:
-		
-		-webkit-gradient(linear, left top, left bottom, from(#373737), to(#1c1c1c));
-		background-image:
-		
-		-webkit-linear-gradient(top, #373737, #1c1c1c);
-		background-image:
-		
-		-moz-linear-gradient(top, #373737, #1c1c1c);
-		background-image:
-		
-		-o-linear-gradient(top, #373737, #1c1c1c);
-		background-image:linear-gradient(to bottom,#373737, #1c1c1c);
-		}
+.skinLight #inboxMainFooter {
+    background-color: #373737;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#373737), to(#1c1c1c));
+    background-image: -webkit-linear-gradient(top, #373737, #1c1c1c);
+    background-image: -moz-linear-gradient(top, #373737, #1c1c1c);
+    background-image: -o-linear-gradient(top, #373737, #1c1c1c);
+    background-image: linear-gradient(to bottom,#373737, #1c1c1c);
+}
 
 
 /* FOOTER ELEMENTS  |=======================================================================================================================*/
@@ -431,27 +423,19 @@ ul li p {
     float:left;
 }
 
-	.skinLight #mainFooterCopyright,
-	.skinLight #mainFooterShortCopyright {
-		color:#BBB;
-		}
+.skinLight #mainFooterCopyright,
+.skinLight #mainFooterShortCopyright {
+    color: #BBB;
+}
 
 /* FOOTER POWERED IMAGE */
 #mainFooterPowered {
-	width:168px;
-	height:35px;
-	background-position:0 0;
-	background-repeat:no-repeat;
-    float:right;
-	/*
-        position:absolute;
-        right:10px;
-	    bottom:4px;
-    */
-	}
-
-#mainFooterPowered {
-	background-image:url(../images/footerPoweredByIC.png);
+    width: 168px;
+    height: 35px;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    float: right;
+    background-image: url(../images/footerPoweredByIC.png);
     margin-top: -15px;
 }
 

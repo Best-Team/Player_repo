@@ -530,18 +530,9 @@ var fm = (function ($) {
 		var h = $(".navbar-static-top").css("height");
 		var m = $("#divFather").css("margin-top");
 
-		$('body').append('<div style="top: ' + h + '; margin-top: ' + m + '; " onclick="javascript: busqueda_panel_show(true);" class="feedback_trigger feedback_trigger_closed ' + fm_options.position + jQueryUIClasses1 + fm_class + jquery_class + bootstrap_class + bootstrap_hero_unit + '">'
+		$('body').append('<div style="top: ' + h + '; margin-top: ' + m + '; z-index:1000;" onclick="javascript: busqueda_panel_show(true);" class="feedback_trigger feedback_trigger_closed ' + fm_options.position + jQueryUIClasses1 + fm_class + jquery_class + bootstrap_class + bootstrap_hero_unit + '">'
 				+ '<span style="background-color: #446e9b;font-size: 17px; margin-top: 20px; font-style: normal; color:white; white-space:nowrap; text-align:center; padding: 6px 20px;border-radius: 5px;border: 1px solid #CCC;font-weight: normal;" class="feedback_trigger_text">' + fm_options.trigger_label
 				+	'</span></div>');
-
-		$('body').append('<div class="feedback_content feedback_content_closed' + fm_options.position + email_feedback_content_class + radio_button_list_class + jQueryUIClasses2 + fm_class + jquery_class + bootstrap_class + bootstrap_hero_unit + '">'
-							+ '<div class="feedback_title ' + jQueryUIClasses1 + jQueryUIClasses3 + '">'
-							+	'<span class="' + jQueryUIClasses4 + '">' + fm_options.title_label + '</span>'
-							+ '</div>'
-							+  form_html
-							+  iframe_html
-							+  fm_options.custom_html
-						+ '</div>');
 
 		if (fm_options.jQueryUI === true) {
 			$('.feedback_submit').button({
