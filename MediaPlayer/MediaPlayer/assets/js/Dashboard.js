@@ -598,6 +598,15 @@ function loadClickRemoveElementSelected_event() {
     });
 }
 
+function afterDownloadFiles() {
+    checkAll_checkboxes();
+    pre_timeframe_prepare();
+}
+
+function checkAll_checkboxes() {
+    $('tr:visible td input:checkbox', table).prop('checked', true);
+}
+
 /**** Event: OnClick check all elements at left grid ****/
 function loadGridCheckboxAll_event() {
     $('#chbSelectAll').click(function (e) {
@@ -828,8 +837,8 @@ function LoadAlertMessagesBackup() {
     hashMessages["IngreseNumeroCamara"] = "Por favor, ingrese el número de cámara.";
     hashMessages["ComentarioGuardado"] = "Comentario correctamente guardado.";
     hashMessages["InstallWebchimera"] = "Por favor, descargue WebChimera plugin desde: ";
-    hashMessages["ConfirmarDesgargaElementos"] = "¿Desea descargar TODOS los elementos seleccionados?";
-    hashMessages["ConfirmarBorrarElementos1"] = "¿Desea borrar TODOS los elementos seleccionados?";
+    hashMessages["ConfirmarDesgargaElementos"] = "¿Desea descargar todos los elementos seleccionados?";
+    hashMessages["ConfirmarBorrarElementos1"] = "¿Desea borrar todos los elementos seleccionados?";
     hashMessages["ConfirmarBorrarElementos2"] = "¿Está seguro?";
     hashMessages["SeleccioneFolio"] = "Por favor, ingrese un folio válido.";
     hashMessages["InstallWebchimera_Aux"] = "Por favor, instale el plugin WebChimera para reproducir el elemento. ";
@@ -2369,8 +2378,17 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     // Right side element details --------------------
     var lblType = type_longStr === "Grabación" ? "Grabación de pantalla" : type_longStr;
 
+
+    var fileName2 = fileName;
+    if (isExtra != null && isExtra.length > 0) {
+        var isExtra_str = isExtra.toString();
+        if (isExtra_str.toLowerCase() === "true") {
+            fileName2 = fileName.replace(/^.*[\\\/]/, '');
+        }
+    }
+
     $("#lblType").val(lblType);
-    $("#lblName").val(fileName);
+    $("#lblName").val(fileName2);
     $("#lblTimestamp").val(timestamp);
 
 
@@ -4353,7 +4371,7 @@ function multiDownload1(objects) {
                                 //filePath_str = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
                             }
 
-                            var elements = hdnElementsToDownload.val() + "#" + filePath_str + "$" + fileName;
+                            var elements = hdnElementsToDownload.val() + "#" + filePath_str + "$" + fileName + "$" + isExtra;
                             hdnElementsToDownload.val(elements);
                             ok = true;
                         }
@@ -4363,6 +4381,7 @@ function multiDownload1(objects) {
         }
 
         if (ok) {
+            // Remove first "#"
             var elementsToDownload_str = hdnElementsToDownload.val();
             var aux = elementsToDownload_str;
             if (elementsToDownload_str != null && elementsToDownload_str.length > 0) {
@@ -4372,6 +4391,7 @@ function multiDownload1(objects) {
                     hdnElementsToDownload.val(aux);
                 }
             }
+            // Call server
             doDownloadElements();
         }
     }

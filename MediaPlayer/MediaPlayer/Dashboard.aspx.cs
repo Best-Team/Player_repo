@@ -1086,28 +1086,38 @@ namespace MediaPlayer
                                 if (!string.IsNullOrWhiteSpace(element))
                                 {
                                     fileData_array = element.Split('$');
-                                    if (fileData_array != null && fileData_array.Length > 1)
+                                    if (fileData_array != null && fileData_array.Length > 2)
                                     {
                                         string file_path = fileData_array[0];
                                         string file_name = fileData_array[1];
+                                        string file_isExtra = fileData_array[2];
 
-                                        string final = Path.Combine(repository_temp, file_name);
-
-                                        try
+                                        if (!string.IsNullOrWhiteSpace(file_path) && !string.IsNullOrWhiteSpace(file_name) && !string.IsNullOrWhiteSpace(file_isExtra))
                                         {
-                                            // Get file from web service
-                                            WebClient webClient = new WebClient();
-                                            webClient.DownloadFile(file_path, final);
+                                            string file_name2 = file_name;
+                                            if (file_isExtra.ToLowerInvariant().Equals("true"))
+                                            {
+                                                file_name2 = Path.GetFileName(file_name);
+                                            }
 
-                                            // Add file to zip
-                                            zip.AddFile(final, folderName);
+                                            string final = Path.Combine(repository_temp, file_name2);
 
-                                            ok = true;
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            // #2- Logger exception
-                                            Logger.LogError("(%s) (%s) -- Excepcion. Copiando archivo temporal al server para ser descargado en zip. ERROR: %s", className, methodName, ex.Message);
+                                            try
+                                            {
+                                                // Get file from web service
+                                                WebClient webClient = new WebClient();
+                                                webClient.DownloadFile(file_path, final);
+
+                                                // Add file to zip
+                                                zip.AddFile(final, folderName);
+
+                                                ok = true;
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                // #2- Logger exception
+                                                Logger.LogError("(%s) (%s) -- Excepcion. Copiando archivo temporal al server para ser descargado en zip. ERROR: %s", className, methodName, ex.Message);
+                                            }
                                         }
                                     }
                                 }
@@ -1153,10 +1163,11 @@ namespace MediaPlayer
                                     Logger.LogError("(%s) (%s) -- Excepcion. Limpiando archivos temporales. ERROR: %s", className, methodName, ex.Message);
                                 }
 
+                                // Fire the timeframe drawing
+                                //ScriptManager.RegisterStartupScript(this, typeof(Page), "afterDownloadFiles", "afterDownloadFiles();", true);
 
                                 // Close thread
                                 Response.End();
-
                             }
                             catch (Exception ex)
                             {
