@@ -727,17 +727,18 @@ function handleDragStop(event, ui) {
         $("#commentDate").val(currentPointerPositionDate_str);
         $("#divUpload input[id*='uploadDate']").val(currentPointerPositionDate_str);
 
+        /******** Globalplay ********/
         if (globalplay_active) {
 
-            /******** Globalplay ********/
-
             // Set current timer
-
             var actual_duration = getDuration_onDatetime(position_date_moment)
             GLOBALPLAY_seconds_current = actual_duration;
 
             // Clear global timer
             $('#divGlobalplay_timer').timer('remove');
+
+
+            actual_duration -= 1; // BUG FIX: Al soltar el Drag el puntero daba un "salto" inicial
 
             // Set global timer current progress
             $('#divGlobalplay_timer').timer({
@@ -759,11 +760,14 @@ function handleDragStop(event, ui) {
 
             globalplay_loadElementSeek(actual_duration);
 
-            // DO PLAY *new*
+            // DO PLAY 
+            globalplay_init();
+
+            /*
             setTimeout(function () {
                 $("#globalplay_play").click();
-            }, 200); 
-
+            }, 200);
+            */
         } 
     }
 }
@@ -2255,6 +2259,9 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
 
     /**** Event: OnClick Load on click event confirm remove button (btnConfirmRemoveElement) ****/
     loadClickConfirmRemoveButton_event(tapeID, isExtra);
+
+    // Reset video zoom settings
+    doReset();
 
     /************************ General events END ************************/
 
@@ -4220,7 +4227,7 @@ function downloadAll() {
                 modal: true,
                 buttons: {
                     "Confirmar": function () {
-                        multiDownload(list_elements);
+                        multiDownload1(list_elements);
                         $(this).dialog("close");
                     },
                     Cancel: function () {
@@ -4314,34 +4321,49 @@ function type(o) {
     return TYPES[typeof o] || TYPES[TOSTRING.call(o)] || (o ? 'object' : 'null');
 };
 
-function multiDownload(objects) {
-    for (obj in objects) {
-        if (objects[obj] != null && objects[obj].length) {
-            var array = objects[obj].split("#");
-            if (array != null && array.length > 2) {
-                var segmentID = array[0];
-                var isExtra = array[1];
-                var mediaType = array[2];
-                if (mediaType != "C") {
-                    var filePath_str = "";
+function multiDownload1(objects) {
+    //var files = [];
 
-                    if (isExtra != null && isExtra.length > 0) {
-                        var isExtra_str = isExtra.toString();
-                        if (isExtra_str.toLowerCase() === "true") {
+    var ok = false;
+    var hdnElementsToDownload = $("input[id*='_hdnElementsToDownload']");
+    if (hdnElementsToDownload != null) {
 
-                            filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=1";
+        hdnElementsToDownload.val("");
 
-                        } else {
+        for (obj in objects) {
+            if (objects[obj] != null && objects[obj].length) {
+                var array = objects[obj].split("#");
+                if (array != null && array.length > 3) {
+                    var segmentID = array[0];
+                    var isExtra = array[1];
+                    var mediaType = array[2];
+                    var fileName = array[3];
+                    if (mediaType != "C") {
+                        var filePath_str = "";
 
-                            filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0";
-                            //filePath_str = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
+                        if (isExtra != null && isExtra.length > 0) {
+                            var isExtra_str = isExtra.toString();
+                            if (isExtra_str.toLowerCase() === "true") {
+
+                                filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=1";
+
+                            } else {
+
+                                filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0";
+                                //filePath_str = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
+                            }
+
+                            var elements = hdnElementsToDownload.val() + "#" + filePath_str + "$" + fileName;
+                            hdnElementsToDownload.val(elements);
+                            ok = true;
                         }
-                        $("#aDownloader").attr("href", filePath_str);
-                        $("#aDownloader")[0].click();
-                        sleep(1000);
                     }
                 }
             }
+        }
+
+        if (ok) {
+            doDownloadElements();
         }
     }
 }

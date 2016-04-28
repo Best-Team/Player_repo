@@ -33,6 +33,7 @@
     <script src="assets/js/jquery.fancybox.js"></script>
     <script src="assets/js/timer.jquery.js"></script>
     <script src="assets/js/jquery.feedback_me.js"></script>
+    <script src="assets/js/zip.js"></script>
     <script src="assets/js/Dashboard.js"></script>
     <script src="assets/js/Globalplay.js"></script>
 
@@ -68,6 +69,10 @@
                 __doPostBack('<%=btnSearchCandidate.UniqueID%>', "");
             }
         }
+
+        function doDownloadElements() {
+            __doPostBack('<%=btnDownloadAllCandidate.UniqueID%>', "");
+        }
        
     </script>
 
@@ -100,7 +105,6 @@
 
                         <h1 style="margin-top: 5px;"><span id="h1-busqueda" class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
-                        <%--<button class="glyphicon glyphicon-hand-left panel-minus" type="button" title="Ocultar panel" onclick="javascript: busqueda_panel_show(false);"></button>--%>                        
 
                         <div class="row" style="margin: 3px; margin-top: 17px; min-height: 110px;">
 
@@ -158,9 +162,11 @@
                             <br />
 
                             <div class="pull-right" style="margin-bottom: 5px; margin-right: 0; padding: 0; margin-top:5px;">
+                                    <!-- btnDownloadAll -->
                                 <button id="btnDownloadAll" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onclick="downloadAll();">
                                     <span class="fa fa-download" aria-hidden="true"></span>
                                 </button>
+                                <asp:Button ID="btnDownloadAllCandidate" runat="server" Style="display: none" Text="" OnClick="btnDownloadAll_Click" />
                                 <a href="#" id="btnAddComment" class="open btn btn-default" style="margin-right: 6px;" title="Agregar comentario al folio" onclick="addCommentClick();">
                                     <!-- addCommentClick -->
                                     <span class="glyphicon glyphicon-comment"></span>
@@ -769,6 +775,7 @@
         <asp:HiddenField ID="_hdnMaxElementsDownload" runat="server" ClientIDMode="Static" />
         <asp:HiddenField ID="_hdnGlobalplay_defaultDuration" runat="server" ClientIDMode="Static" />
         <asp:HiddenField ID="_hdnGlobalplay_maxCollisionElements" runat="server" ClientIDMode="Static" />
+        <asp:HiddenField ID="_hdnElementsToDownload" runat="server" ClientIDMode="Static" />
 
         <!-- -->
         <asp:HiddenField ID="_hdnFolioID_selected" runat="server" ClientIDMode="Static" />

@@ -148,6 +148,15 @@ namespace MediaPlayer {
         protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator1;
         
         /// <summary>
+        /// btnDownloadAllCandidate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnDownloadAllCandidate;
+        
+        /// <summary>
         /// btnRefresh control.
         /// </summary>
         /// <remarks>
@@ -443,6 +452,15 @@ namespace MediaPlayer {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField _hdnGlobalplay_maxCollisionElements;
+        
+        /// <summary>
+        /// _hdnElementsToDownload control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField _hdnElementsToDownload;
         
         /// <summary>
         /// _hdnFolioID_selected control.

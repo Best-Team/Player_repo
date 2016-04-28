@@ -17,6 +17,8 @@ function globalplay_init() {
         globalplay_loadEvents();
 
         /***************** DO PLAY *****************/
+
+        // Change Play icon
         $("#globalplay_play").removeClass("globalplay_play");
         $("#globalplay_play").addClass("globalplay_pause");
 
@@ -38,7 +40,6 @@ function globalplay_init() {
             });
 
             GLOBALPLAY_seconds_current = actual_duration;
-
 
             // Filter elements checked on left grid
             globalplay_filterElementsChecked();
@@ -72,6 +73,8 @@ function globalplay_init() {
     } else {
 
         /***************** DO PAUSE *****************/
+
+        // Change Play icon
         $("#globalplay_play").removeClass("globalplay_pause");
         $("#globalplay_play").addClass("globalplay_play");
 

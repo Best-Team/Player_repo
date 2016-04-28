@@ -4,22 +4,21 @@ using MediaPlayer.Global;
 using Microsoft.WindowsAPICodePack.Shell;
 using NAudio.Wave;
 using Newtonsoft.Json;
-using Shell32;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.ServiceModel;
 using System.Text;
 using System.Web;
-using System.Web.Script.Serialization;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
+using Ionic.Zip;
+using System.Net;
+using System.Threading;
 
 namespace MediaPlayer
 {
@@ -951,11 +950,11 @@ namespace MediaPlayer
                             htmlTable.AppendLine("<tr id='tape_" + folio.tapeID + "' style='background-color: " + tr_color + ";' name='"+ tr_name + "'>");
                             htmlTable.AppendLine("<td>");
 
-                            htmlTable.AppendLine("<input type='checkbox' name='timeline_elements' class='button' value='" + folio.tapeID + "#" + isExtra.ToString().ToLowerInvariant() + "#" + folio.mediaType + "' onclick='manageElement(this, " + folio.tapeID + ", " + (index - 1).ToString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>");
+                            htmlTable.AppendLine("<input type='checkbox' name='timeline_elements' class='button' value='" + folio.tapeID + "#" + isExtra.ToString().ToLowerInvariant() + "#" + folio.mediaType + "#" + folio.fileName + "' onclick='manageElement(this, " + folio.tapeID + ", " + (index - 1).ToString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>");
                             htmlTable.AppendLine("<td>");
                             htmlTable.AppendLine("<h5>" + index + "</h5>");
                             htmlTable.AppendLine("<td>");
-                            htmlTable.AppendLine("<h5>" + folio.userName + "</h5>"); // ??
+                            htmlTable.AppendLine("<h5>" + folio.userName + "</h5>"); 
                             htmlTable.AppendLine("<td>");
                             htmlTable.AppendLine("<h5>" + folio.localParty + "</h5>");
                             htmlTable.AppendLine("<td>");
@@ -1039,6 +1038,136 @@ namespace MediaPlayer
             }
             return onclick_event;
         }
+
+
+        protected void btnDownloadAll_Click(object sender, EventArgs e)
+        {
+            // Zip Source: http://www.aspsnippets.com/Articles/Download-multiple-files-as-Zip-Archive-File-in-ASPNet-using-C-and-VBNet.aspx
+            using (ZipFile zip = new ZipFile())
+            {
+                zip.AlternateEncodingUsage = ZipOption.AsNecessary;
+                //zip.AddDirectoryByName("Elementos");
+
+                bool ok = false;
+
+                string[] elements_array;
+                if (_hdnElementsToDownload.Value.Length > 0)
+                {
+                    elements_array = _hdnElementsToDownload.Value.Split('#');
+                    if (elements_array != null && elements_array.Length > 0)
+                    {
+                        // #1- Logger variables
+                        System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame();
+                        string className = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
+                        string methodName = stackFrame.GetMethod().Name;
+
+                        string zipName = String.Format("Descarga_{0}.zip", DateTime.Now.ToString("MMM-dd-yyyy-HHmmss"));
+                        string folderName = String.Format("Descarga_{0}", DateTime.Now.ToString("MMM-dd-yyyy-HHmmss"));
+
+                        // Repository temp path
+                        string repository_temp = string.Empty;
+                        if (ConfigurationManager.AppSettings != null)
+                        {
+                            repository_temp = ConfigurationManager.AppSettings["LocalTempPath"].ToString();
+                        }
+
+                        try
+                        {
+                            if (!Directory.Exists(Path.GetDirectoryName(repository_temp)))
+                            {
+                                Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
+                            }
+
+                            string[] fileData_array;
+                            foreach (string element in elements_array)
+                            {
+                                if (!string.IsNullOrWhiteSpace(element))
+                                {
+                                    fileData_array = element.Split('$');
+                                    if (fileData_array != null && fileData_array.Length > 1)
+                                    {
+                                        string file_path = fileData_array[0];
+                                        string file_name = fileData_array[1];
+
+                                        string final = Path.Combine(repository_temp, file_name);
+
+                                        try
+                                        {
+                                            // Get file from web service
+                                            WebClient webClient = new WebClient();
+                                            webClient.DownloadFile(file_path, final);
+
+                                            // Add file to zip
+                                            zip.AddFile(final, folderName);
+
+                                            ok = true;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            // #2- Logger exception
+                                            Logger.LogError("(%s) (%s) -- Excepcion. Copiando archivo temporal al server para ser descargado en zip. ERROR: %s", className, methodName, ex.Message);
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // #2- Logger exception
+                            Logger.LogError("(%s) (%s) -- Excepcion. Copiando archivo temporal al server para ser descargado en zip. ERROR: %s", className, methodName, ex.Message);
+                        }
+                        if (ok)
+                        {
+                            // Processing zip file
+                            try
+                            {
+                                Response.Clear();
+                                Response.BufferOutput = false;
+                                Response.ContentType = "application/zip";
+                                Response.AddHeader("content-disposition", "attachment; filename=" + zipName);
+                                zip.Save(Response.OutputStream);
+
+                                // Ensure that the zip file was downloaded before cleaning temp files
+                                Thread.Sleep(300);
+
+                                // Clearing temporary repository folder
+                                try
+                                {
+                                    System.IO.DirectoryInfo di = new DirectoryInfo(repository_temp);
+                                    foreach (FileInfo file in di.GetFiles())
+                                    {
+                                        file.Delete();
+                                    }
+                                    foreach (DirectoryInfo dir in di.GetDirectories())
+                                    {
+                                        dir.Delete(true);
+                                    }
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    // #2- Logger exception
+                                    Logger.LogError("(%s) (%s) -- Excepcion. Limpiando archivos temporales. ERROR: %s", className, methodName, ex.Message);
+                                }
+
+
+                                // Close thread
+                                Response.End();
+
+                            }
+                            catch (Exception ex)
+                            {
+                                // #2- Logger exception
+                                Logger.LogError("(%s) (%s) -- Excepcion. Generando descarga de elementos zip. ERROR: %s", className, methodName, ex.Message);
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
 
         #endregion Private Methods
 

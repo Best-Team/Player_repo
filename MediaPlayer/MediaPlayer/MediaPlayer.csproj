@@ -46,6 +46,10 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>assets\libraries\Interop.Shell32.dll</HintPath>
     </Reference>
+    <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>assets\libraries\Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>assets\libraries\Microsoft.WindowsAPICodePack.dll</HintPath>
@@ -173,6 +177,7 @@
     <Content Include="assets\js\timer.jquery.js" />
     <Content Include="assets\js\tmpl.js" />
     <Content Include="assets\js\webchimera.js" />
+    <Content Include="assets\libraries\Ionic.Zip.Reduced.dll" />
     <Content Include="assets\libraries\Microsoft.WindowsAPICodePack.dll" />
     <Content Include="assets\libraries\Microsoft.WindowsAPICodePack.Shell.dll" />
     <Content Include="assets\libraries\MySql.Data.dll" />
