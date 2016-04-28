@@ -4363,6 +4363,15 @@ function multiDownload1(objects) {
         }
 
         if (ok) {
+            var elementsToDownload_str = hdnElementsToDownload.val();
+            var aux = elementsToDownload_str;
+            if (elementsToDownload_str != null && elementsToDownload_str.length > 0) {
+                if (elementsToDownload_str.charAt(0) === "#") {
+                    aux = elementsToDownload_str.substring(1);
+
+                    hdnElementsToDownload.val(aux);
+                }
+            }
             doDownloadElements();
         }
     }

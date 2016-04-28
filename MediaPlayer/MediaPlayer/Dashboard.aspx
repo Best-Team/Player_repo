@@ -162,13 +162,13 @@
                             <br />
 
                             <div class="pull-right" style="margin-bottom: 5px; margin-right: 0; padding: 0; margin-top:5px;">
-                                    <!-- btnDownloadAll -->
+                                <!-- btnDownloadAll -->
                                 <button id="btnDownloadAll" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onclick="downloadAll();">
                                     <span class="fa fa-download" aria-hidden="true"></span>
                                 </button>
                                 <asp:Button ID="btnDownloadAllCandidate" runat="server" Style="display: none" Text="" OnClick="btnDownloadAll_Click" />
+                                <!-- addCommentClick -->
                                 <a href="#" id="btnAddComment" class="open btn btn-default" style="margin-right: 6px;" title="Agregar comentario al folio" onclick="addCommentClick();">
-                                    <!-- addCommentClick -->
                                     <span class="glyphicon glyphicon-comment"></span>
                                 </a>
                                 <button id="btnUploadElement" class="btn btn-default" type="button" title="Subir elemento al folio" style="margin-right: 6px;" onclick="addFileClick();">
