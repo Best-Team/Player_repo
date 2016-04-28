@@ -263,6 +263,7 @@ namespace MediaPlayer
                         {
                             try
                             {
+                                // Check if directory exists, if not creates it 
                                 if (!Directory.Exists(Path.GetDirectoryName(fullLocalPath)))
                                 {
                                     Directory.CreateDirectory(Path.GetDirectoryName(fullLocalPath));
@@ -359,6 +360,7 @@ namespace MediaPlayer
 
                         /*************** Finally save the file in server ***************/
 
+                        // Check if directory exists, if not creates it 
                         if (!Directory.Exists(Path.GetDirectoryName(fullLocalPath)))
                         {
                             Directory.CreateDirectory(Path.GetDirectoryName(fullLocalPath));
@@ -1046,7 +1048,6 @@ namespace MediaPlayer
             using (ZipFile zip = new ZipFile())
             {
                 zip.AlternateEncodingUsage = ZipOption.AsNecessary;
-                //zip.AddDirectoryByName("Elementos");
 
                 bool ok = false;
 
@@ -1073,6 +1074,7 @@ namespace MediaPlayer
 
                         try
                         {
+                            // Check if directory exists, if not creates it 
                             if (!Directory.Exists(Path.GetDirectoryName(repository_temp)))
                             {
                                 Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
