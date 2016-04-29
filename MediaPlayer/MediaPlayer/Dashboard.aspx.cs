@@ -1095,7 +1095,7 @@ namespace MediaPlayer
                                         if (!string.IsNullOrWhiteSpace(file_path) && !string.IsNullOrWhiteSpace(file_name) && !string.IsNullOrWhiteSpace(file_isExtra))
                                         {
                                             string file_name2 = file_name;
-                                            if (file_isExtra.ToLowerInvariant().Equals("true"))
+                                            if (!file_isExtra.ToLowerInvariant().Equals("true"))
                                             {
                                                 file_name2 = Path.GetFileName(file_name);
                                             }

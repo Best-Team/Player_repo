@@ -2382,7 +2382,7 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     var fileName2 = fileName;
     if (isExtra != null && isExtra.length > 0) {
         var isExtra_str = isExtra.toString();
-        if (isExtra_str.toLowerCase() === "true") {
+        if (isExtra_str.toLowerCase() != "true") {
             fileName2 = fileName.replace(/^.*[\\\/]/, '');
         }
     }
