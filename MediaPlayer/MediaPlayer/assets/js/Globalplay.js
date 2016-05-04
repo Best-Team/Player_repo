@@ -1380,7 +1380,7 @@ function globalplay_filterElementsChecked() {
         for (var i = 0; i < list_elements.length; i++) {
             if (list_elements[i] != null) {
                 var attrs_array = list_elements[i].split("#"); // Element attributes
-                if (attrs_array.length == 3) {
+                if (attrs_array.length > 1) { // BUG FIX
                     var tapeID = attrs_array[0];
                     if (tapeID != null && tapeID.length) {
                         var element = getElementInMemoryByID(tapeID)

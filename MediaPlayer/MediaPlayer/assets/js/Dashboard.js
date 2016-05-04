@@ -746,8 +746,7 @@ function handleDragStop(event, ui) {
             // Clear global timer
             $('#divGlobalplay_timer').timer('remove');
 
-
-            actual_duration -= 1; // BUG FIX: Al soltar el Drag el puntero daba un "salto" inicial
+            //actual_duration -= 1; // BUG FIX: Al soltar el Drag el puntero daba un "salto" inicial
 
             // Set global timer current progress
             $('#divGlobalplay_timer').timer({
@@ -771,7 +770,6 @@ function handleDragStop(event, ui) {
 
             // DO PLAY 
             globalplay_init();
-
             /*
             setTimeout(function () {
                 $("#globalplay_play").click();
