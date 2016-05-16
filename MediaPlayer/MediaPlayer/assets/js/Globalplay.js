@@ -335,16 +335,32 @@ function globalplay_resizeAlreadyAdded(elementsCandidate) {
     var max_amount = GLOBALPLAY_MAX_COLLISION_ELEMENTS;
     if (visual_count <= max_amount) {
 
+        $(".flex").css("margin-top", "auto");
+
         // Vertically center visual elements 
         if (visual_count > 0 && visual_count <= 4) {
             $(".flex").css("display", "flex");
             $(".flex").css("align-items", "center");
             $(".flex").css("height", "100%"); // For IE
+
+            // NEW STUFF
+            // Check smaller screens globalplay resolution
+            if (MONITOR_HEIGHT < 770) { // 1366*768 (h: 643)
+                $(".flex").css("margin-top", "-30px");
+            }
         }
         else {
+            // More than 4 elements ==> double row
+
             $(".flex").css("display", "inline-block");
             $(".flex").css("align-items", "inherit");
             $(".flex").css("height", "inherit"); // For IE
+
+            // NEW STUFF
+            // Check smaller screens globalplay resolution
+            if (MONITOR_HEIGHT < 950) { // 1400*900 (h: 775)
+                $(".flex").css("margin-top", "0");
+            }
         }
 
         // Element distinct types 

@@ -73,6 +73,11 @@
         function doDownloadElements() {
             __doPostBack('<%=btnDownloadAllCandidate.UniqueID%>', "");
         }
+
+        function checkUserSession() {
+            var user_session =  '<%= Session["UserID"] %>';
+            // alert(user_session);
+        }
        
     </script>
 
@@ -99,11 +104,13 @@
             <div style="width: 98%; min-height: 360px; height: 100%; margin: 8px auto;">
                 <div class="row no-gutter" style="height: 100%; min-height: 600px; max-height: 600px;">
 
+                    <%--<input type="button" id="btnPageFullscreen" value="click to toggle fullscreen" onclick="dashboardFullScreen(document.body)" style="visibility:hidden;">--%>
+
                     <!-- PANEL BÚSQUEDA -->
                     <div id="divPanel_Busqueda_pre" class="col-md-4 col-xs-12 img-rounded" style="padding-right: 4px;">
-                    <div id="divPanel_Busqueda" class="div-panel panel " style="max-height: 600px; min-height: 600px;"> <%--unselectable--%>
+                    <div id="divPanel_Busqueda" class="div-panel panel" style="max-height: 600px; min-height: 600px;"> <%--unselectable--%>
 
-                        <h1 style="margin-top: 5px;"><span id="h1-busqueda" class="special-title label label-primary" style="font-weight: normal; z-index: 50;">Búsqueda</span>
+                        <h1 style="margin-top: 5px;"><span id="h1-busqueda" class="special-title label label-primary unselectable" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
 
                         <div class="row" style="margin: 3px; margin-top: 17px; min-height: 110px;">

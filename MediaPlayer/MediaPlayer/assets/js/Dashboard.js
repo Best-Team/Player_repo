@@ -191,7 +191,7 @@ $(document).ready(function () {
 
     // Event Drag & Drop ********
 
-    // Source: http://www.elated.com/articles/drag-and-drop-with-jquery-your-essential-guide/
+    // Drag & Drop Source: http://www.elated.com/articles/drag-and-drop-with-jquery-your-essential-guide/
     if (TIMELINE_POINTER != null) {
         TIMELINE_POINTER.draggable({
             containment: '#divTimelineProgress',
@@ -215,10 +215,10 @@ $(document).ready(function () {
         closeClick: false,
 
         openEffect: 'elastic',
-        openSpeed: 150,
+        openSpeed: 600,
 
         closeEffect: 'elastic',
-        closeSpeed: 150,
+        closeSpeed: 400,
 
         /* - INIT globalplay popup - */
         beforeShow: function () {
@@ -231,6 +231,51 @@ $(document).ready(function () {
 
             // Hide comment tooltip popups during globalplay
             $("body .qtip").css("visibility", "hidden");
+
+            // Go Fullscreen
+            if (globalplay_active) {
+                //dashboardFullScreen(document.body); // TODO
+
+                // Check smaller screens globalplay resolution
+                if (MONITOR_HEIGHT < 950) { // 1400*900 (h real: 775 o 798)
+
+                    $("#divTimelineProgress").css("margin-left", "-8px");
+                    $("#timeframe").css("margin-left", "-8px");
+
+                    //var first_tapeID = 0;
+                    //if (elementsInMemory != null && elementsInMemory.length > 0) {
+                    //    first_tapeID = elementsInMemory[0].tapeID;
+                    //    var first_tapeID_int = parseInt(first_tapeID, 10);
+
+                    //    if (first_tapeID_int > 0) {
+                    //        TIMELINE_POINTER.show();
+                    //        timeline_pointer_setLocation(first_tapeID_int);
+                    //    }
+                    //}
+
+                    
+
+                    $(".flex").css("margin-top", "-20px");
+
+                }
+                if (MONITOR_HEIGHT < 770) { // 1366*768 (h: 643)
+                    $(".globalplayBox").css("max-height", "540px");
+
+                }
+                //$(".globalplayBox").css("max-height", "540px");
+            }
+
+        },
+
+        afterShow: function () {
+            
+            setTimeout(function () {
+                divTimelineProgress_SetWidth();
+
+
+
+            }, 700);
+
 
         },
 
@@ -252,6 +297,24 @@ $(document).ready(function () {
             // Show again comment tooltip popups 
             $("body .qtip").css("visibility", "visible");
 
+            // Exit Fullscreen
+            if (!globalplay_active) {
+                //dashboardFullScreen(null); // TODO
+
+                // Check smaller screens globalplay resolution
+                if (MONITOR_HEIGHT < 1000) { // 1400*900
+
+                    $("#divTimelineProgress").css("margin-left", "0");
+                    $("#timeframe").css("margin-left", "0");
+
+                    $(".flex").css("margin-top", "0");
+
+                }
+                if (MONITOR_HEIGHT < 800) { // 1366*768
+                    $(".globalplayBox").css("max-height", "auto");
+
+                }
+            }
         },
 
         helpers: {
@@ -361,6 +424,13 @@ $(document).ready(function () {
 
     // Hold click effect on video zoom Logic *****************************
 
+
+    // Go fullscreen on Dashboard
+
+    //setTimeout(function () {
+    //    $("#btnPageFullscreen").click();
+    //}, 100);
+    //dashboardFullScreen(document.body);
 
 }); // END On Ready
 
@@ -770,6 +840,7 @@ function handleDragStop(event, ui) {
 
             // DO PLAY 
             globalplay_init();
+
             /*
             setTimeout(function () {
                 $("#globalplay_play").click();
@@ -1923,8 +1994,6 @@ function locateEveryElementByType() {
             }
     }
 
-
-
     // Type letter location
     var border_start = $("#timeframe line[name='timeframe_start']");
     var x_extra = parseInt(border_start.attr('x1'), 10) - 12;
@@ -2042,7 +2111,6 @@ function paintSelectionClick(tapeID, timestamp) {
     // Left panel
     $("#tblLeftGridElements #tape_" + tapeID + " > td > h5").attr("style", "font-weight:bold"); 
     $("#tblLeftGridElements #tape_" + tapeID).attr("style", "border:4px solid rgba(0, 184, 255, 0.39)"); 
-    //$("#tblLeftGridElements #tape_" + tapeID + "[name='Extra']").css("background-color", "inherit"); //#D1E2F3
     $("#tblLeftGridElements #tape_" + tapeID + "[name='Oreka']").css("background-color", "#D1E2F3"); //#D1E2F3
 
 
@@ -2142,7 +2210,7 @@ function timeline_pointer_setLocation(tapeID) {
 
                 sm2_inline_element.offset({ top: divTimelineProgress.offset().top })
 
-            } else {
+            } else { 
                 // TODO: Timeline is not drawn yet
             }
         } else {
@@ -2162,6 +2230,55 @@ function timeline_pointer_setLocation(tapeID) {
             // Pointer left position
             TIMELINE_POINTER.offset({ left: timeline.offset().left });
             sm2_inline_element.offset({ top: timeline.offset().top + 15 }); // + 25
+        }
+    }
+}
+
+function timeline_pointer_setLocation_AUX() {
+    var timeline = $(".background");
+    var sm2_inline_element = $("#sm2-inline-element");
+    var sm2_progress_bd = $("#sm2-progress-bd");
+    var sm2_progress = $("#sm2-progress");
+    var sm2_progress_track = $("#sm2-progress-track");
+    var divTimelineProgress = $("#divTimelineProgress");
+
+    if (TIMELINE_POINTER != null && sm2_inline_element != null && sm2_inline_element.length &&
+        sm2_progress_bd != null && sm2_progress_bd.length && sm2_progress != null && sm2_progress.length &&
+        sm2_progress_track != null && sm2_progress_track.length && timeline != null) {
+
+        TIMELINE_POINTER.show();
+
+        var first_tapeID = 0;
+        if (elementsInMemory != null && elementsInMemory.length > 0) {
+            first_tapeID = elementsInMemory[0].tapeID;
+            var tapeID = parseInt(first_tapeID, 10);
+
+            // Check if if exists at least one element
+            if (tapeID > 0) {
+                var vElement = $("#tlTape_" + tapeID);
+                var vElementRect = $("#tlTape_" + tapeID + " > rect");
+
+                // Check if timeline is already drawn
+                if (vElement != null && vElement.length && vElementRect != null && vElementRect.length) {
+
+                    // Set progress bar width
+                    var _width_int = parseFloat(vElementRect.attr('width'), 10);
+                    var _width_percentage = (5 / 100) * _width_int;
+                    var _width = _width_int + _width_percentage + "px";
+
+                    sm2_progress_bd.css("padding", "0px");
+                    sm2_progress.css('height', 15);
+                    sm2_inline_element.css('width', _width);
+                    sm2_inline_element.offset({ left: divTimelineProgress.offset().left });
+                    sm2_progress_bd.css('width', _width);
+                    sm2_progress_bd.css('left', _width);
+                    sm2_progress_track.css('height', 15);
+                    sm2_inline_element.offset({ top: divTimelineProgress.offset().top })
+
+                } else {
+                    // TODO: Timeline is not drawn yet
+                }
+            }
         }
     }
 }
@@ -2190,6 +2307,11 @@ function downloadElementClick(event) {
 /************************ Event: OnClick over timeline Element ************************/
 
 function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, segmentID, isExtra, fileName, filePath, duration_formatStr, tapeType, fileStatus) {
+
+    // First of all, check user session is active
+
+    // checkUserSession();
+
 
     /************************ General variables START ************************/
 
@@ -4950,5 +5072,35 @@ function busqueda_panel_show(show) {
         }
     }
 }
+
+function dashboardFullScreen(elem) {
+    // Fullscreen - Source: http://stackoverflow.com/questions/7179535/set-window-to-fullscreen-real-fullscreen-f11-functionality-by-javascript
+    // ## The below if statement seems to work better ## if ((document.fullScreenElement && document.fullScreenElement !== null) || (document.msfullscreenElement && document.msfullscreenElement !== null) || (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+    if (((document.fullScreenElement !== undefined && document.fullScreenElement === null) ||
+        (document.msFullscreenElement !== undefined && document.msFullscreenElement === null) ||
+        (document.mozFullScreen !== undefined && !document.mozFullScreen) ||
+        (document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen)) && elem != null) {
+        if (elem.requestFullScreen) {
+            elem.requestFullScreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullScreen) {
+            elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    } else {
+        if (document.cancelFullScreen) {
+            document.cancelFullScreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
+}
+
 
 
