@@ -210,6 +210,7 @@ $(document).ready(function () {
     loadGlobalplay_settings();
 
     // Remove padding, set opening and closing animations, close if clicked and disable overlay
+    // FANCYBOX EVENTS (globalplay container)
     $("#btnOpenFancybox").fancybox({
         padding: 0,
         closeClick: false,
@@ -220,7 +221,7 @@ $(document).ready(function () {
         closeEffect: 'elastic',
         closeSpeed: 400,
 
-        /* - INIT globalplay popup - */
+        /* Before show globalplay popup */
         beforeShow: function () {
             $("#divgp_sc").show();
             $('<div id="timer-labels"><label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label> / <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label></div>').appendTo("#divgp_sc");
@@ -232,64 +233,48 @@ $(document).ready(function () {
             // Hide comment tooltip popups during globalplay
             $("body .qtip").css("visibility", "hidden");
 
-            // Go Fullscreen
-            if (globalplay_active) {
-                //dashboardFullScreen(document.body); // TODO
+        },
 
-                // Check smaller screens globalplay resolution
+        /* After show globalplay popup */
+        afterShow: function () {
+            
+            setTimeout(function () {
+                divTimelineProgress_SetWidth();
+            }, 700);
+
+            // Adapt the globalplay size to the screen resolution
+            if (globalplay_active) {
                 if (MONITOR_HEIGHT < 950) { // 1400*900 (h real: 775 o 798)
 
                     $("#divTimelineProgress").css("margin-left", "-8px");
                     $("#timeframe").css("margin-left", "-8px");
 
-                    //var first_tapeID = 0;
-                    //if (elementsInMemory != null && elementsInMemory.length > 0) {
-                    //    first_tapeID = elementsInMemory[0].tapeID;
-                    //    var first_tapeID_int = parseInt(first_tapeID, 10);
+                    setTimeout(function () {
+                        $(".fancybox-opened").css('transform', 'scale(1, 0.85)');
+                        $('.fancybox-opened').each(function () { // This script is neccesary to apply !important feature
+                            this.style.setProperty('top', '-60px', 'important');
+                        });
 
-                    //    if (first_tapeID_int > 0) {
-                    //        TIMELINE_POINTER.show();
-                    //        timeline_pointer_setLocation(first_tapeID_int);
-                    //    }
-                    //}
-
-                    
+                        $(".fancybox-inner").css("height", "880px");
+                        $(".timeframe").css("margin-top", "-25px");
+                    }, 100);
 
                     $(".flex").css("margin-top", "-20px");
-
                 }
+
                 if (MONITOR_HEIGHT < 770) { // 1366*768 (h: 643)
                     $(".globalplayBox").css("max-height", "540px");
-
                 }
-                //$(".globalplayBox").css("max-height", "540px");
+
             }
 
         },
 
-        afterShow: function () {
-            
-            setTimeout(function () {
-                divTimelineProgress_SetWidth();
-
-
-
-            }, 700);
-
-
-        },
-
+        /* After close globalplay popup */
         afterClose: function () {
             $("#divgp_sc").hide();
             $("#divgp_sc #timer-labels").remove();
             $("#globalPlayer_popup").show();
-
-            // Check smaller screens globalplay resolution
-            /*
-            $(".globalplayBox").css("height", "660px");
-            $(".flex").css("margin-top", "-20px");
-            $("#timeframe").css("margin-top", "-10px");
-            */
 
             // Clear audio tooltip popups already added 
             clearAll_darktooltip();
@@ -299,7 +284,6 @@ $(document).ready(function () {
 
             // Exit Fullscreen
             if (!globalplay_active) {
-                //dashboardFullScreen(null); // TODO
 
                 // Check smaller screens globalplay resolution
                 if (MONITOR_HEIGHT < 1000) { // 1400*900
@@ -348,7 +332,7 @@ $(document).ready(function () {
     PLAYER_BOX_original_top = PLAYER_BOX.offset().top;
    
 
-    // Hold click effect on video zoom Logic *****************************
+    // Hold click effect on video zoom Logic  - BEGIN *****************************
     var zoom_timeout, zoom_clicker_in = $('.glyphicon-zoom-in');
     zoom_clicker_in.mousedown(function () {
         doZoom(true);
@@ -422,15 +406,31 @@ $(document).ready(function () {
         return false;
     });
 
-    // Hold click effect on video zoom Logic *****************************
+    // Hold click effect on video zoom Logic - END *****************************
 
+    // Re adjust dashboard display settings regarding screen resolution - BEGIN *****************************
 
-    // Go fullscreen on Dashboard
+    if (MONITOR_HEIGHT < 950) { // 1400*900 (h real: 775 o 798)
+        $(".panel").css("margin-bottom", "10px");
+        $("#div_divisor").css("height", "5px");
+        $("#div_subBusqueda").css("margin-top", "10px");
+        $("#br_busqueda").remove();
+        $("#timeframe").css("margin-top", "-28px");
+        $(".playerContainer").css("margin-top", "0");
 
-    //setTimeout(function () {
-    //    $("#btnPageFullscreen").click();
-    //}, 100);
-    //dashboardFullScreen(document.body);
+        $("#divElementos").css("max-height", "445px");
+    }
+
+    if (MONITOR_HEIGHT < 770) { // 1366*768 (h: 643)
+        $("body").css('transform', 'scale(1, 0.95)');
+        $("body").offset({ top: 0 });
+    }
+
+    setTimeout(function () {
+        setPosition_TimelineProgressbar();
+    }, 800);
+
+    // Re adjust dashboard display settings regarding screen resolution - END *****************************
 
 }); // END On Ready
 
@@ -442,12 +442,31 @@ $(window).resize(function () {
     resizeId = setTimeout(doneResizing, 100);
 });
 
+function setPosition_TimelineProgressbar() {
+
+    $("#divTimelineProgress").position({
+        my: "left top",
+        at: "left top",
+        of: "#timeframe"
+    });
+    divTimelineProgress_SetWidth();
+
+    //// Relocate Timeline pointer 
+    TIMELINE_POINTER.position({
+        my: "center bottom",
+        at: "left bottom",
+        of: "#divTimelineProgress"
+    });
+
+    var offset = 5;
+    TIMELINE_POINTER.offset({ top: TIMELINE_POINTER.offset().top + offset });
+
+}
 
 function doneResizing() {
     pre_timeframe_prepare();
 
     setTimeout(function () {
-        divTimelineProgress_SetWidth();
 
         // If there are elements loaded, show timeline pointer
         var first_tapeID = 0;
@@ -460,6 +479,9 @@ function doneResizing() {
                 timeline_pointer_setLocation(first_tapeID_int);
             }
         }
+
+        setPosition_TimelineProgressbar();
+
     }, 100);
 }
 
@@ -853,28 +875,22 @@ function handleDragStop(event, ui) {
 // Event Drag & Drop: While Dragging
 function handleDragging(event, ui) {
     var posX = ui.offset.left - $("#svg_timeframe").offset().left;
-    var posY = ui.offset.top;
-    var posXfinal = posX + 80;
-    var posYfinal = posY - 78;
-    var pop4_width = parseInt($(".box4.popbox4").css("width"), 10);
-    if (posXfinal + pop4_width > $(window).width()) {
-        posXfinal = $(window).width() - pop4_width;
-    }
     $(".box4.popbox4").show("scale", 300);
 
-    if (!globalplay_active) {
+    // ***************************************** New stuff
+    // Relocate Timeline pointer 
+    $(".box4.popbox4").position({
+        my: "left bottom",
+        at: "center top",
+        of: "#sm2-progress-ball_TIMELINE"
+    });
 
-        $(".box4.popbox4").offset({
-            left: posXfinal - 11, // 28 Quitar?
-            top: posYfinal
-        });
+    var left_offset = parseInt($("#imgPointer").css("width"), 10) + 4;
+    var top_offset = parseInt($("#imgPointer").css("height"), 10) + 10;
+    $(".box4.popbox4").offset({ top: $(".box4.popbox4").offset().top - top_offset });
+    $(".box4.popbox4").offset({ left: $(".box4.popbox4").offset().left - left_offset });
 
-    } else {
-        $(".box4.popbox4").offset({
-            left: posXfinal + 9, // 28 Quitar?
-            top: posYfinal
-        });
-    }
+    // ***************************************** New stuff - END
 
     var date = window.timeframe_live.getTickDate(posX); // Datetime position - Formato: AÑO DIA MES
     if (date != null) {
@@ -916,6 +932,7 @@ function LoadAlertMessagesBackup() {
     hashMessages["ConfirmarBorrarUnElemento"] = "Está a punto de borrar el elemento, confirme su contraseña para continuar.";
     hashMessages["SeleccioneFolioID"] = "Por favor, seleccione un número de Folio.";
     hashMessages["DatosIncorrectos"] = "Datos incorrectos.";
+    hashMessages["SesionFinalizada"] = "Tu sesión activa ha expirado.";
     
 }
 
@@ -1444,16 +1461,38 @@ function changeTab1(caller) {
         $("#divTypes").hide();
 
         if (type === "liFolio") {
-
-            //$("#divFolios").show();
-            $("#divElementos").css("max-height", "437px");
+            if (MONITOR_HEIGHT < 950) { // 1366*768 (h: 643)
+                $("#divElementos").css("max-height", "445px");
+            } else {
+                $("#divElementos").css("max-height", "437px");
+            }
         } else if (type === "liRoles") {
             $("#divRoles").show();
-            $("#divElementos").css("max-height", "414px");
+            if (MONITOR_HEIGHT < 950) { // 1366*768 (h: 643)
+                $("#divElementos").css("min-height", "310px");
+                $("#divElementos").css("max-height", "383px");
+            } else {
+                $("#divElementos").css("max-height", "414px");
+            }
         } else if (type === "liTipos") {
             $("#divTypes").show();
-            $("#divElementos").css("max-height", "335px");
+            if (MONITOR_HEIGHT < 950) { // 1366*768 (h: 643)
+                $("#divElementos").css("min-height", "303px");
+                $("#divElementos").css("max-height", "303px");
+            } else {
+                $("#divElementos").css("max-height", "335px");
+            }
         }
+
+        //if (type === "liFolio") {
+        //    $("#divElementos").css("max-height", "437px");
+        //} else if (type === "liRoles") {
+        //    $("#divRoles").show();
+        //    $("#divElementos").css("max-height", "414px");
+        //} else if (type === "liTipos") {
+        //    $("#divTypes").show();
+        //    $("#divElementos").css("max-height", "335px");
+        //}
     }
 }
 
@@ -2195,19 +2234,12 @@ function timeline_pointer_setLocation(tapeID) {
                 var _width = _width_int + _width_percentage + "px";
 
                 sm2_progress_bd.css("padding", "0px");
-
                 sm2_progress.css('height', 15);
-
                 sm2_inline_element.css('width', _width);
-
                 sm2_inline_element.offset({ left: divTimelineProgress.offset().left });                
-
                 sm2_progress_bd.css('width', _width);
-
                 sm2_progress_bd.css('left', _width);
-
                 sm2_progress_track.css('height', 15);
-
                 sm2_inline_element.offset({ top: divTimelineProgress.offset().top })
 
             } else { 
@@ -2309,9 +2341,7 @@ function downloadElementClick(event) {
 function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, segmentID, isExtra, fileName, filePath, duration_formatStr, tapeType, fileStatus) {
 
     // First of all, check user session is active
-
-    // checkUserSession();
-
+    checkUserSession();
 
     /************************ General variables START ************************/
 
@@ -2605,6 +2635,11 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     }
 
     /************************ Load element on Player END ************************/
+}
+
+
+function getMyValue() {
+    return propValue; // since it is written as part of page HTML, you can get it
 }
 
 //************************************** 1. VIDEO Element OR SCREEN RECORDING Element ***************************************
@@ -3516,10 +3551,29 @@ function loadClickRemoveButton_event() {
     var btnRemoveElement = $("#btnRemoveElement");
     btnRemoveElement.bind("click", function () {
         if (!$('#btnRemoveElement').hasClass("opened")) {
+
+            //if (MONITOR_HEIGHT < 950) { // 1400*900 (h real: 775 o 798)
+            //    $(".box3.popbox3").css('transform', 'scale(1, 0.8)');
+            //}
+
             $('.popbox3').popbox3();
             $(".box3.popbox3").show("highlight", 700);
             $('#txbConfirmRemoveElement').focus();
             $('#btnRemoveElement').addClass("opened");
+
+            // Popup re-location
+            $(".popbox3").position({
+                my: "left top",
+                at: "left bottom",
+                of: "#btnRemoveElement"
+            });
+
+            var btn_width = (parseInt(btnRemoveElement.css("width"), 10) / 2) + 2;
+
+            // X and Y Axis
+            $("#divPopbox3").offset({ left: $("#divPopbox3").offset().left + btn_width });
+            $("#divPopbox3").offset({ top: $("#divPopbox3").offset().top + 5 });
+
         } else {
             $(".box3.popbox3").hide(200);
             $('#btnRemoveElement').removeClass("opened");
@@ -5103,4 +5157,10 @@ function dashboardFullScreen(elem) {
 }
 
 
+jQuery.fn.center = function () {
+    this.css("position", "fixed");
+    this.css("top", ($(window).height() / 2) - (this.outerHeight() / 2));
+    this.css("left", ($(window).width() / 2) - (this.outerWidth() / 2));
+    return this;
+}
 

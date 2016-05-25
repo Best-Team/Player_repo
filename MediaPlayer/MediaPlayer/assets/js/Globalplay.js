@@ -910,8 +910,11 @@ function globalplay_comment(element_alreadyTaken, global_numberID) {
     var duration_int = parseInt(duration, 10);
     var duration_sec = duration_int <= 1 ? 5 : duration_int;
 
-    var label = $("#globalplay_divComments h2");
-    label.text(fileName);
+    //var label = $("#globalplay_divComments h2");
+    //label.text(fileName);
+
+    $("#globalplay_divComments").append('<h2 class="flex-messages-top-h2 label label-warning" style="z-index: 1001; color: #474747; background-color:#FDFDF0; text-transform: none; font-size: 17px; width: 50%; margin: 0 auto; margin-left: 5px; text-shadow: none;">' + fileName + '</h2>');
+    var label = $("#globalplay_divComments h2").last();
 
     // Remove to element list
     var actual_duration = getDuration_onDatetime(timestamp);

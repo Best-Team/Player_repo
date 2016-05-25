@@ -74,10 +74,41 @@
             __doPostBack('<%=btnDownloadAllCandidate.UniqueID%>', "");
         }
 
+       
         function checkUserSession() {
-            var user_session =  '<%= Session["UserID"] %>';
-            // alert(user_session);
+
+            // Check session - Source: https://www.daniweb.com/programming/web-development/threads/362898/check-for-session-timeout-in-javascript-and-redirect-to-login-page
+
+            var request = false;
+            if(window.XMLHttpRequest) { // Mozilla/Safari
+                request = new XMLHttpRequest();
+            } else if(window.ActiveXObject) { // IE
+                request = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+
+            request.open('POST', 'SessionCheck.aspx', true);
+            request.onreadystatechange = function() {
+                if(request.readyState == 4) {
+                    var session = eval('(' + request.responseText + ')');
+                    if(session.valid) {
+                        // DO SOMETHING IF SESSION IS VALID
+                    } else {
+                        $("#dialog p").text(hashMessages["SesionFinalizada"]);
+                        $("#dialog").dialog({
+                            buttons: {
+                                "Confirmar": function () {
+                                    $(this).dialog("close");
+
+                                    window.location = "Login.aspx";
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            request.send(null);
         }
+
        
     </script>
 
@@ -102,7 +133,7 @@
 
         <div id="divFather" style="width: 100%; margin-top: 11px; margin-bottom: 15px;">
             <div style="width: 98%; min-height: 360px; height: 100%; margin: 8px auto;">
-                <div class="row no-gutter" style="height: 100%; min-height: 600px; max-height: 600px;">
+                <div id="div_horizontalMain" class="row no-gutter" style="height: 100%; min-height: 600px; max-height: 600px;">
 
                     <%--<input type="button" id="btnPageFullscreen" value="click to toggle fullscreen" onclick="dashboardFullScreen(document.body)" style="visibility:hidden;">--%>
 
@@ -113,7 +144,7 @@
                         <h1 style="margin-top: 5px;"><span id="h1-busqueda" class="special-title label label-primary unselectable" style="font-weight: normal; z-index: 50;">Búsqueda</span>
                         </h1>
 
-                        <div class="row" style="margin: 3px; margin-top: 17px; min-height: 110px;">
+                        <div id="div_subBusqueda" class="row" style="margin: 3px; margin-top: 17px; min-height: 110px;">
 
                             <div class="row row-short" id="divFolios">
                                 <div class="col-md-12" style="margin-bottom: -10px;">
@@ -166,7 +197,7 @@
                                     <!-- /input-group -->
                                 </div>
                             </div>
-                            <br />
+                            <br id="br_busqueda" />
 
                             <div class="pull-right" style="margin-bottom: 5px; margin-right: 0; padding: 0; margin-top:5px;">
                                 <!-- btnDownloadAll -->
@@ -514,7 +545,7 @@
                     </div>
                     </div>
                 </div>
-                <div class="row no-gutter">
+                <div id="div_divisor" class="row no-gutter">
                     <div class='popbox' style="margin-right: 6px; display: inline-block;"></div>
                     <!-- popbox: Add comment -->
                     <div class='box popbox' style="width: 300px; min-height: 300px; max-height: 340px;">
