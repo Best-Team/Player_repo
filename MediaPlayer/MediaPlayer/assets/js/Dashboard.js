@@ -243,6 +243,7 @@ $(document).ready(function () {
                 if (MONITOR_HEIGHT < 950) { // 1400*900
 
                     $(".playerContainer").css("width", "4.3%");
+                    $(".flex").css("margin-top", "-20px");
 
                     setTimeout(function () {
                         $(".fancybox-opened").css('transform', 'scale(1, 0.93)');
@@ -251,11 +252,10 @@ $(document).ready(function () {
                         });
 
                         $(".fancybox-inner").css("height", "880px");
-                        $(".timeframe").css("margin-top", "-25px");
+                        $(".timeframe").css("margin-top", "-15px"); //-25
 
                     }, 100);
 
-                    $(".flex").css("margin-top", "-20px");
                 }
 
                 if (MONITOR_HEIGHT < 770) { // 1366*768
@@ -267,6 +267,7 @@ $(document).ready(function () {
             setTimeout(function () {
                 divTimelineProgress_SetWidth();
                 timeline_pointer_setLocation_AUX();
+                setPosition_TimelineProgressbar();
             }, 150);
         },
 
@@ -290,12 +291,12 @@ $(document).ready(function () {
 
                     $(".playerContainer").css("width", "5%");
                     $(".flex").css("margin-top", "0");
+                    $(".timeframe").css("margin-top", "-10px"); //
 
                     setTimeout(function () {
-
                         divTimelineProgress_SetWidth();
                         timeline_pointer_setLocation_AUX();
-
+                        setPosition_TimelineProgressbar();
                     }, 100);
 
                 }
