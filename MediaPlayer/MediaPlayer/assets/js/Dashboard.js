@@ -1672,16 +1672,7 @@ function timeframe_prepare(timeline_data, start, end) {
     divTimelineProgress_SetWidth();
 
     // If there are elements loaded, show timeline pointer
-    var first_tapeID = 0;
-    if (elementsInMemory != null && elementsInMemory.length > 0) {
-        first_tapeID = elementsInMemory[0].tapeID;
-        var first_tapeID_int = parseInt(first_tapeID, 10);
-
-        if (first_tapeID_int > 0) {
-            TIMELINE_POINTER.show();
-            timeline_pointer_setLocation(first_tapeID_int);
-        }
-    }
+    //timeline_pointer_setLocation_AUX();
 
 }
 /* ************* Method: draw Timeline - CSS Custom Styles ************* */
@@ -3020,7 +3011,7 @@ function loadElement_comment(divControlsMask_VIDEO, timestamp, fileName) {
         PLAYER_BOX.append(
             "<div name='divComment' class='col-md-12' style='margin: 30px; margin-top:20px; font-size:15px !important; padding-right:30px;'><div class='row'><h1 style='font-weight: bold;float:left;'>Comentario: " +
             timestamp +
-            "</h1></div><div class='row'><p class='pull-left' style='margin-top:15px; text-align:left;'>" +
+            "</h1></div><div class='row'><p class='pull-left' style='margin-top:15px; text-align:left; word-wrap: break-word; width: 95%;'>" +
             fileName + "</p></div></div>");
     }
     loadPlayerBoxImage("url(assets/images/comments.png)");

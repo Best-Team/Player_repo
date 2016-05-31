@@ -530,8 +530,8 @@ var fm = (function ($) {
 		var h = $(".navbar-static-top").css("height");
 		var m = $("#divFather").css("margin-top");
 
-		$('body').append('<div style="top: ' + h + '; margin-top: ' + m + '; z-index:1000;" onclick="javascript: busqueda_panel_show(true);" class="feedback_trigger feedback_trigger_closed ' + fm_options.position + jQueryUIClasses1 + fm_class + jquery_class + bootstrap_class + bootstrap_hero_unit + '">'
-				+ '<span style="background-color: #446e9b;font-size: 17px; margin-top: 20px; font-style: normal; color:white; white-space:nowrap; text-align:center; padding: 6px 20px;border-radius: 5px;border: 1px solid #CCC;font-weight: normal;" class="feedback_trigger_text">' + fm_options.trigger_label
+		$('body').append('<div style="top: ' + h + '; margin-top: ' + m + '; z-index:1000; position:absolute;" class="feedback_trigger feedback_trigger_closed ' + fm_options.position + jQueryUIClasses1 + fm_class + jquery_class + bootstrap_class + bootstrap_hero_unit + '">'		    
+		+ '<span style="background-color: #446e9b;font-size: 17px; margin-top: 20px; font-style: normal; color:white; white-space:nowrap; text-align:center; padding: 6px 20px;border-radius: 5px;border: 1px solid #CCC;font-weight: normal; cursor: pointer;" class="feedback_trigger_text" onclick="javascript: busqueda_panel_show(true);">' + fm_options.trigger_label
 				+	'</span></div>');
 
 		if (fm_options.jQueryUI === true) {
