@@ -223,8 +223,8 @@ $(document).ready(function () {
 
         /* Before show globalplay popup */
         beforeShow: function () {
-            $("#divgp_sc").show();
-            $('<div id="timer-labels"><label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label> / <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label></div>').appendTo("#divgp_sc");
+            $("#divgp").show();
+            $('<div id="timer-labels"><label id="lblGlobalplay_timer_current" class="label" style="font-size:100%; color:black;">00:00:00</label> / <label id="lblGlobalplay_timer_total" class="label" style="font-size:100%; color:black;">00:00:00</label></div>').appendTo("#divgp");
 
             // Init video zoom arrays
             zoom_w_arraylist = [];
@@ -238,42 +238,42 @@ $(document).ready(function () {
         /* After show globalplay popup */
         afterShow: function () {
             
-            setTimeout(function () {
-                divTimelineProgress_SetWidth();
-            }, 700);
-
             // Adapt the globalplay size to the screen resolution
             if (globalplay_active) {
-                if (MONITOR_HEIGHT < 950) { // 1400*900 (h real: 775 o 798)
+                if (MONITOR_HEIGHT < 950) { // 1400*900
 
-                    $("#divTimelineProgress").css("margin-left", "-8px");
-                    $("#timeframe").css("margin-left", "-8px");
+                    $(".playerContainer").css("width", "4.3%");
 
                     setTimeout(function () {
-                        $(".fancybox-opened").css('transform', 'scale(1, 0.85)');
+                        $(".fancybox-opened").css('transform', 'scale(1, 0.93)');
                         $('.fancybox-opened').each(function () { // This script is neccesary to apply !important feature
-                            this.style.setProperty('top', '-60px', 'important');
+                            this.style.setProperty('top', '-25px', 'important');
                         });
 
                         $(".fancybox-inner").css("height", "880px");
                         $(".timeframe").css("margin-top", "-25px");
+
                     }, 100);
 
                     $(".flex").css("margin-top", "-20px");
                 }
 
-                if (MONITOR_HEIGHT < 770) { // 1366*768 (h: 643)
+                if (MONITOR_HEIGHT < 770) { // 1366*768
                     $(".globalplayBox").css("max-height", "540px");
                 }
-
             }
 
+            // After all
+            setTimeout(function () {
+                divTimelineProgress_SetWidth();
+                timeline_pointer_setLocation_AUX();
+            }, 150);
         },
 
         /* After close globalplay popup */
         afterClose: function () {
-            $("#divgp_sc").hide();
-            $("#divgp_sc #timer-labels").remove();
+            $("#divgp").hide();
+            $("#divgp #timer-labels").remove();
             $("#globalPlayer_popup").show();
 
             // Clear audio tooltip popups already added 
@@ -286,15 +286,20 @@ $(document).ready(function () {
             if (!globalplay_active) {
 
                 // Check smaller screens globalplay resolution
-                if (MONITOR_HEIGHT < 1000) { // 1400*900
+                if (MONITOR_HEIGHT < 950) { // 1400*900
 
-                    $("#divTimelineProgress").css("margin-left", "0");
-                    $("#timeframe").css("margin-left", "0");
-
+                    $(".playerContainer").css("width", "5%");
                     $(".flex").css("margin-top", "0");
 
+                    setTimeout(function () {
+
+                        divTimelineProgress_SetWidth();
+                        timeline_pointer_setLocation_AUX();
+
+                    }, 100);
+
                 }
-                if (MONITOR_HEIGHT < 800) { // 1366*768
+                if (MONITOR_HEIGHT < 770) { // 1366*768
                     $(".globalplayBox").css("max-height", "auto");
 
                 }
@@ -415,8 +420,8 @@ $(document).ready(function () {
         $("#div_divisor").css("height", "5px");
         $("#div_subBusqueda").css("margin-top", "10px");
         $("#br_busqueda").remove();
-        $("#timeframe").css("margin-top", "-28px");
         $(".playerContainer").css("margin-top", "0");
+        //$("#timeframe").css("margin-top", "-28px");
 
         $("#divElementos").css("max-height", "445px");
     }
@@ -479,7 +484,6 @@ function doneResizing() {
                 timeline_pointer_setLocation(first_tapeID_int);
             }
         }
-
         setPosition_TimelineProgressbar();
 
     }, 100);

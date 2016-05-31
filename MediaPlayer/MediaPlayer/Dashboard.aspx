@@ -99,7 +99,13 @@
                                 "Confirmar": function () {
                                     $(this).dialog("close");
 
-                                    window.location = "Login.aspx";
+                                    var _hdnFolioID_selected = $("#_hdnFolioID_selected");
+                                    if (_hdnFolioID_selected != null && _hdnFolioID_selected.val() != null && _hdnFolioID_selected.val().length > 0) {
+                                        window.location = "Login.aspx?folioID=" + _hdnFolioID_selected.val();
+                                    } else {
+                                        window.location = "Login.aspx;";
+                                    }
+
                                 }
                             }
                         });
@@ -556,7 +562,7 @@
                         </div>
                         <div class="form-group">
                             <div class="col-md-12">
-                                <input type="text" class="form-control" id="txbComment" placeholder="Comentario" name="login-username" required="required" />
+                                <input type="text" class="form-control" id="txbComment" placeholder="Comentario" name="login-username" required="required" maxlength="300" />
                             </div>
                         </div>
                         <div class="form-group">
@@ -666,7 +672,7 @@
                     <div id="globalPlayer_popup" class="unselectable">
 
                         <!-- GLOBALPLAY SCREEN -->
-                        <div id="divgp_sc" class="globalplayBox img-rounded" style="display: none;">
+                        <div id="divgp" class="globalplayBox img-rounded" style="display: none;">
                             <div id="flex_messages">                                
 
                             <div id="flex-messages-top" style="cursor:default;">
@@ -714,13 +720,13 @@
 
                                             <!-- Play/Pause button -->
                                             <li id="globalplay_play_li" class="img-rounded globalplay_play_li blue" style="position: relative; padding: 8px;">
-                                                <a href="#divgp_sc" id="globalplay_play" class="push_button globalplay_play" data-attr="playPauseAudio" 
+                                                <a href="#divgp" id="globalplay_play" class="push_button globalplay_play" data-attr="playPauseAudio" 
                                                     onclick="return globalplay_init()" style="position: relative; border: none; vertical-align:top;"></a>
                                                 <a href="#globalPlayer_popup" id="btnOpenFancybox" style="display: none;"></a>
                                             </li>
                                             <!-- Stop button -->
                                             <li id="globalplay_stop_li" class="img-rounded blue">
-                                                <a href="#divgp_sc" id="globalplay_stop" class="globalplay_stop" data-attr="nextAudio" 
+                                                <a href="#divgp" id="globalplay_stop" class="globalplay_stop" data-attr="nextAudio" 
                                                     onclick="return globalplay_stop()" style="padding: 14px; border: none; vertical-align:top;">
                                                 </a>
                                             </li>

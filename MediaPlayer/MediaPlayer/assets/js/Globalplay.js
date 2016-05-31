@@ -86,7 +86,6 @@ function globalplay_init() {
 
         // Pause all media current playing elements
         globalplay_pausePlayingElements(false);
-
     }
     return false;
 }
@@ -176,7 +175,7 @@ function globalplay_loadElements() {
         var filePath_OREKA = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL;
 
         // globalplay box container
-        var flex_div = $("#divgp_sc .flex");
+        var flex_div = $("#divgp .flex");
 
         var id_list = "";
         for (var i = 0; i < elementsCandidate.length; i++) {
@@ -909,9 +908,6 @@ function globalplay_comment(element_alreadyTaken, global_numberID) {
 
     var duration_int = parseInt(duration, 10);
     var duration_sec = duration_int <= 1 ? 5 : duration_int;
-
-    //var label = $("#globalplay_divComments h2");
-    //label.text(fileName);
 
     $("#globalplay_divComments").append('<h2 class="flex-messages-top-h2 label label-warning" style="z-index: 1001; color: #474747; background-color:#FDFDF0; text-transform: none; font-size: 17px; width: 50%; margin: 0 auto; margin-left: 5px; text-shadow: none;">' + fileName + '</h2>');
     var label = $("#globalplay_divComments h2").last();
