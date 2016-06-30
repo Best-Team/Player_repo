@@ -5061,64 +5061,30 @@ function busqueda_panel_show(show) {
     if (panel_show_minus != null && divPanel_container != null && playerControl_sub1 != null &&
         playerControl_sub2 != null && divPanel_Busqueda_pre != null && feedback_trigger_closed != null) {
         if (show) {
-            panel_show_minus.show();
 
-            
-            divPanel_container.toggle("scale", { percent: 55, direction: 'horizontal' }, 300, busqueda_panel_show_callback);
+            // Se contrae
+            $("#divPanel_Busqueda_pre").removeClass('cerrar-panel-izquierda');
+            $("#divPanel_container").removeClass('cerrar-panel-derecha');
 
+            feedback_trigger_closed.hide();
             setTimeout(function () {
-                divPanel_container.css("right", "inherit");
-                divPanel_container.css("position", "relative");
-                divPanel_container.removeClass("col-md-12");
-                divPanel_container.addClass("col-md-8");
-
-                // sub
-                playerControl_sub1.removeClass("col-md-10");
-                playerControl_sub1.addClass("col-md-9")
-                playerControl_sub2.removeClass("col-md-2");
-                playerControl_sub2.addClass("col-md-3");
-
-                divPanel_container.css("padding-left", "8px");
-                divPanel_Busqueda_pre.toggle("slide", {}, 450);
-                feedback_trigger_closed.hide();
-
                 doReset();
-            }, 315);
-
+            }, 300);
+            
         }
         else {
+
             // Se expande
-            panel_show_minus.hide();
-
-            divPanel_container.css("right", 0);
-            divPanel_container.css("position", "absolute");
-            divPanel_Busqueda_pre.toggle("slide", {}, 450);
-
-            divPanel_container.toggle("scale", { percent: 160, direction: 'horizontal' }, 500, busqueda_panel_show_callback);
+            $("#divPanel_Busqueda_pre").addClass('cerrar-panel-izquierda');
+            $("#divPanel_container").addClass('cerrar-panel-derecha');
 
             setTimeout(function () {
-                divPanel_container.css("left", 0);
-                divPanel_container.css("right", 0);
-                divPanel_container.css("margin", "0 auto");
-                divPanel_container.removeClass("col-md-8");
-                divPanel_container.addClass("col-md-12");
-
-                // sub
-                playerControl_sub1.removeClass("col-md-9")
-                playerControl_sub1.addClass("col-md-10");
-                playerControl_sub2.removeClass("col-md-3");
-                playerControl_sub2.addClass("col-md-2");
-
-                divPanel_container.css("padding-left", "50px");
-                doReset();
-            }, 640);
-
-            // Feedback me - Source: http://www.jqueryscript.net/other/Simple-jQuery-Plugin-For-Slide-Out-Tab-Feedback-Widget-Feedback-Me.html
-            fm_options = {
-                position: "left-top",
-                trigger_label: "Búsqueda",
-            };
-            fm.init(fm_options);
+                fm_options = {
+                    position: "left-top",
+                    trigger_label: "Búsqueda",
+                };
+                fm.init(fm_options);
+            }, 100);
         }
     }
 }

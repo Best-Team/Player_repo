@@ -510,3 +510,20 @@ a.disabled {
 }
 
 
+#divPanel_Busqueda_pre {
+    transition: all 0.4s;
+}
+
+.cerrar-panel-derecha {
+    left: 40px;
+    position: absolute;
+    width: 96%;
+}
+
+.cerrar-panel-izquierda {
+    transform: translateX(-1000px);
+    transition: all 1s;
+}
+
+
+

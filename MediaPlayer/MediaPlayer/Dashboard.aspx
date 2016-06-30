@@ -178,7 +178,7 @@
                                                         <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                                                     </button>
 
-                                                     <button class="btn btn-default panel-minus pull-right" type="button" title="Ocultar panel" style="position:relative; margin:0;" onclick="javascript: busqueda_panel_show(false);">
+                                                     <button id="btnExpandPanel" class="btn btn-default panel-minus pull-right" type="button" title="Ocultar panel" style="position:relative; margin:0;" onclick="javascript: busqueda_panel_show(false);">
                                                         <span class="glyphicon glyphicon-hand-left" aria-hidden="true"></span>
                                                     </button>
                                                 </span>
