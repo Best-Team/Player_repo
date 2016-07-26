@@ -70,10 +70,11 @@
             }
         }
 
+        <%--    
         function doDownloadElements() {
             __doPostBack('<%=btnDownloadAllCandidate.UniqueID%>', "");
         }
-
+        --%>
        
         function checkUserSession() {
 
@@ -207,10 +208,9 @@
 
                             <div class="pull-right" style="margin-bottom: 5px; margin-right: 0; padding: 0; margin-top:5px;">
                                 <!-- btnDownloadAll -->
-                                <button id="btnDownloadAll" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onclick="downloadAll();">
+                                <button id="btnDownloadAll" runat="server" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onserverclick="DownloadHTML_Click">
                                     <span class="fa fa-download" aria-hidden="true"></span>
                                 </button>
-                                <asp:Button ID="btnDownloadAllCandidate" runat="server" Style="display: none" Text="" OnClick="btnDownloadAll_Click" />
                                 <!-- addCommentClick -->
                                 <a href="#" id="btnAddComment" class="open btn btn-default" style="margin-right: 6px;" title="Agregar comentario al folio" onclick="addCommentClick();">
                                     <span class="glyphicon glyphicon-comment"></span>

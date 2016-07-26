@@ -19,6 +19,10 @@ using System.Web.UI.WebControls;
 using Ionic.Zip;
 using System.Net;
 using System.Threading;
+using System.Resources;
+using System.Reflection;
+using System.Collections;
+using HtmlAgilityPack;
 
 namespace MediaPlayer
 {
@@ -56,6 +60,21 @@ namespace MediaPlayer
         #endregion Properties
 
         #region Events
+
+        // Source: http://forums.asp.net/t/931180.aspx?Grab+resulting+HTML+from+aspx+page+and+save+to+file+or+put+in+email+
+
+        protected override void Render(HtmlTextWriter writer)
+        {
+            StringBuilder sbOut = new StringBuilder();
+            StringWriter swOut = new StringWriter(sbOut);
+            HtmlTextWriter htwOut = new HtmlTextWriter(swOut);
+            base.Render(htwOut);
+            string sOut = sbOut.ToString();
+
+            // Send sOut as an Email
+
+            writer.Write(sOut);
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -949,14 +968,14 @@ namespace MediaPlayer
                             string title = folio.mediaType == "S" ? "Grabación de Pantalla" : media_str;
 
                             /****** Table data ******/
-                            htmlTable.AppendLine("<tr id='tape_" + folio.tapeID + "' style='background-color: " + tr_color + ";' name='"+ tr_name + "'>");
+                            htmlTable.AppendLine("<tr id='tape_" + folio.tapeID + "' style='background-color: " + tr_color + ";' name='" + tr_name + "'>");
                             htmlTable.AppendLine("<td>");
 
                             htmlTable.AppendLine("<input type='checkbox' name='timeline_elements' class='button' value='" + folio.tapeID + "#" + isExtra.ToString().ToLowerInvariant() + "#" + folio.mediaType + "#" + folio.fileName + "' onclick='manageElement(this, " + folio.tapeID + ", " + (index - 1).ToString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>");
                             htmlTable.AppendLine("<td>");
                             htmlTable.AppendLine("<h5>" + index + "</h5>");
                             htmlTable.AppendLine("<td>");
-                            htmlTable.AppendLine("<h5>" + folio.userName + "</h5>"); 
+                            htmlTable.AppendLine("<h5>" + folio.userName + "</h5>");
                             htmlTable.AppendLine("<td>");
                             htmlTable.AppendLine("<h5>" + folio.localParty + "</h5>");
                             htmlTable.AppendLine("<td>");
@@ -1040,7 +1059,6 @@ namespace MediaPlayer
             }
             return onclick_event;
         }
-
 
         protected void btnDownloadAll_Click(object sender, EventArgs e)
         {
@@ -1181,6 +1199,368 @@ namespace MediaPlayer
             }
         }
 
+        protected void Download_ZipFiles(string html_str)
+        {
+            // Revisar
+            // http://dotnetzip.codeplex.com/discussions/231933
+            // http://dotnetzip.codeplex.com/discussions/234342
+
+            // #1- Logger variables
+            System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame();
+            string className = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
+            string methodName = stackFrame.GetMethod().Name;
+
+            string folioID = string.Empty;
+            if(ViewState["FolioID"]!= null)
+            {
+                folioID = ViewState["FolioID"].ToString();
+            }
+            string zipName = String.Format("MP_portable{0}.zip", folioID);
+
+            // Repository temp path
+            string repository_temp = string.Empty;
+            if (ConfigurationManager.AppSettings != null)
+            {
+                repository_temp = ConfigurationManager.AppSettings["LocalTempPath"].ToString();
+            }
+
+            // Client file name
+            string client_fileName = string.Empty;
+            if (ConfigurationManager.AppSettings != null)
+            {
+                client_fileName = ConfigurationManager.AppSettings["Download_ClientName"].ToString();
+            }
+
+            // Client file name exe
+            string client_fileName_exe = string.Empty;
+            if (ConfigurationManager.AppSettings != null)
+            {
+                client_fileName_exe = ConfigurationManager.AppSettings["Download_ClientName_exe"].ToString();
+            }
+
+            // Zip Source: http://www.aspsnippets.com/Articles/Download-multiple-files-as-Zip-Archive-File-in-ASPNet-using-C-and-VBNet.aspx
+
+            using (ZipFile zip = new ZipFile())
+            {
+                zip.AlternateEncodingUsage = ZipOption.AsNecessary;
+                string temp_file = Path.Combine(repository_temp, client_fileName);
+
+                /* ******************** HTML File ******************** */
+
+                // Check if directory exists, if not creates it 
+                if (!Directory.Exists(Path.GetDirectoryName(repository_temp)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
+                }
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append(html_str);
+                sb.Append("\r\n");
+                File.WriteAllText(temp_file, sb.ToString());
+
+                // Ensure that the temp file is already created before generate the zip file
+                Thread.Sleep(300);
+
+                /* ******************** Directories Files ******************** */
+
+                Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+                string folder_path_1 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\files");
+                string folder_path_2 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\fonts");
+                string folder_path_3 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\image");
+                string folder_path_4 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\images");
+
+                /* -Self-Extractor--------------------------------------------------
+                    //zip.SaveSelfExtractor(Path.Combine(repository_temp, "archive.exe"), SelfExtractorFlavor.ConsoleApplication);
+                */
+
+                Response.Clear();
+                Response.BufferOutput = false;
+                Response.ContentType = "application/zip";
+                Response.AddHeader("content-disposition", "attachment; filename=" + zipName);
+
+                /* -Self-Extractor--------------------------------------------------
+                Response.AddHeader("Content-Disposition", "attachment; filename=" + client_fileName_exe);
+                Response.AddHeader("Content-Description", "File Transfer");
+                Response.AddHeader("Content-Transfer-Encoding", "binary");
+                Response.ContentType = "application/exe";
+                */
+
+                // Add folders directories
+                zip.AddDirectory(folder_path_1, Path.GetFileName(folder_path_1));
+                zip.AddDirectory(folder_path_2, Path.GetFileName(folder_path_2));
+                zip.AddDirectory(folder_path_3, Path.GetFileName(folder_path_3));
+                zip.AddDirectory(folder_path_4, Path.GetFileName(folder_path_4));
+
+                zip.AddFile(temp_file, "");
+
+                zip.Save(Response.OutputStream);
+
+                // Ensure that the zip file is already downloaded before cleaning temp files
+                Thread.Sleep(300);
+
+                /* ******************** Clear temporary HTML file ******************** */
+
+                // Clearing temporary HTML file
+                try
+                {
+                    // Check if directory exists
+                    if (Directory.Exists(Path.GetDirectoryName(repository_temp)) && File.Exists(temp_file))
+                    {
+                        File.Delete(temp_file);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // #2- Logger exception
+                    Logger.LogError("(%s) (%s) -- Excepcion. Limpiando archivo HTML temporal. ERROR: %s", className, methodName, ex.Message);
+                }
+
+                // Close thread
+                Response.End();
+
+                /* -Self-Extractor--------------------------------------------------
+                int fileSize = 99999999;
+                byte[] Buffer = new byte[fileSize];
+
+                FileStream MyFileStream = new FileStream(Path.Combine(repository_temp, "archive.exe"), FileMode.Open);
+                long FileSize = MyFileStream.Length;
+
+                MyFileStream.Read(Buffer, 0, int.Parse(FileSize.ToString()));
+                MyFileStream.Close();
+
+                Response.ContentType = "application/exe";
+                Response.AddHeader("Content-Disposition", "attachment; filename=archive.exe");
+                Response.OutputStream.Write(Buffer, 0, fileSize);
+                Response.Flush();
+                Response.Close();
+                */
+            }
+        }
+
+        protected void DownloadHTML_Click(object sender, EventArgs e)
+        {
+            // Source: http://stackoverflow.com/questions/13762338/read-files-from-a-folder-present-in-project
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+            string path = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\Multimedia_Player_client.html");
+            string html_str = File.ReadAllText(path);
+            string id_str = "divElementos";
+
+            // Get dynamic table
+            string dynamic_table = GetTable_download();
+
+            // Create document
+            HtmlDocument html_doc = new HtmlDocument();
+            html_doc.LoadHtml(html_str);
+
+            // Create table node
+            HtmlNode table_node = HtmlNode.CreateNode(dynamic_table);
+
+            // Get container div
+            HtmlNode divElementos_node = html_doc.DocumentNode.SelectSingleNode("//div[@id='" + id_str + "']");
+            divElementos_node.AppendChild(table_node);
+
+            // Convert to string
+            html_str = html_doc.DocumentNode.OuterHtml;
+
+            Download_ZipFiles(html_str);
+        }
+
+        private string GetTable_download()
+        {
+            int index = 0;
+            StringBuilder htmlTable = new StringBuilder();
+
+            /****** Table headers ******/
+
+            htmlTable.AppendLine("<table class='table unselectable' id='tblLeftGridElements'>"); // style='display:none;'
+            htmlTable.AppendLine("<thead>");
+            htmlTable.AppendLine("<tr style='background: #446e9b; color: whitesmoke;'>");
+            htmlTable.AppendLine("<th width='3%' style='text-align: center;'><input type='checkbox' id='chbSelectAll' name='timeline_elements_checkAll' class='button' checked></th>");
+            htmlTable.AppendLine("<th width='3%' style='text-align: center;'>#</th>");
+            htmlTable.AppendLine("<th width='5%' style='text-align: center;'>Usuario</th>");
+            htmlTable.AppendLine("<th width='8%' style='text-align: center;'>Local Party</th>");
+            htmlTable.AppendLine("<th width='5%' style='text-align: center;'>Remote Party</th>");
+            htmlTable.AppendLine("<th width='5%' style='text-align: center;'>Tipo</th>");
+            htmlTable.AppendLine("<th width='6%' style='text-align: center;'>Inicio</th>");
+            htmlTable.AppendLine("<th width='3%' style='text-align: center;'>Duración</th>");
+            htmlTable.AppendLine("</tr>");
+            htmlTable.AppendLine("</thead>");
+            htmlTable.AppendLine("<tbody>");
+
+            if (!string.IsNullOrWhiteSpace(txbSearchBox1.Text))
+            {
+                this.folio_list = Global.GlobalMethods.GetAllFolios(txbSearchBox1.Text);
+
+                if (this.folio_list != null && this.folio_list.Count > 0)
+                {
+                    this.folio_filteredList = this.folio_list.FindAll(x => x.deleted == 0);
+
+                    // Json object
+                    RootObject json_elementList = new RootObject();
+                    json_elementList.name = "Elements";
+                    json_elementList.color = "#000000";
+
+                    DateTime folio_start = DateTime.MaxValue;
+                    DateTime folio_end = DateTime.MinValue;
+                    //
+
+                    List<Folio> list = this.folio_filteredList.Where(x => x.deleted == 0).ToList();
+                    if (list != null && list.Count > 0)
+                    {
+                        foreach (Folio folio in list)
+                        {
+                            index++;
+
+                            string end_date = folio.timestamp.AddSeconds(folio.duration).ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
+
+                            // Duration
+                            TimeSpan time = TimeSpan.FromSeconds(folio.duration);
+                            string duration_formatStr = time.ToString(@"hh\:mm\:ss");
+
+                            // Get max and min value
+                            folio_start = folio_start > folio.timestamp ? folio.timestamp : folio_start;
+                            folio_end = folio_end < folio.timestamp.AddSeconds(folio.duration) ? folio.timestamp.AddSeconds(folio.duration) : folio_end;
+
+                            /****** Create json data ******/
+                            Span json_element = new Span();
+                            json_element.name = folio.mediaType == "S" ? "P" : folio.mediaType;
+                            json_element.start = folio.timestamp.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
+                            json_element.end = end_date;
+                            json_element.id = folio.tapeID.ToString();
+                            json_element.type = folio.mediaType;
+                            json_element.role = folio.groupName;
+
+                            json_elementList.spans.Add(json_element);
+
+                            // isExtra, type, icon and color
+                            //bool isExtra = false; // If its taken from orkextra table
+                            string icon = "glyphicon glyphicon-headphones";
+                            string media_str = "Grabación";
+                            string color_str = "";
+                            switch (folio.mediaType)
+                            {
+                                case "S":
+                                    {
+                                        icon = "fa fa-video-camera";
+                                        media_str = "Grabación";
+                                        color_str = "blue";
+                                        break;
+                                    }
+                                case "V":
+                                    {
+                                        icon = "glyphicon glyphicon-film";
+                                        media_str = "Video";
+                                        color_str = "purple";
+                                        break;
+                                    }
+                                case "A":
+                                    {
+                                        icon = "glyphicon glyphicon-headphones";
+                                        media_str = "Audio";
+                                        color_str = "red";
+                                        break;
+                                    }
+                                case "D":
+                                    {
+                                        icon = "fa fa-file-text";
+                                        media_str = "Documento";
+                                        color_str = "green";
+                                        break;
+                                    }
+                                case "C":
+                                    {
+                                        icon = "glyphicon glyphicon-comment";
+                                        media_str = "Comentario";
+                                        color_str = "orange";
+                                        break;
+                                    }
+                                case "I":
+                                    {
+                                        icon = "glyphicon glyphicon-picture";
+                                        media_str = "Imagen";
+                                        color_str = "Violet";
+                                        break;
+                                    }
+                            }
+
+                            // IsExtra = If filePath is NOT empty, then is extra from incextras table
+                            bool isExtra = folio.filePath == string.Empty ? false : true;
+                            if (folio.mediaType == "C")
+                            {
+                                isExtra = true;
+                            }
+
+                            string color_icon = "beige";
+                            string tr_color = isExtra ? "inherit" : "#D1E2F3";
+                            string tr_name = isExtra ? "Extra" : "Oreka";
+
+                            // Onclick event
+                            string onclick_event = FolioElements_GetOnClickEvent(folio, index, isExtra, duration_formatStr, media_str);
+
+                            // Title
+                            string title = folio.mediaType == "S" ? "Grabación de Pantalla" : media_str;
+
+                            /****** Table data ******/
+                            htmlTable.AppendLine("<tr id='tape_" + folio.tapeID + "' style='background-color: " + tr_color + ";' name='" + tr_name + "'>");
+                            htmlTable.AppendLine("<td>");
+
+                            htmlTable.AppendLine("<input type='checkbox' name='timeline_elements' class='button' value='" + folio.tapeID + "#" + isExtra.ToString().ToLowerInvariant() + "#" + folio.mediaType + "#" + folio.fileName + "' onclick='manageElement(this, " + folio.tapeID + ", " + (index - 1).ToString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>");
+                            htmlTable.AppendLine("<td>");
+                            htmlTable.AppendLine("<h5>" + index + "</h5>");
+                            htmlTable.AppendLine("<td>");
+                            htmlTable.AppendLine("<h5>" + folio.userName + "</h5>");
+                            htmlTable.AppendLine("<td>");
+                            htmlTable.AppendLine("<h5>" + folio.localParty + "</h5>");
+                            htmlTable.AppendLine("<td>");
+                            htmlTable.AppendLine("<h5>" + folio.remoteParty + "</h5>");
+                            htmlTable.AppendLine("<td>");
+
+                            htmlTable.AppendLine("<button type='button' class='btn btn-default btn-sm' style='color:" + color_str + "; opacity: 0.9; background-color: " + color_icon + "; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' ");
+                            htmlTable.AppendLine("title=" + title + " onclick='" + onclick_event + "'><span class='" + icon + "' aria-hidden='true'></span></button>");
+                            htmlTable.AppendLine("<td>");
+                            htmlTable.AppendLine("<h5 id='timestamp'>" + folio.timestamp.ToString("dd'-'MM'-'yyyy HH':'mm':'ss") + "</h5>");
+                            htmlTable.AppendLine("<td>");
+
+                            htmlTable.AppendLine("<h5>" + duration_formatStr + "</h5>");
+                            htmlTable.AppendLine("</tr>");
+                        }
+                    }
+
+                }
+                else
+                {
+                }
+            }
+            else
+            {
+            }
+            htmlTable.AppendLine("</tbody>");
+            htmlTable.AppendLine("</table>");
+
+            return htmlTable.ToString();
+        }
+
+        private void Download_HTML(string _html)
+        {
+            // Otro: http://htmlagilitypack.codeplex.com/wikipage?title=Examples
+            // http://www.codeproject.com/Tips/804660/How-to-Parse-HTML-using-Csharp
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append(_html);
+            sb.Append("\r\n");
+
+            string text = sb.ToString();
+
+            Response.Clear();
+            Response.ClearHeaders();
+
+            Response.AddHeader("Content-Length", text.Length.ToString());
+            Response.ContentType = "text/plain";
+            Response.AppendHeader("content-disposition", "attachment;filename=\"MP_client.html\"");
+
+            Response.Write(text);
+            Response.End();
+        }
 
         #endregion Private Methods
 
@@ -1292,7 +1672,7 @@ namespace MediaPlayer
                 json_element.name = comment;
                 json_element.start = date_final_start;
                 json_element.end = date_final_end;
-                json_element.id = elementID.ToString(); 
+                json_element.id = elementID.ToString();
                 json_element.type = "C";
                 json_element.duration = duration; // new
                 json_element.role = string.Empty;
@@ -1407,5 +1787,6 @@ namespace MediaPlayer
         }
 
         #endregion Web Methods
+
     }
 }
