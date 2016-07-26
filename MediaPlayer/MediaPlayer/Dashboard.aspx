@@ -76,6 +76,10 @@
         }
         --%>
        
+        function doDownloadElements2() {
+            __doPostBack('<%=btnDownloadAllCandidate.UniqueID%>', "");
+        }
+
         function checkUserSession() {
 
             // Check session - Source: https://www.daniweb.com/programming/web-development/threads/362898/check-for-session-timeout-in-javascript-and-redirect-to-login-page
@@ -208,9 +212,22 @@
 
                             <div class="pull-right" style="margin-bottom: 5px; margin-right: 0; padding: 0; margin-top:5px;">
                                 <!-- btnDownloadAll -->
-                                <button id="btnDownloadAll" runat="server" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onserverclick="DownloadHTML_Click">
+                                <%--<button id="btnDownloadAll" runat="server" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onserverclick="DownloadHTML_Click">
+                                    <span class="fa fa-download" aria-hidden="true"></span>
+                                </button>--%>
+
+                                <button id="btnDownloadAll" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onclick="downloadAll2();">
                                     <span class="fa fa-download" aria-hidden="true"></span>
                                 </button>
+                                <asp:Button ID="btnDownloadAllCandidate" runat="server" Style="display: none" Text="" OnClick="DownloadHTML_Click" />
+
+                                <%--<asp:Button ID="btnDownloadAllCandidate" runat="server" Style="display: none" Text="" OnClick="btnDownloadAll_Click" />
+                                 <!-- btnDownloadAll -->
+                                <%--<button id="btnDownloadAll" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onclick="downloadAll();">
+                                    <span class="fa fa-download" aria-hidden="true"></span>
+                                </button>--%>
+
+
                                 <!-- addCommentClick -->
                                 <a href="#" id="btnAddComment" class="open btn btn-default" style="margin-right: 6px;" title="Agregar comentario al folio" onclick="addCommentClick();">
                                     <span class="glyphicon glyphicon-comment"></span>

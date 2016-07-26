@@ -148,13 +148,13 @@ namespace MediaPlayer {
         protected global::System.Web.UI.WebControls.RegularExpressionValidator RegularExpressionValidator1;
         
         /// <summary>
-        /// btnDownloadAll control.
+        /// btnDownloadAllCandidate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlButton btnDownloadAll;
+        protected global::System.Web.UI.WebControls.Button btnDownloadAllCandidate;
         
         /// <summary>
         /// btnRefresh control.

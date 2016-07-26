@@ -4452,6 +4452,76 @@ function downloadAll() {
     }
 }
 
+
+function downloadAll2() {
+
+    // Check if folio is selected
+    var _hdnFolioID = $("input[id*='_hdnFolioID']");
+    if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
+
+        // Get only visible and checked checkboxes to remove
+        var list_elements = [];
+        $('tr:visible td input:checked').each(function () {
+            list_elements.push($(this).attr('value'));
+        });
+        if (list_elements.length > MAX_DOWNLOAD_FILES) {
+
+            var msj = hashMessages["MaximoElementosDescarga1"] + " " + MAX_DOWNLOAD_FILES + " " + hashMessages["MaximoElementosDescarga2"];
+            $("#dialog p").text(msj);
+            $("#dialog").dialog({
+                buttons: {
+                    "Confirmar": function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+        } else if (list_elements.length > 0) {
+
+            $("#dialog p").text(hashMessages["ConfirmarDesgargaElementos"]);
+            $("#dialog").dialog({
+                resizable: false,
+                height: 140,
+                modal: true,
+                buttons: {
+                    "Confirmar": function () {
+                        multiDownload2(list_elements);
+                        $(this).dialog("close");
+                    },
+                    Cancel: function () {
+                        $(this).dialog("close");
+                    }
+                },
+                close: function (event, ui) {
+                    //$(this).dialog('destroy').remove()
+                }
+
+            });
+
+        } else if (list_elements.length == 0) {
+
+            $("#dialog p").text(hashMessages["SeleccioneElemento"]);
+            $("#dialog").dialog({
+                buttons: {
+                    "Confirmar": function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+
+        }
+    } else {
+        $("#dialog p").text(hashMessages["SeleccioneFolio"]);
+        $("#dialog").dialog({
+            buttons: {
+                "Confirmar": function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    }
+}
+
 /******** Auxiliar Functions ********/
 
 function getDuration_onDatetime(date){
@@ -4563,6 +4633,46 @@ function multiDownload1(objects) {
             }
             // Call server
             doDownloadElements();
+        }
+    }
+}
+
+
+function multiDownload2(objects) {
+    //var files = [];
+
+    var ok = false;
+    var hdnElementsToDownload = $("input[id*='_hdnElementsToDownload']");
+    if (hdnElementsToDownload != null) {
+
+        hdnElementsToDownload.val("");
+
+        for (obj in objects) {
+            if (objects[obj] != null && objects[obj].length) {
+                var array = objects[obj].split("#");
+                if (array != null && array.length > 3) {
+                    var segmentID = array[0];
+
+                    var elements = hdnElementsToDownload.val() + "#" + segmentID;
+                    hdnElementsToDownload.val(elements);
+                    ok = true;
+                }
+            }
+        }
+
+        if (ok) {
+            // Remove first "#"
+            var elementsToDownload_str = hdnElementsToDownload.val();
+            var aux = elementsToDownload_str;
+            if (elementsToDownload_str != null && elementsToDownload_str.length > 0) {
+                if (elementsToDownload_str.charAt(0) === "#") {
+                    aux = elementsToDownload_str.substring(1);
+
+                    hdnElementsToDownload.val(aux);
+                }
+            }
+            // Call server
+            doDownloadElements2();
         }
     }
 }
