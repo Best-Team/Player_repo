@@ -135,3 +135,4 @@ artifacts/
 # Keep resources from project
 !MediaPlayer/MediaPlayer/assets/libraries/*
 MediaPlayer/MediaPlayer/MediaPlayer.csproj
+MediaPlayer/MediaPlayer/MediaPlayer.csproj
