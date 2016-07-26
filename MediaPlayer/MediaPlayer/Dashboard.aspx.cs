@@ -1349,7 +1349,8 @@ namespace MediaPlayer
             html_doc_Table.LoadHtml(dynamic_table);
 
             // Get container div
-            //HtmlNodeCollection tr_nodes = html_doc_Table.DocumentNode.SelectNodes("//tr[@id='" + id_str + "']");
+
+            HtmlNodeCollection tr_nodes_toDownload = new HtmlNodeCollection(html_doc_Table.DocumentNode);
 
             string[] elements_array;
             if (_hdnElementsToDownload.Value.Length > 0)
@@ -1357,27 +1358,20 @@ namespace MediaPlayer
                 elements_array = _hdnElementsToDownload.Value.Split('#');
                 if (elements_array != null && elements_array.Length > 0)
                 {
-                    string[] fileData_array;
-                    foreach (string element in elements_array)
+                    foreach (string segment_ID in elements_array)
                     {
-                        if (!string.IsNullOrWhiteSpace(element))
+                        if (!string.IsNullOrWhiteSpace(segment_ID))
                         {
-                            string segment_ID = string.Empty;
-
-                            fileData_array = element.Split('$');
-                            if (fileData_array != null && fileData_array.Length > 2)
-                            {
-                                segment_ID = fileData_array[0];
-                            }
-                            if (!string.IsNullOrWhiteSpace(segment_ID))
-                            {
-                                HtmlNode tr_node = html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segment_ID + "']");
-                                tr_node.Remove();
-                            }
+                            HtmlNode tr_node = html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segment_ID + "']");
+                            //tr_node.Remove(); //
+                            tr_nodes_toDownload.Add(tr_node);
                         }
                     }
                 }
             }
+            HtmlNode tr_node_parent = html_doc_Table.DocumentNode.SelectSingleNode("//tbody");
+            tr_node_parent.RemoveAllChildren();
+            tr_node_parent.AppendChildren(tr_nodes_toDownload);
 
             /* ************** */
 
@@ -1386,7 +1380,8 @@ namespace MediaPlayer
             html_doc.LoadHtml(html_str);
 
             // Create table node
-            HtmlNode table_node = HtmlNode.CreateNode(dynamic_table);
+            //HtmlNode table_node = HtmlNode.CreateNode(dynamic_table);
+            HtmlNode table_node = HtmlNode.CreateNode(html_doc_Table.DocumentNode.OuterHtml);
 
             // Get container div
             HtmlNode divElementos_node = html_doc.DocumentNode.SelectSingleNode("//div[@id='" + id_str + "']");
