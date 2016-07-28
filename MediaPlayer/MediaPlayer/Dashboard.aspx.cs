@@ -31,12 +31,15 @@ namespace MediaPlayer
         private bool _signalSearchFolioElements = false;
         private string _argSearchFolioElements = null;
         private bool? _isPostbackExpected = null;
+        private string build_date;
 
         #region Properties
 
         private List<Folio> folio_list;
 
         private List<Folio> folio_filteredList;
+
+        public string Build_date { get { return build_date; } }
 
         private bool IsPostbackExpected
         {
@@ -82,6 +85,8 @@ namespace MediaPlayer
             {
                 if (!IsPostBack)
                 {
+                    build_date = GetLinkerTime(Assembly.GetExecutingAssembly()).ToString();
+
                     string search = string.Empty;
                     if (!string.IsNullOrWhiteSpace(qs_folio))
                     {
@@ -1344,6 +1349,32 @@ namespace MediaPlayer
                             divElementos_node.AppendChild(table_node);
                         }
 
+                        // Send FolioID
+                        HtmlNode hdnFolioID_node = html_doc.DocumentNode.SelectSingleNode("//input[contains(@id, '_hdnFolioID')]");
+                        if (hdnFolioID_node != null)
+                        {
+                            hdnFolioID_node.Attributes["value"].Value = ViewState["FolioID"].ToString();
+                        }
+
+                        // Send Build datetime                        
+                        HtmlNode divBuild_node = html_doc.DocumentNode.SelectSingleNode("//div[@id='mainFooterCopyright']/label");
+                        if (divBuild_node != null)
+                        {
+                            divBuild_node.InnerHtml = "Generado: " + DateTime.Now;
+                        }
+
+                        /*
+                        // Add Hidden Fields 
+                        string folioID = string.Empty;
+                        if (ViewState["FolioID"] != null)
+                        {
+                            folioID = ViewState["FolioID"].ToString();
+                        }
+                        string hdn_folioID = "<input type='hidden' id='hdn_folioID' value='" + folioID + "'>";
+                        HtmlNode hdn_folioID_node = HtmlNode.CreateNode(hdn_folioID);
+                        html_doc.DocumentNode.AppendChild(hdn_folioID_node);
+                        */
+
                         // Convert to string
                         html_str = html_doc.DocumentNode.OuterHtml;
 
@@ -1493,7 +1524,6 @@ namespace MediaPlayer
                 }
             }
         }
-
 
         private string GetTable_download()
         {
@@ -1739,6 +1769,29 @@ namespace MediaPlayer
 
             Response.Write(text);
             Response.End();
+        }
+
+        public static DateTime GetLinkerTime(Assembly assembly, TimeZoneInfo target = null)
+        {
+            var filePath = assembly.Location;
+            const int c_PeHeaderOffset = 60;
+            const int c_LinkerTimestampOffset = 8;
+
+            var buffer = new byte[2048];
+
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                stream.Read(buffer, 0, 2048);
+
+            var offset = BitConverter.ToInt32(buffer, c_PeHeaderOffset);
+            var secondsSince1970 = BitConverter.ToInt32(buffer, offset + c_LinkerTimestampOffset);
+            var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            var linkTimeUtc = epoch.AddSeconds(secondsSince1970);
+
+            var tz = target ?? TimeZoneInfo.Local;
+            var localTime = TimeZoneInfo.ConvertTimeFromUtc(linkTimeUtc, tz);
+
+            return localTime;
         }
 
         #endregion Private Methods

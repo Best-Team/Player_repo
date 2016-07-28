@@ -2796,7 +2796,7 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
         divControlsMask_AUDIO.on("click", { _tapeID: tapeID }, playAudioElement);
     }
     // Set background image
-    loadPlayerBoxImage("url(assets/images/audio.png)");
+    loadPlayerBoxImage("url('./files/assets/images/audio.png')");
 
     ////////////////////////////////////
 
@@ -3017,7 +3017,7 @@ function loadElement_comment(divControlsMask_VIDEO, timestamp, fileName) {
             "</h1></div><div class='row'><p class='pull-left' style='margin-top:15px; text-align:left; word-wrap: break-word; width: 95%;'>" +
             fileName + "</p></div></div>");
     }
-    loadPlayerBoxImage("url(assets/images/comments.png)");
+    loadPlayerBoxImage("url('./files/assets/images/comments.png')");
     $("#lnkElementDownload").addClass("disabled");
     $("#btnRemoveElement").removeClass("disabled");
 }
@@ -3052,16 +3052,6 @@ function loadElement_image(file_url, divControlsMask_VIDEO, divControlsMask_AUDI
 
 //************************************ 5. DOCUMENT Element **************************************
 function loadElement_document(divControlsMask_VIDEO, divControlsMask_AUDIO, timestamp, fileName, filePath_str) {
-    /*
-    loadPlayerBoxImage("url(assets/images/document.png)");
-    if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
-        divControlsMask_VIDEO.hide();
-    }
-
-    if (divControlsMask_VIDEO != null && divControlsMask_AUDIO.length > 0) {
-        divControlsMask_AUDIO.addClass("disabled");
-    }
-    */
 
     removeDivPlayerContentExcept();
     if (divControlsMask_VIDEO != null && divControlsMask_VIDEO.length > 0) {
@@ -3084,7 +3074,7 @@ function loadElement_document(divControlsMask_VIDEO, divControlsMask_AUDIO, time
             fileName + "</p></div>" +
             "<div class='row'><p class='pull-left' style='margin-top:15px;'> Click <a href='" + filePath_str + "'>aquí</a> para descargar y visualizar el documento.</p></div></div>");
     }
-    loadPlayerBoxImage("url(assets/images/document.png)");
+    loadPlayerBoxImage("url('./files/assets/images/document.png')");
     $("#lnkElementDownload").removeClass("disabled");
 }
 
