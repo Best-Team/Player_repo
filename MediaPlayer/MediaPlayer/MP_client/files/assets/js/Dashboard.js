@@ -113,7 +113,7 @@ $(document).ready(function () {
 
     // Events on Ready ---------------------------------------------------
 
-    /**** Date time picker control: comment date ****/
+    //#region /**** Date time picker control: comment date ****/
     $('#commentDate').inputmask({
         mask: "1-2-y h:s:s",
         placeholder: "dd-mm-yyyy HH:mm:ss",
@@ -144,6 +144,8 @@ $(document).ready(function () {
         separator: "-",
         hourFormat: "24"
     });
+
+    //#endregion
 
     /**** Event: OnClick check all elements at left grid ****/ // TEST THIS COMMENT
     //loadGridCheckboxAll_event();
@@ -185,7 +187,6 @@ $(document).ready(function () {
             timeline_pointer_setLocation(first_tapeID_int);
         }
     }
-
     TIMELINE_POINTER.css("top", "5px");
     $('.popbox4').popbox4();
 
@@ -209,8 +210,7 @@ $(document).ready(function () {
     /**** Load Globalplay settings ****/
     loadGlobalplay_settings();
 
-    // Remove padding, set opening and closing animations, close if clicked and disable overlay
-    // FANCYBOX EVENTS (globalplay container)
+    //#region FANCYBOX EVENTS (globalplay container)
     $("#btnOpenFancybox").fancybox({
         padding: 0,
         closeClick: false,
@@ -237,7 +237,7 @@ $(document).ready(function () {
 
         /* After show globalplay popup */
         afterShow: function () {
-            
+
             // Adapt the globalplay size to the screen resolution
             if (globalplay_active) {
                 if (MONITOR_HEIGHT < 950) { // 1400*900
@@ -311,6 +311,7 @@ $(document).ready(function () {
             overlay: null
         }
     });
+    //#endregion
 
     if (typeof $(".flex").flex != "undefined") {
         $(".flex").flex();
@@ -336,9 +337,8 @@ $(document).ready(function () {
 
     // Load player box original top
     PLAYER_BOX_original_top = PLAYER_BOX.offset().top;
-   
 
-    // Hold click effect on video zoom Logic  - BEGIN *****************************
+    //#region Hold click effect on video zoom Logic  - BEGIN *****************************
     var zoom_timeout, zoom_clicker_in = $('.glyphicon-zoom-in');
     zoom_clicker_in.mousedown(function () {
         doZoom(true);
@@ -413,8 +413,9 @@ $(document).ready(function () {
     });
 
     // Hold click effect on video zoom Logic - END *****************************
+    //#endregion 
 
-    // Re adjust dashboard display settings regarding screen resolution - BEGIN *****************************
+    //#region Re adjust dashboard display settings regarding screen resolution - BEGIN *****************************
 
     if (MONITOR_HEIGHT < 950) { // 1400*900 (h real: 775 o 798)
         $(".panel").css("margin-bottom", "10px");
@@ -422,7 +423,6 @@ $(document).ready(function () {
         $("#div_subBusqueda").css("margin-top", "10px");
         $("#br_busqueda").remove();
         $(".playerContainer").css("margin-top", "0");
-        //$("#timeframe").css("margin-top", "-28px");
 
         $("#divElementos").css("max-height", "445px");
     }
@@ -437,15 +437,17 @@ $(document).ready(function () {
     }, 800);
 
     // Re adjust dashboard display settings regarding screen resolution - END *****************************
+    //#endregion 
 
 }); // END On Ready
+
 
 
 // EVENT: When viewport resized, resize timeline and locate pointer
 var resizeId;
 $(window).resize(function () {
     clearTimeout(resizeId);
-    resizeId = setTimeout(doneResizing, 100);
+    //resizeId = setTimeout(doneResizing, 100);
 });
 
 function setPosition_TimelineProgressbar() {

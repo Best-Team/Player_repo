@@ -12,7 +12,7 @@
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <link rel="Shortcut Icon" type="image/ico" href="assets/images/logo.ico" />
+    <link rel="Shortcut Icon" type="image/ico" href="./assets/images/logo.ico" />
 
     <!-- Scripts -->
     <script src="assets/js/jquery-1.12.0.js"></script>
