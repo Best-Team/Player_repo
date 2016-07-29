@@ -612,7 +612,7 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
                                     html_player[0].currentTime = element_current_duration;
                                 }
                             } catch (err) {
-                                console.log("l:473 Error seeking HTML5 video");
+                                console.log(WriteJSLine() + "Error seeking HTML5 video");
                                 console.log(err);
                             }
                         }, 500);
@@ -697,7 +697,7 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
                                 }
 
                             } catch (err) {
-                                console.log("l:5087 Error pausing FBS Player");
+                                console.log(WriteJSLine() + "Error pausing FBS Player");
                                 console.log(err);
 
                                 // Hide player until it is removed by "globalplay_remove_elements"
@@ -801,7 +801,7 @@ function globalplay_video_screenRecording(file_url, visual_size_width, visual_si
                             }
 
                         } catch (err) {
-                            console.log("l:660 Error loading webchimera");
+                            console.log(WriteJSLine() + "Error loading webchimera");
                             console.log(err);
 
                             webchimera_loaded = false;
@@ -1095,14 +1095,14 @@ function globalplay_pausePlayingElements(isStop) {
                                             try {
                                                 audio_player[0].controls.stop();
                                             } catch (err) {
-                                                console.log("l:936 Error stoping IE ActiveX Player");
+                                                console.log(WriteJSLine() + "Error stoping IE ActiveX Player");
                                                 console.log(err);
                                             }
                                         } else {
                                             try {
                                                 audio_player[0].controls.pause();
                                             } catch (err) {
-                                                console.log("l:943 Error pausing IE ActiveX Player");
+                                                console.log(WriteJSLine() + "Error pausing IE ActiveX Player");
                                                 console.log(err);
                                             }
                                         }
@@ -1114,14 +1114,14 @@ function globalplay_pausePlayingElements(isStop) {
                                             audio_player[0].pause();
                                             audio_player[0].currentTime = 0;
                                         } catch (err) {
-                                            console.log("l:955 Error pausing HTML5 Player");
+                                            console.log(WriteJSLine() + "Error pausing HTML5 Player");
                                             console.log(err);
                                         }
                                     } else {
                                         try {
                                             audio_player[0].pause();
                                         } catch (err) {
-                                            console.log("l:962 Error pausing HTML5 Player");
+                                            console.log(WriteJSLine() + "Error pausing HTML5 Player");
                                             console.log(err);
                                         }
                                     }
@@ -1153,14 +1153,14 @@ function globalplay_pausePlayingElements(isStop) {
                                                 video_player[0].pause();
                                                 video_player[0].currentTime = 0;
                                             } catch (err) {
-                                                console.log("l:4456 Error pausing HTML5 Player");
+                                                console.log(WriteJSLine() + "Error pausing HTML5 Player");
                                                 console.log(err);
                                             }
                                         } else {
                                             try {
                                                 video_player[0].pause();
                                             } catch (err) {
-                                                console.log("l:4463 Error pausing HTML5 Player");
+                                                console.log(WriteJSLine() + "Error pausing HTML5 Player");
                                                 console.log(err);
                                             }
                                         }
@@ -1175,14 +1175,14 @@ function globalplay_pausePlayingElements(isStop) {
                                                 try {
                                                     video_player[0].stop();
                                                 } catch (err) {
-                                                    console.log("l:4429 Error playing FBS Player");
+                                                    console.log(WriteJSLine() + "Error playing FBS Player");
                                                     console.log(err);
                                                 }
                                             } else {
                                                 try {
                                                     video_player[0].pause();
                                                 } catch (err) {
-                                                    console.log("l:4436 Error pausing FBS Player");
+                                                    console.log(WriteJSLine() + "Error pausing FBS Player");
                                                     console.log(err);
                                                 }
                                             }
@@ -1205,14 +1205,14 @@ function globalplay_pausePlayingElements(isStop) {
                                                     try {
                                                         video_player[0].controls.stop();
                                                     } catch (err) {
-                                                        console.log("l:1033 Error stopping IE video object");
+                                                        console.log(WriteJSLine() + "Error stopping IE video object");
                                                         console.log(err);
                                                     }
                                                 } else {
                                                     try {
                                                         video_player[0].controls.pause();
                                                     } catch (err) {
-                                                        console.log("l:1040 Error pausing IE video object");
+                                                        console.log(WriteJSLine() + "Error pausing IE video object");
                                                         console.log(err);
                                                     }
                                                 }
@@ -1225,14 +1225,14 @@ function globalplay_pausePlayingElements(isStop) {
                                                 try {
                                                     wjs("#" + dynamicID).stop();
                                                 } catch (err) {
-                                                    console.log("l:4504 Error stopping webchimera");
+                                                    console.log(WriteJSLine() + "Error stopping webchimera");
                                                     console.log(err);
                                                 }
                                             } else {
                                                 try {
                                                     wjs("#" + dynamicID).pause();
                                                 } catch (err) {
-                                                    console.log("l:4511 Error pausing webchimera");
+                                                    console.log(WriteJSLine() + "Error pausing webchimera");
                                                     console.log(err);
                                                 }
                                             }
@@ -1288,7 +1288,7 @@ function globalplay_resumeAllCurrentMedia() {
                                         try {
                                             audio_player[0].controls.play();
                                         } catch (err) {
-                                            console.log("l:4545 Error playing IE ActiveX Player");
+                                            console.log(WriteJSLine() + "Error playing IE ActiveX Player");
                                             console.log(err);
                                         }
 
@@ -1318,7 +1318,7 @@ function globalplay_resumeAllCurrentMedia() {
                                             try {
                                                 video_player[0].play();
                                             } catch (err) {
-                                                console.log("l:4572 Error playing HTML5 Player");
+                                                console.log(WriteJSLine() + "Error playing HTML5 Player");
                                                 console.log(err);
                                             }
                                         break;
@@ -1330,7 +1330,7 @@ function globalplay_resumeAllCurrentMedia() {
                                             try {
                                                 video_player[0].play();
                                             } catch (err) {
-                                                console.log("l:4586 Error playing FBS Player");
+                                                console.log(WriteJSLine() + "Error playing FBS Player");
                                                 console.log(err);
                                             }
                                         break;
@@ -1350,7 +1350,7 @@ function globalplay_resumeAllCurrentMedia() {
                                                 try {
                                                     video_player[0].controls.play();
                                                 } catch (err) {
-                                                    console.log("l:1148 Error resuming IE video object");
+                                                    console.log(WriteJSLine() + "Error resuming IE video object");
                                                     console.log(err);
                                                 }
 
@@ -1363,7 +1363,7 @@ function globalplay_resumeAllCurrentMedia() {
                                                 wjs("#" + dynamicID).play();
 
                                             } catch (err) {
-                                                console.log("l:1160 Error resuming webchimera");
+                                                console.log(WriteJSLine() + "Error resuming webchimera");
                                                 console.log(err);                                               
                                             }
                                         } // END webchimera
@@ -1507,7 +1507,7 @@ function globalplay_loadElementSeek(pointer_current_duration) {
                                                         // ActiveX audio object - wav -
                                                         audio_player[0].controls.currentPosition = element_current_duration;
                                                     } catch (err) {
-                                                        console.log("l:1330 Error seeking IE ActiveX Player");
+                                                        console.log(WriteJSLine() + "Error seeking IE ActiveX Player");
                                                         console.log(err);
                                                     }
 
@@ -1538,7 +1538,7 @@ function globalplay_loadElementSeek(pointer_current_duration) {
                                                 try {
                                                     video_player[0].currentTime = element_current_duration;
                                                 } catch (err) {
-                                                    console.log("l:1366 Error seeking HTML5 Player");
+                                                    console.log(WriteJSLine() + "Error seeking HTML5 Player");
                                                     console.log(err);
                                                 }
                                                 break;
@@ -1550,7 +1550,7 @@ function globalplay_loadElementSeek(pointer_current_duration) {
                                                 try {
                                                     video_player[0].seekViewerSeconds(element_current_duration);
                                                 } catch (err) {
-                                                    console.log("l:1379 Error seeking FBS Player");
+                                                    console.log(WriteJSLine() + "Error seeking FBS Player");
                                                     console.log(err);
                                                 }
 
@@ -1571,7 +1571,7 @@ function globalplay_loadElementSeek(pointer_current_duration) {
                                                         try {
                                                             video_player[0].controls.currentPosition = element_current_duration;
                                                         } catch (err) {
-                                                            console.log("l:1375 Error seeking IE video object");
+                                                            console.log(WriteJSLine() + "Error seeking IE video object");
                                                             console.log(err);
                                                         }
 
@@ -1584,7 +1584,7 @@ function globalplay_loadElementSeek(pointer_current_duration) {
                                                         //wjs("#" + dynamicID).plugin.time = element_current_duration;
                                                         wjs("#" + dynamicID).time(element_current_duration);
                                                     } catch (err) {
-                                                        console.log("l:1386 Error seeking webchimera");
+                                                        console.log(WriteJSLine() + "Error seeking webchimera");
                                                         console.log(err);
                                                     }
                                                 } // END webchimera
@@ -1741,7 +1741,7 @@ function globalplay_removeElement(dynamicID, element_alreadyTaken) {
                             try {
                                 audio_player[0].controls.stop();
                             } catch (err) {
-                                console.log("l:5614 Error stopping IE ActiveX Player");
+                                console.log(WriteJSLine() + "Error stopping IE ActiveX Player");
                                 console.log(err);
                             }
 
@@ -2009,6 +2009,28 @@ function AddZoomEffects(element_ID, index) {
 }
 
 // Hold click effect on video zoom Logic *****************************
+
+
+function WriteJSLine() {
+    var e = new Error();
+    if (!e.stack) try {
+        // IE requires the Error to actually be throw or else the Error's 'stack'
+        // property is undefined.
+        throw e;
+    } catch (e) {
+        if (!e.stack) {
+            return 0; // IE < 10, likely
+        }
+    }
+    var stack = e.stack.toString().split(/\r\n|\n/);
+    // We want our caller's frame. It's index into |stack| depends on the
+    // browser and browser version, so we need to search for the second frame:
+    var frameRE = /:(\d+):(?:\d+)[^\d]*$/;
+    do {
+        var frame = stack.shift();
+    } while (!frameRE.exec(frame) && stack.length);
+    return "l:" + frameRE.exec(stack.shift())[1] + " ";
+}
 
 /******** @author: Gonzalo Borderolle - inConcert MVD/UY ********/
 /******** END: Media Player 2.0: Nuevo Requerimiento: Global Play ********/

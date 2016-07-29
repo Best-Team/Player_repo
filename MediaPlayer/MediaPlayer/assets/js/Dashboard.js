@@ -1,4 +1,5 @@
-﻿
+﻿// ORIGINAL: Solution / assets ==> Copiado dinámicamente al cliente portable al descargar
+
 //#region Global Variables
 
 /**** Timeline global variables ****/
@@ -82,11 +83,11 @@ $(document).ready(function () {
     // Check JS Message file loaded OK, if not load default values
     try {
         if (!hashMessages) {
-            console.log("Importante: Alert_Messages.js ==> hashMessages no encontrado.")
+            console.log(WriteJSLine() + "Importante: Alert_Messages.js ==> hashMessages no encontrado.")
             LoadAlertMessagesBackup();
         }
     } catch (err) {
-        console.log("Importante: Alert_Messages.js ==> hashMessages no encontrado.")
+        console.log(WriteJSLine() + "Importante: Alert_Messages.js ==> hashMessages no encontrado.")
         LoadAlertMessagesBackup();
     }
 
@@ -172,7 +173,7 @@ $(document).ready(function () {
     currentPointerPositionDate_str = _TL_STARTDATE;
 
     // If the folio selected is not valid, then hides the Pointer from timeline
-    TIMELINE_POINTER.hide();
+    //TIMELINE_POINTER.hide();
 
     // If there are elements loaded, show timeline pointer
     var first_tapeID = 0;
@@ -181,7 +182,7 @@ $(document).ready(function () {
         var first_tapeID_int = parseInt(first_tapeID, 10);
 
         if (first_tapeID_int > 0) {
-            TIMELINE_POINTER.show();
+            //TIMELINE_POINTER.show();
             timeline_pointer_setLocation(first_tapeID_int);
         }
     }
@@ -209,8 +210,7 @@ $(document).ready(function () {
     /**** Load Globalplay settings ****/
     loadGlobalplay_settings();
 
-    // Remove padding, set opening and closing animations, close if clicked and disable overlay
-    // FANCYBOX EVENTS (globalplay container)
+    //#region FANCYBOX EVENTS (globalplay container)
     $("#btnOpenFancybox").fancybox({
         padding: 0,
         closeClick: false,
@@ -312,6 +312,8 @@ $(document).ready(function () {
         }
     });
 
+    //#endregion FANCYBOX EVENTS (globalplay container)
+
     if (typeof $(".flex").flex != "undefined") {
         $(".flex").flex();
     }
@@ -336,9 +338,8 @@ $(document).ready(function () {
 
     // Load player box original top
     PLAYER_BOX_original_top = PLAYER_BOX.offset().top;
-   
 
-    // Hold click effect on video zoom Logic  - BEGIN *****************************
+    //#region Hold click effect on video zoom Logic  - BEGIN *****************************
     var zoom_timeout, zoom_clicker_in = $('.glyphicon-zoom-in');
     zoom_clicker_in.mousedown(function () {
         doZoom(true);
@@ -412,9 +413,9 @@ $(document).ready(function () {
         return false;
     });
 
-    // Hold click effect on video zoom Logic - END *****************************
+    //#endregion Hold click effect on video zoom Logic - END *****************************
 
-    // Re adjust dashboard display settings regarding screen resolution - BEGIN *****************************
+    //#region Re adjust dashboard display settings regarding screen resolution - BEGIN *****************************
 
     if (MONITOR_HEIGHT < 950) { // 1400*900 (h real: 775 o 798)
         $(".panel").css("margin-bottom", "10px");
@@ -436,7 +437,9 @@ $(document).ready(function () {
         setPosition_TimelineProgressbar();
     }, 800);
 
-    // Re adjust dashboard display settings regarding screen resolution - END *****************************
+    //#endregion Re adjust dashboard display settings regarding screen resolution - END *****************************
+
+    TIMELINE_POINTER.hide();
 
 }); // END On Ready
 
@@ -481,7 +484,7 @@ function doneResizing() {
             var first_tapeID_int = parseInt(first_tapeID, 10);
 
             if (first_tapeID_int > 0) {
-                TIMELINE_POINTER.show();
+                //TIMELINE_POINTER.show();
                 timeline_pointer_setLocation(first_tapeID_int);
             }
         }
@@ -550,7 +553,7 @@ function loadClickFullscreen_event() {
                 timer = (document.fbsviewer.getCurrTimeOffsetInMSec() / 1000).toString();
                 document.fbsviewer.pause();
             } catch (err) {
-                console.log("l:299 Error getCurrTimeOffsetInMSec fbsviewer");
+                console.log(WriteJSLine() + "Error getCurrTimeOffsetInMSec fbsviewer");
                 console.log(err);
             }
         }
@@ -937,7 +940,7 @@ function LoadAlertMessagesBackup() {
     hashMessages["ConfirmarBorrarUnElemento"] = "Está a punto de borrar el elemento, confirme su contraseña para continuar.";
     hashMessages["SeleccioneFolioID"] = "Por favor, seleccione un número de Folio.";
     hashMessages["DatosIncorrectos"] = "Datos incorrectos.";
-    hashMessages["SesionFinalizada"] = "Tu sesión activa ha expirado.";
+    hashMessages["SesionFinalizada"] = "Su sesión activa ha expirado.";
     
 }
 
@@ -1069,6 +1072,7 @@ function loadHiddenFields() {
 
 }
 
+//#endregion 
 
 function getFormattedDate(date) {
     var day = date.getDate();
@@ -1076,8 +1080,6 @@ function getFormattedDate(date) {
     var year = date.getFullYear().toString().slice(2);
     return day + '-' + month + '-' + year;
 }
-
-//#endregion 
 
 //#region JS Methods 1: openFullscreen | closeFullscreen | openUploadModal | addCommentClick | removeElement | closeModal 
 
@@ -1613,7 +1615,7 @@ function pre_timeframe_prepare() {
         }
 
         // Show timeline pointer
-        TIMELINE_POINTER.show();
+        //TIMELINE_POINTER.show();
 
         // Re Load all grid button events, because Ajax call removes them
 
@@ -3316,7 +3318,7 @@ function loadPlayer_Webchimera(divPlayer_VIDEO, file_url, aPlayPause_VIDEO, divC
                 wjs("#webchimera1").clearPlaylist();
                 wjs("#webchimera1").addPlaylist(file_url);
             } catch (err) {
-                console.log("l:2790 Error loading webchimera");
+                console.log(WriteJSLine() + "Error loading webchimera");
                 console.log(err);
 
                 // Show alert message
@@ -3440,7 +3442,7 @@ function goFullscreen(video_object) {
                 }
             }
         } catch (err) {
-            console.log("l:3173 Error going Fullscreen");
+            console.log(WriteJSLine() + "Error going Fullscreen");
             console.log(err);
         }
     }
@@ -3747,7 +3749,7 @@ function getClickPosition(e, duration, fileName) {
                                 try {
                                     html_player[0].currentTime = currentSecs;
                                 } catch (err) {
-                                    console.log("l:3203 Error seeking HTML5 Player");
+                                    console.log(WriteJSLine() + "Error seeking HTML5 Player");
                                     console.log(err);
                                 }
                             }
@@ -3774,7 +3776,7 @@ function getClickPosition(e, duration, fileName) {
                                         wjs("#webchimera1").time(currentSecs);
                                     }
                                 } catch (err) {
-                                    console.log("l:3221 Error seeking webchimera");
+                                    console.log(WriteJSLine() + "Error seeking webchimera");
                                     console.log(err);
                                 }
 
@@ -3906,7 +3908,7 @@ function ActionVideoPlay(tapeID, duration, isAudioPlaying) {
                                 TimeRefreshLoop(duration);
                             }
                         } catch (err) {
-                            console.log("l:3265 Error loading FBS Player");
+                            console.log(WriteJSLine() + "Error loading FBS Player");
                             console.log(err);
                         }
                     } else {
@@ -3919,7 +3921,7 @@ function ActionVideoPlay(tapeID, duration, isAudioPlaying) {
                                 document.fbsviewer.pause();
                             }
                         } catch (err) {
-                            console.log("l:3278 Error loading FBS Player");
+                            console.log(WriteJSLine() + "Error loading FBS Player");
                             console.log(err);
                         }
                     }
@@ -4045,7 +4047,7 @@ function videoPlayerINIT(fileName, duration, segmentID) {
             document.fbsviewer.pause();
         }
     } catch (err) {
-        console.log("l:3403 Oreka Player (.fbs) error try catch");
+        console.log(WriteJSLine() + "Oreka Player (.fbs) error try catch");
         console.log(err);
     }
 
@@ -4118,7 +4120,7 @@ function stopFBSPlayer() {
             document.fbsviewer.pause();
         }
     } catch (err) {
-        console.log("l:3481 Oreka Player (.fbs) error try catch");
+        console.log(WriteJSLine() + "Oreka Player (.fbs) error try catch");
         console.log(err);
     }
 }
@@ -4242,7 +4244,7 @@ function TimeRefreshLoop(totalDurationSecs) {
                     // doTimeout Source: http://benalman.com/code/projects/jquery-dotimeout/examples/delay-poll/
                 }
             } catch (err) {
-                console.log("l:3842 Error getCurrTimeOffsetInMSec fbsviewer");
+                console.log(WriteJSLine() + "Error getCurrTimeOffsetInMSec fbsviewer");
                 console.log(err);
             }
         } else {
@@ -4519,6 +4521,27 @@ function downloadAll2() {
 }
 
 /******** Auxiliar Functions ********/
+
+function WriteJSLine() {
+    var e = new Error();
+    if (!e.stack) try {
+        // IE requires the Error to actually be throw or else the Error's 'stack'
+        // property is undefined.
+        throw e;
+    } catch (e) {
+        if (!e.stack) {
+            return 0; // IE < 10, likely
+        }
+    }
+    var stack = e.stack.toString().split(/\r\n|\n/);
+    // We want our caller's frame. It's index into |stack| depends on the
+    // browser and browser version, so we need to search for the second frame:
+    var frameRE = /:(\d+):(?:\d+)[^\d]*$/;
+    do {
+        var frame = stack.shift();
+    } while (!frameRE.exec(frame) && stack.length);
+    return "l:" + frameRE.exec(stack.shift())[1] + " ";
+}
 
 function getDuration_onDatetime(date){
 

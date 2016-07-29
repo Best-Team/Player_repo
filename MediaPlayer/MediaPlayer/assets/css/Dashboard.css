@@ -1,4 +1,6 @@
-﻿input[type="checkbox"] {
+﻿/* ORIGINAL: Solution / assets ==> Copiado dinámicamente al cliente portable al descargar */
+
+input[type="checkbox"] {
     width: 17px;
     height: 17px;
 }

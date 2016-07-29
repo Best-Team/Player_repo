@@ -221,13 +221,6 @@
                                 </button>
                                 <asp:Button ID="btnDownloadAllCandidate" runat="server" Style="display: none" Text="" OnClick="DownloadHTML_Click" />
 
-                                <%--<asp:Button ID="btnDownloadAllCandidate" runat="server" Style="display: none" Text="" OnClick="btnDownloadAll_Click" />
-                                 <!-- btnDownloadAll -->
-                                <%--<button id="btnDownloadAll" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onclick="downloadAll();">
-                                    <span class="fa fa-download" aria-hidden="true"></span>
-                                </button>--%>
-
-
                                 <!-- addCommentClick -->
                                 <a href="#" id="btnAddComment" class="open btn btn-default" style="margin-right: 6px;" title="Agregar comentario al folio" onclick="addCommentClick();">
                                     <span class="glyphicon glyphicon-comment"></span>

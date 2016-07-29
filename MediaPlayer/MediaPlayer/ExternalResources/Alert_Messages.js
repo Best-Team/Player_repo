@@ -22,4 +22,4 @@ hashMessages["OrekaPlayerError"] = "Ocurrió un error cargando el Player Oreka, 
 hashMessages["ConfirmarBorrarUnElemento"] = "Está a punto de borrar el elemento, confirme su contraseña para continuar.";
 hashMessages["SeleccioneFolioID"] = "Por favor, seleccione un número de Folio.";
 hashMessages["DatosIncorrectos"] = "Datos incorrectos.";
-hashMessages["SesionFinalizada"] = "Tu sesión activa ha expirado.";
+hashMessages["SesionFinalizada"] = "Su sesión activa ha expirado.";
