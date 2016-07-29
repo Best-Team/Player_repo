@@ -447,7 +447,7 @@ $(document).ready(function () {
 var resizeId;
 $(window).resize(function () {
     clearTimeout(resizeId);
-    //resizeId = setTimeout(doneResizing, 100);
+    resizeId = setTimeout(doneResizing, 100);
 });
 
 function setPosition_TimelineProgressbar() {
@@ -2590,6 +2590,7 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
         oldPlayer_activeElement_extension = file_extension[0];
     }
 
+    var lblElementName = "Video Player";
     switch (tapeType) {
         case "S":
         case "P":
@@ -2610,20 +2611,23 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
 
         case "C": {
             loadElement_comment(divControlsMask_VIDEO, timestamp, fileName);
+            lblElementName = "Visor de Comentarios";
             break;
         }
 
         case "I": {
             loadElement_image(file_url, divControlsMask_VIDEO, divControlsMask_AUDIO, fileStatus);
+            lblElementName = "Visor de Imágenes";
             break;
         }
 
         case "D": {
             loadElement_document(divControlsMask_VIDEO, divControlsMask_AUDIO, timestamp, fileName, filePath_str);
+            lblElementName = "Visor de Documentos";
             break;
         }
-
     }
+    $("#lblElementName").text(lblElementName);
 
     // If the element is PROCESSING or ERROR 
     if (fileStatus === "PROCESSING" || fileStatus === "ERROR") {

@@ -1201,7 +1201,6 @@ namespace MediaPlayer
         {
             // Source: http://stackoverflow.com/questions/13762338/read-files-from-a-folder-present-in-project
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-            //string path = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\Multimedia_Player_client.html");
 
             // Get static HTML client
             string staticHTML_client = string.Empty;
@@ -1210,21 +1209,19 @@ namespace MediaPlayer
                 staticHTML_client = ConfigurationManager.AppSettings["staticHTML_client_path"].ToString();
             }
             string path = Path.Combine(Directory.GetCurrentDirectory(), staticHTML_client);
-
-            if (File.Exists(path))
+            if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
             {
-                string html_str = File.ReadAllText(path);
-                string id_str = "divElementos";
+                string static_HTML = File.ReadAllText(path);
+                string div_container_ID = "divElementos";
 
-                // Get dynamic table
-                //string dynamic_table = GetTable_download();
+                // Get dynamic table with elements
                 string dynamic_table = litTable.Text;
 
                 /* ************** */
                 // HTML Agility Pack: http://htmlagilitypack.codeplex.com/wikipage?title=Examples
                 // http://www.codeproject.com/Tips/804660/How-to-Parse-HTML-using-Csharp
 
-                if (!string.IsNullOrWhiteSpace(html_str) && !string.IsNullOrWhiteSpace(id_str) && !string.IsNullOrWhiteSpace(dynamic_table))
+                if (!string.IsNullOrWhiteSpace(static_HTML) && !string.IsNullOrWhiteSpace(div_container_ID) && !string.IsNullOrWhiteSpace(dynamic_table))
                 {
                     // Create document
                     HtmlDocument html_doc_Table = new HtmlDocument();
@@ -1233,26 +1230,19 @@ namespace MediaPlayer
                     // Create collection of tr nodes
                     HtmlNodeCollection tr_nodes_toDownload = new HtmlNodeCollection(html_doc_Table.DocumentNode);
 
-                    /*
+                    // Get all folio elements
+                    RootObject json_elementList = JsonConvert.DeserializeObject<RootObject>(_hdnJSonList.Value);
+                    List<Span> spans_aux = new List<Span>();
 
-                    //------------------------------------------------------//-----------
-                    // Json object
-                    RootObject json_elementList = new RootObject();
-                    json_elementList.name = "Elements";
-                    json_elementList.color = "#000000";
-
+                    // Folio start date and end date
                     DateTime folio_start = DateTime.MaxValue;
                     DateTime folio_end = DateTime.MinValue;
-                    */
-
-
-
-                    //------------------------------------------------------//-----------
-
 
                     string[] elements_array;
+                    string hdnElementsAttributes_str = string.Empty;
                     if (_hdnElementsToDownload.Value.Length > 0)
                     {
+                        // Recorro los elementos seleccionados
                         elements_array = _hdnElementsToDownload.Value.Split('#');
                         if (elements_array != null && elements_array.Length > 0)
                         {
@@ -1267,54 +1257,56 @@ namespace MediaPlayer
                                     html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segment_ID + "'] //h5").InnerHtml = index.ToString();
                                     tr_nodes_toDownload.Add(tr_node);
 
+                                    // Recorro todos los elementos del folio
+                                    foreach (var span in json_elementList.spans)
+                                    {
+                                        if (span.id == segment_ID)
+                                        {
+                                            spans_aux.Add(span);
+
+                                            string groupName = span.name; // missing data
+                                            string mediaType = span.type;
+                                            string duration = span.duration;
+                                            string timestamp = span.start;
+                                            string fileName = span.name; // missing data
+                                            string end_date = span.end;
+                                            string filePath = span.duration; // missing data
+                                            string duration_formatStr = span.duration;
+                                            string fileStatus = span.name; // missing data
+                                            string userName = span.userName;
+
+                                            // Recupero la lista de elementos
+                                            hdnElementsAttributes_str += segment_ID + "#" + groupName + "#" + mediaType + "#" + duration + "#" + timestamp + "#" + segment_ID
+                                                + "#" + index + "#" + fileName + "#" + end_date + "#" + filePath + "#" + duration_formatStr + "#" + fileStatus + "#" + userName + "$";
+
+                                            // Get filtered elements MIN date
+                                            DateTime timestamp_date = DateTime.Now;
+                                            if (!DateTime.TryParseExact(timestamp, "dd-MM-yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timestamp_date))
+                                            {
+                                                timestamp_date = DateTime.Now;
+                                            }
+
+                                            // Get filtered elements MAX date
+                                            DateTime end_date_date = DateTime.Now;
+                                            if (!DateTime.TryParseExact(end_date, "dd-MM-yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out end_date_date))
+                                            {
+                                                end_date_date = DateTime.Now;
+                                            }
+
+                                            // Get MX and MIN value of filtered folio
+                                            folio_start = folio_start > timestamp_date ? timestamp_date : folio_start;
+                                            folio_end = folio_end < end_date_date ? end_date_date : folio_end;
+                                        }
+                                    }
                                     index++;
-
-                                    /*
-
-                                    //
-                                    HtmlNode tr_button_node = tr_node.SelectNodes("//button").LastOrDefault();
-                                    string onclick = tr_button_node.Attributes["onclick"].Value;
-
-                                    string[] values = onclick.Split(',');
-
-                                    /****** Create json data ****** /
-                                    Span json_element = new Span();
-                                    json_element.name = values[10];
-                                    json_element.start = values[3];
-                                    json_element.end = "00:01:17"; // 
-                                    json_element.id = segment_ID.ToString();
-                                    json_element.type = values[10];
-                                    json_element.role = "";
-
-                                    // ACA json_element
-                                    json_elementList.spans.Add(json_element);
-
-                                    */
                                 }
                             }
                         }
                     }
 
-
-                    /*
-
-                    <input type="hidden" name="ctl00$ContentBody$_hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName" id="ctl00_ContentBody__hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName" value="627#terminator#I#0#24-10-2015 00:27:40#627#1#CSYJ_014017.jpg#24-10-2015 00:27:40#2015/10/24/00/6aa0427b-2246-4895-8ac8-9372cfc9e13d.bin#00:00:00#OK#gonzalo$641#terminator#C#1#24-10-2015 00:27:40#641#2#ASdadasdasd#24-10-2015 00:27:41##00:00:01#OK#gonzalo$621#terminator#C#1#24-10-2015 00:27:46#621#3#Comentario1#24-10-2015 00:27:47##00:00:01#OK#gonzalo$666#terminator#D#0#24-10-2015 00:28:02#666#4#Economia.gif#24-10-2015 00:28:02#2015/10/24/00/ae6bb8fe-d6b3-4d6e-a591-71fc3084d737.bin#00:00:00#OK#gonzalo$665#terminator#D#0#24-10-2015 00:28:06#665#5#Economia_-_Copy.tiff#24-10-2015 00:28:06#2015/10/24/00/1ce43876-d379-4eb6-a0d3-dae61a0cc624.bin#00:00:00#OK#gonzalo$615#terminator#D#0#24-10-2015 00:28:15#615#6#UDELAR Ticket de confirmacion.pdf#24-10-2015 00:28:15#2015/10/24/00/0d837330-4131-440e-a7bf-4ec3d1621e5e.bin#00:00:00#OK#gonzalo$644#terminator#C#1#24-10-2015 00:28:22#644#7#Comentario 1 segundo#24-10-2015 00:28:23##00:00:01#OK#gonzalo$617#terminator#V#77#24-10-2015 00:28:28#617#8#Himno Uruguay (versión alternativa) - Uruguay National Anthem (alternate version).avi#24-10-2015 00:29:45#2015/10/24/00/913fb47f-d2e7-4422-931a-e9171f1f5470.bin#00:01:17#OK#gonzalo$630#terminator#I#0#24-10-2015 00:28:38#630#9#Cities wallpaper (78).jpg#24-10-2015 00:28:38#2015/10/24/00/129ca36c-4054-4c3b-b5db-652a328d8bc5.bin#00:00:00#OK#gonzalo$628#terminator#I#0#24-10-2015 00:28:45#628#10#Beautiful-City-Background-1600x1066.jpg#24-10-2015 00:28:45#2015/10/24/00/34f145bf-0760-491c-9902-b29aa711762f.bin#00:00:00#OK#gonzalo$629#terminator#I#0#24-10-2015 00:28:51#629#11#1757-hdr-wallpaper-city-desktop-wallpaper-1920x1200.jpg#24-10-2015 00:28:51#2015/10/24/00/94cd456f-c592-4daa-8468-34f7143df438.bin#00:00:00#OK#gonzalo$632#terminator#I#0#24-10-2015 00:28:53#632#12#CSYJ_014017.jpg#24-10-2015 00:28:53#2015/10/24/00/a821c8ca-bffb-42a1-a6c9-be8068b52c14.bin#00:00:00#OK#gonzalo$646#terminator#C#27#24-10-2015 00:29:04#646#13#27 seg#24-10-2015 00:29:31##00:00:27#OK#gonzalo$634#terminator#I#0#24-10-2015 00:29:15#634#14#CSYJ_014013.jpg#24-10-2015 00:29:15#2015/10/24/00/041a343e-b42f-40f2-8e99-9b8dd5a9d30d.bin#00:00:00#OK#gonzalo$679#terminator#I#0#24-10-2015 00:29:42#679#15#I2T11Sc.jpg#24-10-2015 00:29:42#2015/10/24/00/ae4b0df0-7b08-43ee-88a8-808a97eab0bc.bin#00:00:00#OK#gonzalo$639#terminator#C#1#24-10-2015 00:29:51#639#16#Prueba Folio destino 2#24-10-2015 00:29:52##00:00:01#OK#gonzalo$649#terminator#C#21#24-10-2015 00:30:07#649#17#Durango, MEX.#24-10-2015 00:30:28##00:00:21#OK#gonzalo$650#terminator#I#0#24-10-2015 00:30:12#650#18#SSPE.jpg#24-10-2015 00:30:12#2015/10/24/00/c35d5ab9-877c-4694-a67d-12c586ed7a51.bin#00:00:00#OK#gonzalo$658#terminator#I#0#24-10-2015 00:30:14#658#19#Durango.png#24-10-2015 00:30:14#2015/10/24/00/359aab37-93d7-4fa2-b99d-413c46a746f6.bin#00:00:00#OK#gonzalo$677#terminator#C#22#24-10-2015 00:30:32#677#20#Holaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa#24-10-2015 00:30:54##00:00:22#OK#gonzalo$661#terminator#V#4#24-10-2015 00:30:34#661#21#FlickAnimation.avi#24-10-2015 00:30:38#2015/10/24/00/0e9f63d7-f27b-4950-b9f1-a04cde51c80c.bin#00:00:04#OK#gonzalo$655#terminator#C#31#24-10-2015 00:30:37#655#22#Este es un comentario bien largo y loco. Lorem muchas veces. El gato se mueve.#24-10-2015 00:31:08##00:00:31#OK#gonzalo$618#terminator#A#44#24-10-2015 00:31:05#618#23#el mejor ringtone.mp3#24-10-2015 00:31:49#2015/10/24/00/7bdee11d-92c3-4390-a26c-d32890217af1.bin#00:00:44#OK#gonzalo$633#terminator#C#1#24-10-2015 00:31:11#633#24#Este es un comentario.#24-10-2015 00:31:12##00:00:01#OK#gonzalo$674#terminator#C#1#24-10-2015 00:31:21#674#25#Comentario largo1 Comentario largo2 Comentario largo3 Comentario largo4 Comentario largo5 Comentario largo6 Comentario largo7 Comentario largo8 Comentario largo9 Comentario largo10 Comentario largo11 Comentario largo12 Comentario largo13 Comentario largo1#24-10-2015 00:31:22##00:00:01#OK#gonzalo$619#terminator#A#119#24-10-2015 00:31:36#619#26#Ed-Sheeran-I-See-Fire-(Kygo-Remix).mp3#24-10-2015 00:33:35#2015/10/24/00/22f6eef7-2a2d-444b-a47a-8f17059778c2.bin#00:01:59#OK#gonzalo$648#terminator#C#57#24-10-2015 00:31:42#648#27#Coment 57 seg#24-10-2015 00:32:39##00:00:57#OK#gonzalo$84##S#68#24-10-2015 00:32:00#84#28#2015/10/24/00/20151023_172932_SGQL-1.fbs#24-10-2015 00:33:08##00:01:08#OK#$675#terminator#C#21#24-10-2015 00:33:19#675#29#Esto es un comentario largo. Esto es un comentario largo. Esto es un comentario largo. Esto es un comentario largo. Esto es un comentario largo. Esto es un comentario largo. Esto es un comentario largo. Esto es un comentario largo. Esto es un comentario l#24-10-2015 00:33:40##00:00:21#OK#gonzalo$645#terminator#C#289#24-10-2015 00:33:28#645#30#Comentario de 289 seg#24-10-2015 00:38:17##00:04:49#OK#gonzalo$654#terminator#C#26#24-10-2015 00:33:41#654#31#ppppp#24-10-2015 00:34:07##00:00:26#OK#gonzalo$676#terminator#C#1#24-10-2015 00:33:52#676#32#Hola Hola#24-10-2015 00:33:53##00:00:01#OK#gonzalo$668#terminator#I#0#24-10-2015 00:34:18#668#33#Economia_-_Copy.tiff#24-10-2015 00:34:18#2015/10/24/00/a97c405c-082f-41e7-93e2-648824a77c2f.bin#00:00:00#OK#gonzalo$595#terminator#D#0#24-10-2015 00:34:46#595#34#Alvas.Audio.dll#24-10-2015 00:34:46#2015/10/24/00/d5e2de57-d180-4d8b-8de8-a6f0f7d7a691.bin#00:00:00#OK#gonzalo$667#terminator#I#0#24-10-2015 00:35:11#667#35#Economia.gif#24-10-2015 00:35:11#2015/10/24/00/648c7b00-2ddc-4502-b7c9-c5d0655d9eea.bin#00:00:00#OK#gonzalo$673#terminator#V#96#24-10-2015 00:35:27#673#36#video_4096.mp4#24-10-2015 00:37:03#2015/10/24/00/dee40cc5-c5ee-4bc4-88ac-4b7d0c921c10.bin#00:01:36#OK#gonzalo$541#terminator#S#4#24-10-2015 00:35:43#541#37#backgr.mp4#24-10-2015 00:35:47##00:00:04#OK#gonzalo$613#terminator#V#85#24-10-2015 00:36:08#613#38#Himno-Nacional-Mexicano--Version-Instrumental-.mp4#24-10-2015 00:37:33#2015/10/24/00/24fe286e-7f4b-4256-9c1e-bcfa60de8036.bin#00:01:25#OK#gonzalo$656#terminator#V#103#24-10-2015 00:36:14#656#39#20160309_192548_WQVP-1.mp4#24-10-2015 00:37:57#2015/10/24/00/26c0a67a-5fc6-450c-9000-8e9f70dd9dc0.bin#00:01:43#OK#gonzalo$636#terminator#V#187#24-10-2015 00:36:16#636#40#MS1.mp4#24-10-2015 00:39:23#2015/10/24/00/09d59330-ad93-43b7-8510-70bca243f7f5.bin#00:03:07#OK#gonzalo$664#terminator#I#0#24-10-2015 00:36:18#664#41#1757-hdr-wallpaper-city-desktop-wallpaper-1920x1200.jpg#24-10-2015 00:36:18#2015/10/24/00/735cba52-8241-4c47-839c-68781ab7a5d3.bin#00:00:00#OK#gonzalo$637#terminator#I#0#24-10-2015 00:36:19#637#42#wallpapers (4).jpg#24-10-2015 00:36:19#2015/10/24/00/102060c0-552f-42b3-8c4e-12e5627d7057.bin#00:00:00#OK#gonzalo$635#terminator#V#4#24-10-2015 00:36:19#635#43#backgr.mp4#24-10-2015 00:36:23#2015/10/24/00/5e63b3ec-dd82-47d1-8b54-851136b2200e.bin#00:00:04#OK#gonzalo$663#terminator#I#0#24-10-2015 00:36:20#663#44#CSYJ_014017.jpg#24-10-2015 00:36:20#2015/10/24/00/8f45f77b-08a0-417b-b21a-fdecbeef644d.bin#00:00:00#OK#gonzalo$567#terminator#A#10#24-10-2015 00:37:16#567#45#Mi Mejor Tono De Msj_1.mp3#24-10-2015 00:37:26#2015/10/24/00/edaa2f1f-501a-4dbd-9bfd-ad6a82c4fbcf.bin#00:00:10#OK#gonzalo$623#terminator#A#162#24-10-2015 00:37:40#623#46#Capital.wav#24-10-2015 00:40:22#2015/10/24/00/8d9b410d-c434-47bd-8774-4d6ba53cc8f0.bin#00:02:42#OK#gonzalo$575#terminator#C#69#24-10-2015 00:39:06#575#47#Comentario, Video e Imágenes#24-10-2015 00:40:15##00:01:09#OK#gonzalo$572#terminator#V#187#24-10-2015 00:39:09#572#48#asdasdasd.avi#24-10-2015 00:42:16#2015/10/24/00/a797a069-3e24-4e10-a11f-9bfc94b6af24.bin#00:03:07#OK#gonzalo$573#terminator#I#0#24-10-2015 00:39:19#573#49#wallpapers (4).jpg#24-10-2015 00:39:19#2015/10/24/00/27da7632-11ef-4a53-b7fe-7a5d78e719b6.bin#00:00:00#OK#gonzalo$574#terminator#I#0#24-10-2015 00:39:40#574#50#wallpapers (1).jpg#24-10-2015 00:39:40#2015/10/24/00/ef59e9d4-577d-4aba-b415-14b37bf3a676.bin#00:00:00#OK#gonzalo$647#terminator#C#38#24-10-2015 00:40:43#647#51#38 segundos#24-10-2015 00:41:21##00:00:38#OK#gonzalo$603#terminator#I#0#24-10-2015 00:41:10#603#52#2013-01-17 00.02.03.png#24-10-2015 00:41:10#2015/10/24/00/1a9b65d1-f4e5-43bb-88a2-01ebaddeaa3b.bin#00:00:00#OK#gonzalo$660#terminator#C#1#24-10-2015 00:41:39#660#53#asdasd#24-10-2015 00:41:40##00:00:01#OK#gonzalo$678#terminator#C#15#24-10-2015 00:41:53#678#54#aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa#24-10-2015 00:42:08##00:00:15#OK#gonzalo">
-                    <input type="hidden" name="ctl00$ContentBody$_hdnJSonList" id="ctl00_ContentBody__hdnJSonList" value="{&quot;name&quot;:&quot;Elements&quot;,&quot;color&quot;:&quot;#000000&quot;,&quot;spans&quot;:[{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:27:40&quot;,&quot;end&quot;:&quot;24-10-2015 00:27:40&quot;,&quot;id&quot;:&quot;627&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:27:40&quot;,&quot;end&quot;:&quot;24-10-2015 00:27:41&quot;,&quot;id&quot;:&quot;641&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:27:46&quot;,&quot;end&quot;:&quot;24-10-2015 00:27:47&quot;,&quot;id&quot;:&quot;621&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;D&quot;,&quot;start&quot;:&quot;24-10-2015 00:28:02&quot;,&quot;end&quot;:&quot;24-10-2015 00:28:02&quot;,&quot;id&quot;:&quot;666&quot;,&quot;type&quot;:&quot;D&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;D&quot;,&quot;start&quot;:&quot;24-10-2015 00:28:06&quot;,&quot;end&quot;:&quot;24-10-2015 00:28:06&quot;,&quot;id&quot;:&quot;665&quot;,&quot;type&quot;:&quot;D&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;D&quot;,&quot;start&quot;:&quot;24-10-2015 00:28:15&quot;,&quot;end&quot;:&quot;24-10-2015 00:28:15&quot;,&quot;id&quot;:&quot;615&quot;,&quot;type&quot;:&quot;D&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:28:22&quot;,&quot;end&quot;:&quot;24-10-2015 00:28:23&quot;,&quot;id&quot;:&quot;644&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;V&quot;,&quot;start&quot;:&quot;24-10-2015 00:28:28&quot;,&quot;end&quot;:&quot;24-10-2015 00:29:45&quot;,&quot;id&quot;:&quot;617&quot;,&quot;type&quot;:&quot;V&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:28:38&quot;,&quot;end&quot;:&quot;24-10-2015 00:28:38&quot;,&quot;id&quot;:&quot;630&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:28:45&quot;,&quot;end&quot;:&quot;24-10-2015 00:28:45&quot;,&quot;id&quot;:&quot;628&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:28:51&quot;,&quot;end&quot;:&quot;24-10-2015 00:28:51&quot;,&quot;id&quot;:&quot;629&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:28:53&quot;,&quot;end&quot;:&quot;24-10-2015 00:28:53&quot;,&quot;id&quot;:&quot;632&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:29:04&quot;,&quot;end&quot;:&quot;24-10-2015 00:29:31&quot;,&quot;id&quot;:&quot;646&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:29:15&quot;,&quot;end&quot;:&quot;24-10-2015 00:29:15&quot;,&quot;id&quot;:&quot;634&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:29:42&quot;,&quot;end&quot;:&quot;24-10-2015 00:29:42&quot;,&quot;id&quot;:&quot;679&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:29:51&quot;,&quot;end&quot;:&quot;24-10-2015 00:29:52&quot;,&quot;id&quot;:&quot;639&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:30:07&quot;,&quot;end&quot;:&quot;24-10-2015 00:30:28&quot;,&quot;id&quot;:&quot;649&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:30:12&quot;,&quot;end&quot;:&quot;24-10-2015 00:30:12&quot;,&quot;id&quot;:&quot;650&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:30:14&quot;,&quot;end&quot;:&quot;24-10-2015 00:30:14&quot;,&quot;id&quot;:&quot;658&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:30:32&quot;,&quot;end&quot;:&quot;24-10-2015 00:30:54&quot;,&quot;id&quot;:&quot;677&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;V&quot;,&quot;start&quot;:&quot;24-10-2015 00:30:34&quot;,&quot;end&quot;:&quot;24-10-2015 00:30:38&quot;,&quot;id&quot;:&quot;661&quot;,&quot;type&quot;:&quot;V&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:30:37&quot;,&quot;end&quot;:&quot;24-10-2015 00:31:08&quot;,&quot;id&quot;:&quot;655&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;A&quot;,&quot;start&quot;:&quot;24-10-2015 00:31:05&quot;,&quot;end&quot;:&quot;24-10-2015 00:31:49&quot;,&quot;id&quot;:&quot;618&quot;,&quot;type&quot;:&quot;A&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:31:11&quot;,&quot;end&quot;:&quot;24-10-2015 00:31:12&quot;,&quot;id&quot;:&quot;633&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:31:21&quot;,&quot;end&quot;:&quot;24-10-2015 00:31:22&quot;,&quot;id&quot;:&quot;674&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;A&quot;,&quot;start&quot;:&quot;24-10-2015 00:31:36&quot;,&quot;end&quot;:&quot;24-10-2015 00:33:35&quot;,&quot;id&quot;:&quot;619&quot;,&quot;type&quot;:&quot;A&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:31:42&quot;,&quot;end&quot;:&quot;24-10-2015 00:32:39&quot;,&quot;id&quot;:&quot;648&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;P&quot;,&quot;start&quot;:&quot;24-10-2015 00:32:00&quot;,&quot;end&quot;:&quot;24-10-2015 00:33:08&quot;,&quot;id&quot;:&quot;84&quot;,&quot;type&quot;:&quot;S&quot;,&quot;role&quot;:&quot;&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:33:19&quot;,&quot;end&quot;:&quot;24-10-2015 00:33:40&quot;,&quot;id&quot;:&quot;675&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:33:28&quot;,&quot;end&quot;:&quot;24-10-2015 00:38:17&quot;,&quot;id&quot;:&quot;645&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:33:41&quot;,&quot;end&quot;:&quot;24-10-2015 00:34:07&quot;,&quot;id&quot;:&quot;654&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:33:52&quot;,&quot;end&quot;:&quot;24-10-2015 00:33:53&quot;,&quot;id&quot;:&quot;676&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:34:18&quot;,&quot;end&quot;:&quot;24-10-2015 00:34:18&quot;,&quot;id&quot;:&quot;668&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;D&quot;,&quot;start&quot;:&quot;24-10-2015 00:34:46&quot;,&quot;end&quot;:&quot;24-10-2015 00:34:46&quot;,&quot;id&quot;:&quot;595&quot;,&quot;type&quot;:&quot;D&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:35:11&quot;,&quot;end&quot;:&quot;24-10-2015 00:35:11&quot;,&quot;id&quot;:&quot;667&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;V&quot;,&quot;start&quot;:&quot;24-10-2015 00:35:27&quot;,&quot;end&quot;:&quot;24-10-2015 00:37:03&quot;,&quot;id&quot;:&quot;673&quot;,&quot;type&quot;:&quot;V&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;P&quot;,&quot;start&quot;:&quot;24-10-2015 00:35:43&quot;,&quot;end&quot;:&quot;24-10-2015 00:35:47&quot;,&quot;id&quot;:&quot;541&quot;,&quot;type&quot;:&quot;S&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;V&quot;,&quot;start&quot;:&quot;24-10-2015 00:36:08&quot;,&quot;end&quot;:&quot;24-10-2015 00:37:33&quot;,&quot;id&quot;:&quot;613&quot;,&quot;type&quot;:&quot;V&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;V&quot;,&quot;start&quot;:&quot;24-10-2015 00:36:14&quot;,&quot;end&quot;:&quot;24-10-2015 00:37:57&quot;,&quot;id&quot;:&quot;656&quot;,&quot;type&quot;:&quot;V&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;V&quot;,&quot;start&quot;:&quot;24-10-2015 00:36:16&quot;,&quot;end&quot;:&quot;24-10-2015 00:39:23&quot;,&quot;id&quot;:&quot;636&quot;,&quot;type&quot;:&quot;V&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:36:18&quot;,&quot;end&quot;:&quot;24-10-2015 00:36:18&quot;,&quot;id&quot;:&quot;664&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:36:19&quot;,&quot;end&quot;:&quot;24-10-2015 00:36:19&quot;,&quot;id&quot;:&quot;637&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;V&quot;,&quot;start&quot;:&quot;24-10-2015 00:36:19&quot;,&quot;end&quot;:&quot;24-10-2015 00:36:23&quot;,&quot;id&quot;:&quot;635&quot;,&quot;type&quot;:&quot;V&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:36:20&quot;,&quot;end&quot;:&quot;24-10-2015 00:36:20&quot;,&quot;id&quot;:&quot;663&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;A&quot;,&quot;start&quot;:&quot;24-10-2015 00:37:16&quot;,&quot;end&quot;:&quot;24-10-2015 00:37:26&quot;,&quot;id&quot;:&quot;567&quot;,&quot;type&quot;:&quot;A&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;A&quot;,&quot;start&quot;:&quot;24-10-2015 00:37:40&quot;,&quot;end&quot;:&quot;24-10-2015 00:40:22&quot;,&quot;id&quot;:&quot;623&quot;,&quot;type&quot;:&quot;A&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:39:06&quot;,&quot;end&quot;:&quot;24-10-2015 00:40:15&quot;,&quot;id&quot;:&quot;575&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;V&quot;,&quot;start&quot;:&quot;24-10-2015 00:39:09&quot;,&quot;end&quot;:&quot;24-10-2015 00:42:16&quot;,&quot;id&quot;:&quot;572&quot;,&quot;type&quot;:&quot;V&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:39:19&quot;,&quot;end&quot;:&quot;24-10-2015 00:39:19&quot;,&quot;id&quot;:&quot;573&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:39:40&quot;,&quot;end&quot;:&quot;24-10-2015 00:39:40&quot;,&quot;id&quot;:&quot;574&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:40:43&quot;,&quot;end&quot;:&quot;24-10-2015 00:41:21&quot;,&quot;id&quot;:&quot;647&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;I&quot;,&quot;start&quot;:&quot;24-10-2015 00:41:10&quot;,&quot;end&quot;:&quot;24-10-2015 00:41:10&quot;,&quot;id&quot;:&quot;603&quot;,&quot;type&quot;:&quot;I&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:41:39&quot;,&quot;end&quot;:&quot;24-10-2015 00:41:40&quot;,&quot;id&quot;:&quot;660&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null},{&quot;name&quot;:&quot;C&quot;,&quot;start&quot;:&quot;24-10-2015 00:41:53&quot;,&quot;end&quot;:&quot;24-10-2015 00:42:08&quot;,&quot;id&quot;:&quot;678&quot;,&quot;type&quot;:&quot;C&quot;,&quot;role&quot;:&quot;terminator&quot;,&quot;localParty&quot;:null,&quot;userName&quot;:null,&quot;duration&quot;:null}]}">
-                    <input type="hidden" name="ctl00$ContentBody$_hdnJSonStart" id="ctl00_ContentBody__hdnJSonStart" value="24-10-2015 00:27:40">
-                    <input type="hidden" name="ctl00$ContentBody$_hdnJSonEnd" id="ctl00_ContentBody__hdnJSonEnd" value="24-10-2015 00:42:16">
-                    <input type="hidden" name="ctl00$ContentBody$_hdnFolioID" id="ctl00_ContentBody__hdnFolioID" value="1234567890">
-
-
-                    string val1 = JsonConvert.SerializeObject(json_elementList);
-                    string val2 = folio_start.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
-
-                    _hdnJSonList.Value = val1;
-                    _hdnJSonStart.Value = val2;
-
-                    */
-
                     if (tr_nodes_toDownload != null && tr_nodes_toDownload.Count > 0)
                     {
+                        // Filtrar elementos seleccionados
                         HtmlNode tr_node_parent = html_doc_Table.DocumentNode.SelectSingleNode("//tbody");
                         if (tr_node_parent != null)
                         {
@@ -1322,38 +1314,64 @@ namespace MediaPlayer
                             tr_node_parent.AppendChildren(tr_nodes_toDownload);
                         }
 
-                        // Remove all checkboxes from table of elements
-                        var remove_list = tr_node_parent.SelectNodes("//input[@type='checkbox']").ToList();
-                        if (remove_list != null && remove_list.Count > 0)
-                        {
-                            foreach (var checkbox in remove_list)
-                            {
-                                checkbox.Remove();
-                            }
-                        }
-
-                        /* ************** */
-
                         // Create document
                         HtmlDocument html_doc = new HtmlDocument();
-                        html_doc.LoadHtml(html_str);
+                        html_doc.LoadHtml(static_HTML);
 
                         // Create table node
-                        //HtmlNode table_node = HtmlNode.CreateNode(dynamic_table);
                         HtmlNode table_node = HtmlNode.CreateNode(html_doc_Table.DocumentNode.OuterHtml);
 
                         // Get container div
-                        HtmlNode divElementos_node = html_doc.DocumentNode.SelectSingleNode("//div[@id='" + id_str + "']");
+                        HtmlNode divElementos_node = html_doc.DocumentNode.SelectSingleNode("//div[@id='" + div_container_ID + "']");
                         if (divElementos_node != null)
                         {
                             divElementos_node.AppendChild(table_node);
                         }
+
+                        #region Send data by Hidden Fields 
 
                         // Send FolioID
                         HtmlNode hdnFolioID_node = html_doc.DocumentNode.SelectSingleNode("//input[contains(@id, '_hdnFolioID')]");
                         if (hdnFolioID_node != null)
                         {
                             hdnFolioID_node.Attributes["value"].Value = ViewState["FolioID"].ToString();
+                        }
+
+                        // Send JSonList updated
+                        json_elementList.spans = spans_aux;
+                        HtmlNode hdnJSonList_node = html_doc.DocumentNode.SelectSingleNode("//input[contains(@id, '_hdnJSonList')]");
+                        if (hdnJSonList_node != null)
+                        {
+                            string value = JsonConvert.SerializeObject(json_elementList).Replace(@"""", "&quot;"); ;
+                            hdnJSonList_node.Attributes["value"].Value = value;
+                        }
+
+                        // Send JSonList updated
+                        HtmlNode hdnJSonStart_node = html_doc.DocumentNode.SelectSingleNode("//input[contains(@id, '_hdnJSonStart')]");
+                        if (hdnJSonStart_node != null)
+                        {
+                            string folio_start_final = folio_start.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
+                            hdnJSonStart_node.Attributes["value"].Value = folio_start_final;
+                        }
+
+                        // Send JSonList updated
+                        HtmlNode hdnJSonEnd_node = html_doc.DocumentNode.SelectSingleNode("//input[contains(@id, '_hdnJSonEnd')]");
+                        if (hdnJSonEnd_node != null)
+                        {
+                            string folio_end_final = folio_end.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
+                            hdnJSonEnd_node.Attributes["value"].Value = folio_end_final;
+                        }
+
+                        // Send Element attributes updated
+                        if (hdnElementsAttributes_str.Length > 0)
+                        {
+                            hdnElementsAttributes_str = hdnElementsAttributes_str.Remove(hdnElementsAttributes_str.Length - 1);
+                        }
+
+                        HtmlNode hdnElementsAttributes = html_doc.DocumentNode.SelectSingleNode("//input[contains(@id, '_hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName')]");
+                        if (hdnElementsAttributes != null)
+                        {
+                            hdnElementsAttributes.Attributes["value"].Value = hdnElementsAttributes_str;
                         }
 
                         // Send Build datetime                        
@@ -1363,34 +1381,25 @@ namespace MediaPlayer
                             divBuild_node.InnerHtml = "Generado: " + DateTime.Now;
                         }
 
-                        /*
-                        // Add Hidden Fields 
-                        string folioID = string.Empty;
-                        if (ViewState["FolioID"] != null)
-                        {
-                            folioID = ViewState["FolioID"].ToString();
-                        }
-                        string hdn_folioID = "<input type='hidden' id='hdn_folioID' value='" + folioID + "'>";
-                        HtmlNode hdn_folioID_node = HtmlNode.CreateNode(hdn_folioID);
-                        html_doc.DocumentNode.AppendChild(hdn_folioID_node);
-                        */
+                        #endregion 
 
                         // Convert to string
-                        html_str = html_doc.DocumentNode.OuterHtml;
+                        static_HTML = html_doc.DocumentNode.OuterHtml;
 
-                        Download_ZipFiles(html_str);
+                        // Download ZIP file
+                        Download_ZipFiles(static_HTML);
                     }
                 }
             }
         }
 
-        protected void Download_ZipFiles(string html_str)
+        protected void Download_ZipFiles(string static_HTML)
         {
             // Revisar
             // http://dotnetzip.codeplex.com/discussions/231933
             // http://dotnetzip.codeplex.com/discussions/234342
 
-            if (!string.IsNullOrWhiteSpace(html_str))
+            if (!string.IsNullOrWhiteSpace(static_HTML))
             {
                 // #1- Logger variables
                 System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame();
@@ -1403,6 +1412,8 @@ namespace MediaPlayer
                     folioID = ViewState["FolioID"].ToString();
                 }
                 string zipName = String.Format("MP_portable{0}.zip", folioID);
+
+                #region Get Configuration variables 
 
                 // Get Repository temp path
                 string repository_temp = string.Empty;
@@ -1425,331 +1436,111 @@ namespace MediaPlayer
                     client_fileName_exe = ConfigurationManager.AppSettings["Download_ClientName_exe"].ToString();
                 }
 
-                // Zip Source: http://www.aspsnippets.com/Articles/Download-multiple-files-as-Zip-Archive-File-in-ASPNet-using-C-and-VBNet.aspx
+                #endregion 
 
-                using (ZipFile zip = new ZipFile())
+                if (!string.IsNullOrWhiteSpace(repository_temp) && !string.IsNullOrWhiteSpace(client_fileName))
                 {
-                    zip.AlternateEncodingUsage = ZipOption.AsNecessary;
-                    string temp_file = Path.Combine(repository_temp, client_fileName);
-
-                    /* ******************** HTML File ******************** */
-
-                    // Check if directory exists, if not creates it
-                    if (!Directory.Exists(Path.GetDirectoryName(repository_temp)))
+                    // Zip Source: http://www.aspsnippets.com/Articles/Download-multiple-files-as-Zip-Archive-File-in-ASPNet-using-C-and-VBNet.aspx
+                    using (ZipFile zip = new ZipFile())
                     {
-                        Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
-                    }
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.Append(html_str);
-                    sb.Append("\r\n");
-                    File.WriteAllText(temp_file, sb.ToString());
-
-                    // Ensure that the temp file is already created before generate the zip file
-                    Thread.Sleep(300);
-
-                    /* ******************** Directories Files ******************** */
-
-                    Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-                    string folder_path_1 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\files");
-                    string folder_path_2 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\fonts");
-                    string folder_path_3 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\image");
-                    string folder_path_4 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\images");
-
-                    /* -Self-Extractor--------------------------------------------------
-                        //zip.SaveSelfExtractor(Path.Combine(repository_temp, "archive.exe"), SelfExtractorFlavor.ConsoleApplication);
-                    */
-
-                    Response.Clear();
-                    Response.BufferOutput = false;
-                    Response.ContentType = "application/zip";
-                    Response.AddHeader("content-disposition", "attachment; filename=" + zipName);
-
-                    /* -Self-Extractor--------------------------------------------------
-                    Response.AddHeader("Content-Disposition", "attachment; filename=" + client_fileName_exe);
-                    Response.AddHeader("Content-Description", "File Transfer");
-                    Response.AddHeader("Content-Transfer-Encoding", "binary");
-                    Response.ContentType = "application/exe";
-                    */
-
-                    // Add folders directories
-                    zip.AddDirectory(folder_path_1, Path.GetFileName(folder_path_1));
-                    zip.AddDirectory(folder_path_2, Path.GetFileName(folder_path_2));
-                    zip.AddDirectory(folder_path_3, Path.GetFileName(folder_path_3));
-                    zip.AddDirectory(folder_path_4, Path.GetFileName(folder_path_4));
-
-                    zip.AddFile(temp_file, "");
-
-                    zip.Save(Response.OutputStream);
-
-                    // Ensure that the zip file is already downloaded before cleaning temp files
-                    Thread.Sleep(300);
-
-                    /* ******************** Clear temporary HTML file ******************** */
-
-                    // Clearing temporary HTML file
-                    try
-                    {
-                        // Check if directory exists
-                        if (Directory.Exists(Path.GetDirectoryName(repository_temp)) && File.Exists(temp_file))
+                        zip.AlternateEncodingUsage = ZipOption.AsNecessary;
+                        string temp_file = Path.Combine(repository_temp, client_fileName);
+                        if (!string.IsNullOrWhiteSpace(temp_file))
                         {
-                            File.Delete(temp_file);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // #2- Logger exception
-                        Logger.LogError("(%s) (%s) -- Excepcion. Limpiando archivo HTML temporal. ERROR: %s", className, methodName, ex.Message);
-                    }
 
-                    // Close thread
-                    Response.End();
+                            /* ******************** HTML File ******************** */
 
-                    /* -Self-Extractor--------------------------------------------------
-                    int fileSize = 99999999;
-                    byte[] Buffer = new byte[fileSize];
+                            // Check if directory exists, if not creates it
+                            if (!Directory.Exists(Path.GetDirectoryName(repository_temp)))
+                            {
+                                Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
+                            }
 
-                    FileStream MyFileStream = new FileStream(Path.Combine(repository_temp, "archive.exe"), FileMode.Open);
-                    long FileSize = MyFileStream.Length;
+                            StringBuilder sb = new StringBuilder();
+                            sb.Append(static_HTML);
+                            sb.Append("\r\n");
+                            File.WriteAllText(temp_file, sb.ToString());
 
-                    MyFileStream.Read(Buffer, 0, int.Parse(FileSize.ToString()));
-                    MyFileStream.Close();
+                            // Ensure that the temp file is already created before generate the zip file
+                            Thread.Sleep(300);
 
-                    Response.ContentType = "application/exe";
-                    Response.AddHeader("Content-Disposition", "attachment; filename=archive.exe");
-                    Response.OutputStream.Write(Buffer, 0, fileSize);
-                    Response.Flush();
-                    Response.Close();
-                    */
-                }
-            }
-        }
+                            /* ******************** Directories Files ******************** */
 
-        private string GetTable_download()
-        {
-            int index = 0;
-            StringBuilder htmlTable = new StringBuilder();
+                            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+                            string folder_path_1 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\files");
+                            string folder_path_2 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\fonts");
+                            string folder_path_3 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\image");
+                            string folder_path_4 = Path.Combine(Directory.GetCurrentDirectory(), @"MP_client\images");
 
-            /****** Table headers ******/
-
-            htmlTable.AppendLine("<table class='table unselectable' id='tblLeftGridElements'>"); // style='display:none;'
-            htmlTable.AppendLine("<thead>");
-            htmlTable.AppendLine("<tr style='background: #446e9b; color: whitesmoke;'>");
-            htmlTable.AppendLine("<th width='3%' style='text-align: center;'><input type='checkbox' id='chbSelectAll' name='timeline_elements_checkAll' class='button' checked></th>");
-            htmlTable.AppendLine("<th width='3%' style='text-align: center;'>#</th>");
-            htmlTable.AppendLine("<th width='5%' style='text-align: center;'>Usuario</th>");
-            htmlTable.AppendLine("<th width='8%' style='text-align: center;'>Local Party</th>");
-            htmlTable.AppendLine("<th width='5%' style='text-align: center;'>Remote Party</th>");
-            htmlTable.AppendLine("<th width='5%' style='text-align: center;'>Tipo</th>");
-            htmlTable.AppendLine("<th width='6%' style='text-align: center;'>Inicio</th>");
-            htmlTable.AppendLine("<th width='3%' style='text-align: center;'>Duración</th>");
-            htmlTable.AppendLine("</tr>");
-            htmlTable.AppendLine("</thead>");
-            htmlTable.AppendLine("<tbody>");
-
-            if (!string.IsNullOrWhiteSpace(txbSearchBox1.Text))
-            {
-                this.folio_list = Global.GlobalMethods.GetAllFolios(txbSearchBox1.Text);
-
-                if (this.folio_list != null && this.folio_list.Count > 0)
-                {
-                    this.folio_filteredList = this.folio_list.FindAll(x => x.deleted == 0);
-
-                    /*
-                    string hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName = string.Empty;
-                    string hdnElementsIDChecked = string.Empty;
-                    */
-
-                    // Json object
-                    RootObject json_elementList = new RootObject();
-                    json_elementList.name = "Elements";
-                    json_elementList.color = "#000000";
-
-                    DateTime folio_start = DateTime.MaxValue;
-                    DateTime folio_end = DateTime.MinValue;
-                    //
-
-                    List<Folio> list = this.folio_filteredList.Where(x => x.deleted == 0).ToList();
-                    if (list != null && list.Count > 0)
-                    {
-                        foreach (Folio folio in list)
-                        {
-                            index++;
-
-                            string end_date = folio.timestamp.AddSeconds(folio.duration).ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
-
-                            // Duration
-                            TimeSpan time = TimeSpan.FromSeconds(folio.duration);
-                            string duration_formatStr = time.ToString(@"hh\:mm\:ss");
-
-                            /*
-                            /****** Hidden fields ****** /
-                            hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName
-                                += folio.tapeID + "#" + folio.groupName + "#" + folio.mediaType.ToString() + "#" + folio.duration + "#" + folio.timestamp.ToString("dd'-'MM'-'yyyy HH':'mm':'ss")
-                                + "#" + folio.segmentID + "#" + index + "#" + folio.fileName + "#" + end_date + "#" + folio.filePath + "#" + duration_formatStr + "#" + folio.fileStatus + "#" + folio.userName + "$";
+                            /* -Self-Extractor--------------------------------------------------
+                                //zip.SaveSelfExtractor(Path.Combine(repository_temp, "archive.exe"), SelfExtractorFlavor.ConsoleApplication);
                             */
 
-                            // Get max and min value
-                            folio_start = folio_start > folio.timestamp ? folio.timestamp : folio_start;
-                            folio_end = folio_end < folio.timestamp.AddSeconds(folio.duration) ? folio.timestamp.AddSeconds(folio.duration) : folio_end;
+                            Response.Clear();
+                            Response.BufferOutput = false;
+                            Response.ContentType = "application/zip";
+                            Response.AddHeader("content-disposition", "attachment; filename=" + zipName);
 
-                            /****** Create json data ******/
-                            Span json_element = new Span();
-                            json_element.name = folio.mediaType == "S" ? "P" : folio.mediaType;
-                            json_element.start = folio.timestamp.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
-                            json_element.end = end_date;
-                            json_element.id = folio.tapeID.ToString();
-                            json_element.type = folio.mediaType;
-                            json_element.role = folio.groupName;
+                            /* -Self-Extractor--------------------------------------------------
+                            Response.AddHeader("Content-Disposition", "attachment; filename=" + client_fileName_exe);
+                            Response.AddHeader("Content-Description", "File Transfer");
+                            Response.AddHeader("Content-Transfer-Encoding", "binary");
+                            Response.ContentType = "application/exe";
+                            */
 
-                            json_elementList.spans.Add(json_element);
+                            // Add folders directories
+                            zip.AddDirectory(folder_path_1, Path.GetFileName(folder_path_1));
+                            zip.AddDirectory(folder_path_2, Path.GetFileName(folder_path_2));
+                            zip.AddDirectory(folder_path_3, Path.GetFileName(folder_path_3));
+                            zip.AddDirectory(folder_path_4, Path.GetFileName(folder_path_4));
 
-                            // isExtra, type, icon and color
-                            //bool isExtra = false; // If its taken from orkextra table
-                            string icon = "glyphicon glyphicon-headphones";
-                            string media_str = "Grabación";
-                            string color_str = "";
-                            switch (folio.mediaType)
+                            zip.AddFile(temp_file, "");
+
+                            zip.Save(Response.OutputStream);
+
+                            // Ensure that the zip file is already downloaded before cleaning temp files
+                            Thread.Sleep(300);
+
+                            /* ******************** Clear temporary HTML file ******************** */
+
+                            // Clearing temporary HTML file
+                            try
                             {
-                                case "S":
-                                    {
-                                        icon = "fa fa-video-camera";
-                                        media_str = "Grabación";
-                                        color_str = "blue";
-                                        break;
-                                    }
-                                case "V":
-                                    {
-                                        icon = "glyphicon glyphicon-film";
-                                        media_str = "Video";
-                                        color_str = "purple";
-                                        break;
-                                    }
-                                case "A":
-                                    {
-                                        icon = "glyphicon glyphicon-headphones";
-                                        media_str = "Audio";
-                                        color_str = "red";
-                                        break;
-                                    }
-                                case "D":
-                                    {
-                                        icon = "fa fa-file-text";
-                                        media_str = "Documento";
-                                        color_str = "green";
-                                        break;
-                                    }
-                                case "C":
-                                    {
-                                        icon = "glyphicon glyphicon-comment";
-                                        media_str = "Comentario";
-                                        color_str = "orange";
-                                        break;
-                                    }
-                                case "I":
-                                    {
-                                        icon = "glyphicon glyphicon-picture";
-                                        media_str = "Imagen";
-                                        color_str = "Violet";
-                                        break;
-                                    }
+                                // Check if directory exists
+                                if (Directory.Exists(Path.GetDirectoryName(repository_temp)) && File.Exists(temp_file))
+                                {
+                                    File.Delete(temp_file);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // #2- Logger exception
+                                Logger.LogError("(%s) (%s) -- Excepcion. Limpiando archivo HTML temporal. ERROR: %s", className, methodName, ex.Message);
                             }
 
-                            // IsExtra = If filePath is NOT empty, then is extra from incextras table
-                            bool isExtra = folio.filePath == string.Empty ? false : true;
-                            if (folio.mediaType == "C")
-                            {
-                                isExtra = true;
-                            }
+                            // Close thread
+                            Response.End();
 
-                            string color_icon = "beige";
-                            string tr_color = isExtra ? "inherit" : "#D1E2F3";
-                            string tr_name = isExtra ? "Extra" : "Oreka";
+                            /* -Self-Extractor--------------------------------------------------
+                            int fileSize = 99999999;
+                            byte[] Buffer = new byte[fileSize];
 
-                            // Onclick event
-                            string onclick_event = FolioElements_GetOnClickEvent(folio, index, isExtra, duration_formatStr, media_str);
+                            FileStream MyFileStream = new FileStream(Path.Combine(repository_temp, "archive.exe"), FileMode.Open);
+                            long FileSize = MyFileStream.Length;
 
-                            // Title
-                            string title = folio.mediaType == "S" ? "Grabación de Pantalla" : media_str;
+                            MyFileStream.Read(Buffer, 0, int.Parse(FileSize.ToString()));
+                            MyFileStream.Close();
 
-                            /****** Table data ******/
-                            htmlTable.AppendLine("<tr id='tape_" + folio.tapeID + "' style='background-color: " + tr_color + ";' name='" + tr_name + "'>");
-                            htmlTable.AppendLine("<td>");
-
-                            htmlTable.AppendLine("<input type='checkbox' name='timeline_elements' class='button' value='" + folio.tapeID + "#" + isExtra.ToString().ToLowerInvariant() + "#" + folio.mediaType + "#" + folio.fileName + "' onclick='manageElement(this, " + folio.tapeID + ", " + (index - 1).ToString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>");
-                            htmlTable.AppendLine("<td>");
-                            htmlTable.AppendLine("<h5>" + index + "</h5>");
-                            htmlTable.AppendLine("<td>");
-                            htmlTable.AppendLine("<h5>" + folio.userName + "</h5>");
-                            htmlTable.AppendLine("<td>");
-                            htmlTable.AppendLine("<h5>" + folio.localParty + "</h5>");
-                            htmlTable.AppendLine("<td>");
-                            htmlTable.AppendLine("<h5>" + folio.remoteParty + "</h5>");
-                            htmlTable.AppendLine("<td>");
-
-                            htmlTable.AppendLine("<button type='button' class='btn btn-default btn-sm' style='color:" + color_str + "; opacity: 0.9; background-color: " + color_icon + "; background-image: none;' name='btnTimelineElement' data-toggle='tooltip' ");
-                            htmlTable.AppendLine("title=" + title + " onclick='" + onclick_event + "'><span class='" + icon + "' aria-hidden='true'></span></button>");
-                            htmlTable.AppendLine("<td>");
-                            htmlTable.AppendLine("<h5 id='timestamp'>" + folio.timestamp.ToString("dd'-'MM'-'yyyy HH':'mm':'ss") + "</h5>");
-                            htmlTable.AppendLine("<td>");
-
-                            htmlTable.AppendLine("<h5>" + duration_formatStr + "</h5>");
-                            htmlTable.AppendLine("</tr>");
+                            Response.ContentType = "application/exe";
+                            Response.AddHeader("Content-Disposition", "attachment; filename=archive.exe");
+                            Response.OutputStream.Write(Buffer, 0, fileSize);
+                            Response.Flush();
+                            Response.Close();
+                            */
                         }
                     }
-
-                    /*
-                    if (hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Length > 0)
-                    {
-                        hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName = hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Remove(hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Length - 1);
-                        _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Value = hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName;
-                    }
-
-                    ****** Load bottom Timeline ****** /
-                    string val1 = JsonConvert.SerializeObject(json_elementList);
-                    string val2 = folio_start.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
-                    string val3 = folio_end.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
-
-                    _hdnJSonList.Value = val1;
-                    _hdnJSonStart.Value = val2;
-                    _hdnJSonEnd.Value = val3;
-
-                    // Fire the timeframe drawing
-                    ScriptManager.RegisterStartupScript(this, typeof(Page), "pre_timeframe_prepare", "pre_timeframe_prepare();", true);
-                    */
-                }
-                else
-                {
-                    /*
-                    // Folio does not exist
-                    ViewState["FolioID"] = "0";
-                    _hdnJSonEnd.Value = "0";
-
-                    _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Value = string.Empty;
-                    ScriptManager.RegisterStartupScript(this, typeof(Page), "clear_timeline", "clear_timeline();", true);
-                    */
                 }
             }
-            else
-            {
-                /*
-                // Empty Folio search textbox
-                ViewState["FolioID"] = "0";
-                _hdnJSonEnd.Value = "0";
-
-                _hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName.Value = string.Empty;
-                ScriptManager.RegisterStartupScript(this, typeof(Page), "clear_timeline", "clear_timeline();", true);
-                */
-            }
-            htmlTable.AppendLine("</tbody>");
-            htmlTable.AppendLine("</table>");
-
-            /*
-            // Change Roles and Types filter checkboxes to checked status
-            ScriptManager.RegisterStartupScript(this, typeof(Page), "checkRolesAndTypesFilters", "checkRolesAndTypesFilters();", true);
-            */
-
-            return htmlTable.ToString();
         }
 
         private void Download_HTML(string _html)

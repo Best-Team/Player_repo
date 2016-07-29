@@ -553,11 +553,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <button id="btnFullscreen" class="btn btn-default" type="button" title="Maximizar video" onclick="openFullscreen();"> <!-- goFullscreen() -->
+                                    <button id="btnFullscreen" class="btn btn-default" type="button" title="Maximizar" onclick="openFullscreen();"> <!-- goFullscreen() -->
                                         <span class="fa fa-arrows-alt" aria-hidden="true"></span>
                                     </button>
 
-                                    <a id="aBtnFullscreen" class="btn btn-default" type="button" title="Maximizar video" style="margin-right: 4px; display: none;" href="Fullscreen.aspx">
+                                    <a id="aBtnFullscreen" class="btn btn-default" type="button" title="Maximizar" style="margin-right: 4px; display: none;" href="Fullscreen.aspx">
                                         <span class="fa fa-arrows-alt" aria-hidden="true"></span>
                                     </a>
                                 </div>

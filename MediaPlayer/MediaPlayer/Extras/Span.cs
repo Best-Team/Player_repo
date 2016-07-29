@@ -24,5 +24,6 @@ namespace MediaPlayer.Extras
         public string userName { get; set; }
 
         public string duration { get; set; }
+
     }
 }
