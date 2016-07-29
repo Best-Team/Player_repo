@@ -1,4 +1,5 @@
-﻿
+﻿// ORIGINAL: Solution / assets ==> Copiado dinámicamente al cliente portable al descargar
+
 /******** START: Media Player 2.0: Nuevo Requerimiento: Global Play ********/
 
 

@@ -1272,6 +1272,7 @@ namespace MediaPlayer
                                             {
                                                 spans_aux.Add(span);
 
+                                                // JSon Element data
                                                 string groupName = span.name; // missing data
                                                 string mediaType = span.type;
                                                 string duration = span.duration;
@@ -1280,13 +1281,10 @@ namespace MediaPlayer
                                                 string end_date = span.end;
                                                 string filePath = span.duration; // missing data
                                                 string duration_formatStr = span.duration;
-                                                string fileStatus = span.name; // missing data
+                                                string fileStatus = "OK"; 
                                                 string userName = span.userName;
 
-                                                // Recupero la lista de elementos
-                                                hdnElementsAttributes_str += segment_ID + "#" + groupName + "#" + mediaType + "#" + duration + "#" + timestamp + "#" + segment_ID
-                                                    + "#" + index + "#" + fileName + "#" + end_date + "#" + filePath + "#" + duration_formatStr + "#" + fileStatus + "#" + userName + "$";
-
+                                               
                                                 // Get filtered elements MIN date
                                                 DateTime timestamp_date = DateTime.Now;
                                                 if (!DateTime.TryParseExact(timestamp, "dd-MM-yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timestamp_date))
@@ -1301,9 +1299,20 @@ namespace MediaPlayer
                                                     end_date_date = DateTime.Now;
                                                 }
 
+                                                var diffInSeconds = (end_date_date - timestamp_date).TotalSeconds;
+
+
                                                 // Get MX and MIN value of filtered folio
                                                 folio_start = folio_start > timestamp_date ? timestamp_date : folio_start;
                                                 folio_end = folio_end < end_date_date ? end_date_date : folio_end;
+
+                                                duration = diffInSeconds.ToString();
+                                                duration_formatStr = string.Format("{0:00}:{1:00}:{2:00}", diffInSeconds / 3600, (diffInSeconds / 60) % 60, diffInSeconds % 60);
+
+                                                // Recupero la lista de elementos
+                                                hdnElementsAttributes_str += segment_ID + "#" + groupName + "#" + mediaType + "#" + duration + "#" + timestamp + "#" + segment_ID
+                                                    + "#" + index + "#" + fileName + "#" + end_date + "#" + filePath + "#" + duration_formatStr + "#" + fileStatus + "#" + userName + "$";
+
                                             }
                                         }
                                         index++;
