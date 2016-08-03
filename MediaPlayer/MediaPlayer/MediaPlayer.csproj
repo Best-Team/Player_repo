@@ -50,9 +50,9 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>assets\libraries\Interop.Shell32.dll</HintPath>
     </Reference>
-    <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>assets\libraries\Ionic.Zip.Reduced.dll</HintPath>
+      <HintPath>assets\libraries\Ionic.Zip.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -186,12 +186,15 @@
     <Content Include="assets\js\waitMe.min.js" />
     <Content Include="assets\js\webchimera.js" />
     <Content Include="assets\js\zip.js" />
-    <Content Include="assets\libraries\Ionic.Zip.Reduced.dll" />
+    <Content Include="assets\libraries\HtmlAgilityPack.dll" />
+    <Content Include="assets\libraries\Interop.Shell32.dll" />
+    <Content Include="assets\libraries\Ionic.Zip.dll" />
     <Content Include="assets\libraries\Microsoft.WindowsAPICodePack.dll" />
     <Content Include="assets\libraries\Microsoft.WindowsAPICodePack.Shell.dll" />
     <Content Include="assets\libraries\MySql.Data.dll" />
     <Content Include="assets\libraries\NAudio.dll" />
     <Content Include="assets\libraries\NAudio.WindowsMediaFormat.dll" />
+    <Content Include="assets\libraries\NAudio.xml" />
     <Content Include="assets\libraries\Newtonsoft.Json.dll" />
     <Content Include="assets\swf\soundmanager2.swf" />
     <Content Include="assets\swf\soundmanager2_debug.swf" />
@@ -705,6 +708,7 @@
     <Folder Include="assets\scripts\" />
     <Folder Include="Dummy Files\" />
     <Folder Include="MP_client\files\assets\scripts\" />
+    <Folder Include="Temp\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\css\bootstrap-theme.css.map" />

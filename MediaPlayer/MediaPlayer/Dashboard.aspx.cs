@@ -1069,143 +1069,6 @@ namespace MediaPlayer
             return onclick_event;
         }
 
-        protected void btnDownloadAll_Click(object sender, EventArgs e)
-        {
-            // Zip Source: http://www.aspsnippets.com/Articles/Download-multiple-files-as-Zip-Archive-File-in-ASPNet-using-C-and-VBNet.aspx
-            using (ZipFile zip = new ZipFile())
-            {
-                zip.AlternateEncodingUsage = ZipOption.AsNecessary;
-
-                bool ok = false;
-
-                string[] elements_array;
-                if (_hdnElementsToDownload.Value.Length > 0)
-                {
-                            // Recorro los elementos seleccionados
-                    elements_array = _hdnElementsToDownload.Value.Split('#');
-                    if (elements_array != null && elements_array.Length > 0)
-                    {
-                        // #1- Logger variables
-                        System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame();
-                        string className = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
-                        string methodName = stackFrame.GetMethod().Name;
-
-                        string zipName = String.Format("Descarga_{0}.zip", DateTime.Now.ToString("MMM-dd-yyyy-HHmmss"));
-                        string folderName = String.Format("Descarga_{0}", DateTime.Now.ToString("MMM-dd-yyyy-HHmmss"));
-
-                        // Repository temp path
-                        string repository_temp = string.Empty;
-                        if (ConfigurationManager.AppSettings != null)
-                        {
-                            repository_temp = ConfigurationManager.AppSettings["LocalTempPath"].ToString();
-                        }
-
-                        try
-                        {
-                            // Check if directory exists, if not creates it
-                            if (!Directory.Exists(Path.GetDirectoryName(repository_temp)))
-                            {
-                                Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
-                            }
-
-                            string[] fileData_array;
-                            foreach (string element in elements_array)
-                            {
-                                if (!string.IsNullOrWhiteSpace(element))
-                                {
-                                    fileData_array = element.Split('$');
-                                    if (fileData_array != null && fileData_array.Length > 2)
-                                    {
-                                        string file_path = fileData_array[0];
-                                        string file_name = fileData_array[1];
-                                        string file_isExtra = fileData_array[2];
-
-                                        if (!string.IsNullOrWhiteSpace(file_path) && !string.IsNullOrWhiteSpace(file_name) && !string.IsNullOrWhiteSpace(file_isExtra))
-                                        {
-                                            string file_name2 = file_name;
-                                            if (!file_isExtra.ToLowerInvariant().Equals("true"))
-                                            {
-                                                file_name2 = Path.GetFileName(file_name);
-                                            }
-
-                                            string final = Path.Combine(repository_temp, file_name2);
-
-                                            try
-                                            {
-                                                // Get file from web service
-                                                WebClient webClient = new WebClient();
-                                                webClient.DownloadFile(file_path, final);
-
-                                                // Add file to zip
-                                                zip.AddFile(final, folderName);
-
-                                                ok = true;
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                // #2- Logger exception
-                                                Logger.LogError("(%s) (%s) -- Excepcion. Copiando archivo temporal al server para ser descargado en zip. ERROR: %s", className, methodName, ex.Message);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            // #2- Logger exception
-                            Logger.LogError("(%s) (%s) -- Excepcion. Copiando archivo temporal al server para ser descargado en zip. ERROR: %s", className, methodName, ex.Message);
-                        }
-                        if (ok)
-                        {
-                            // Processing zip file
-                            try
-                            {
-                                Response.Clear();
-                                Response.BufferOutput = false;
-                                Response.ContentType = "application/zip";
-                                Response.AddHeader("content-disposition", "attachment; filename=" + zipName);
-                                zip.Save(Response.OutputStream);
-
-                                // Ensure that the zip file was downloaded before cleaning temp files
-                                Thread.Sleep(300);
-
-                                // Clearing temporary repository folder
-                                try
-                                {
-                                    System.IO.DirectoryInfo di = new DirectoryInfo(repository_temp);
-                                    foreach (FileInfo file in di.GetFiles())
-                                    {
-                                        file.Delete();
-                                    }
-                                    foreach (DirectoryInfo dir in di.GetDirectories())
-                                    {
-                                        dir.Delete(true);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    // #2- Logger exception
-                                    Logger.LogError("(%s) (%s) -- Excepcion. Limpiando archivos temporales. ERROR: %s", className, methodName, ex.Message);
-                                }
-
-                                // Fire the timeframe drawing
-                                //ScriptManager.RegisterStartupScript(this, typeof(Page), "afterDownloadFiles", "afterDownloadFiles();", true);
-
-                                // Close thread
-                                Response.End();
-                            }
-                            catch (Exception ex)
-                            {
-                                // #2- Logger exception
-                                Logger.LogError("(%s) (%s) -- Excepcion. Generando descarga de elementos zip. ERROR: %s", className, methodName, ex.Message);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         protected void DownloadHTML_Click(object sender, EventArgs e)
         {
             // #1- Logger variables
@@ -1622,10 +1485,6 @@ namespace MediaPlayer
                         string folder_path_3 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_image);
                         string folder_path_4 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_images);
 
-                        /* -Self-Extractor--------------------------------------------------
-                            //zip.SaveSelfExtractor(Path.Combine(repository_temp, "archive.exe"), SelfExtractorFlavor.ConsoleApplication);
-                        */
-
                         if (!string.IsNullOrWhiteSpace(folder_path_1) && !string.IsNullOrWhiteSpace(folder_path_2) &&
                             !string.IsNullOrWhiteSpace(folder_path_3) && !string.IsNullOrWhiteSpace(folder_path_4))
                         {
@@ -1635,18 +1494,6 @@ namespace MediaPlayer
                             {
                                 try
                                 {
-                                    Response.Clear();
-                                    Response.BufferOutput = false;
-                                    Response.ContentType = "application/zip";
-                                    Response.AddHeader("content-disposition", "attachment; filename=" + zipName);
-
-                                    /* -Self-Extractor--------------------------------------------------
-                                    Response.AddHeader("Content-Disposition", "attachment; filename=" + client_fileName_exe);
-                                    Response.AddHeader("Content-Description", "File Transfer");
-                                    Response.AddHeader("Content-Transfer-Encoding", "binary");
-                                    Response.ContentType = "application/exe";
-                                    */
-
                                     // Add folders directories
                                     zip.AddDirectory(folder_path_1, Path.GetFileName(folder_path_1));
                                     zip.AddDirectory(folder_path_2, Path.GetFileName(folder_path_2));
@@ -1693,17 +1540,14 @@ namespace MediaPlayer
 
                                     if (ok)
                                     {
-                                        zip.Save(Response.OutputStream);
-
-                                        /*
+                                        //zip.Save(Response.OutputStream);
+                                  
                                         // Repository temp path
                                         string repository_temp = string.Empty;
                                         if (ConfigurationManager.AppSettings != null)
                                         {
                                             repository_temp = ConfigurationManager.AppSettings["LocalTempPath"].ToString();
                                         }
-
-                                        string name = Path.Combine(repository_temp + "archivo.exe");
 
                                         try
                                         {
@@ -1713,32 +1557,22 @@ namespace MediaPlayer
                                                 Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
                                             }
 
-                                            zip.SaveSelfExtractor("archive.exe", SelfExtractorFlavor.WinFormsApplication);
-
-                                            // Write sfx file to temp folder on server
-                                            zip.SaveSelfExtractor("archivo.exe", new SelfExtractorSaveOptions
-                                            {
-                                                Flavor = SelfExtractorFlavor.ConsoleApplication,
-                                                Quiet = false, // true
-                                                DefaultExtractDirectory = "\\temp",
-                                                SfxExeWindowTitle = "Export",
-                                                ExtractExistingFile = ExtractExistingFileAction.DoNotOverwrite, //OverwriteSilently
-                                                RemoveUnpackedFilesAfterExecute = false,
-                                                
-                                                //PostExtractCommandLine = "./MP_portable.html"
-
-
-                                            });
+                                            SelfExtractorSaveOptions options = new SelfExtractorSaveOptions();
+                                            options.Flavor = SelfExtractorFlavor.ConsoleApplication;
+                                            options.Quiet = true;
+                                            options.DefaultExtractDirectory = repository_temp;
+                                            options.PostExtractCommandLine = repository_temp + "\\" + client_fileName_html;
+                                            options.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;
+                                            options.RemoveUnpackedFilesAfterExecute = true;
+                                            zip.SaveSelfExtractor(".\\Temp\\" + client_fileName_exe, options);
                                         }
                                         catch (Exception ex)
                                         {
                                             // #2- Logger exception
                                             Logger.LogError("(%s) (%s) -- Excepcion. Creando archivo ZIP. ERROR: %s", className, methodName, ex.Message);
+
+                                            ok = false;
                                         }
-
-                                */
-
-
 
                                     }
                                     else
@@ -1746,27 +1580,26 @@ namespace MediaPlayer
                                         // #2- Logger exception
                                         Logger.LogError("(%s) (%s) -- ERROR. Creando archivo ZIP, archivos no encontrados. ERROR", className, methodName, "");
                                     }
+
+                                    if (ok)
+                                    {
+                                        string path = Server.MapPath(".\\Temp\\" + client_fileName_exe);
+                                        if (File.Exists(path))
+                                        {
+                                            Response.Clear();
+                                            Response.BufferOutput = false;
+                                            Response.ContentType = "application/exe";
+                                            Response.AddHeader("content-disposition", "attachment; filename=" + client_fileName_exe);
+                                            Response.TransmitFile(path);
+                                            Response.End();
+                                        }
+                                    }
                                 }
                                 catch (Exception ex)
                                 {
                                     // #2- Logger exception
                                     Logger.LogError("(%s) (%s) -- Excepcion. Creando archivo ZIP. ERROR: %s", className, methodName, ex.Message);
                                 }
-
-                                // Close thread
-                                Response.End();
-
-                                /* -Self-Extractor--------------------------------------------------
-                                int fileSize = 99999999;
-                                byte[] Buffer = new byte[fileSize];
-
-                                FileStream MyFileStream = new FileStream(Path.Combine(repository_temp, "archive.exe"), FileMode.Open);
-                                long FileSize = MyFileStream.Length;
-
-                                MyFileStream.Read(Buffer, 0, int.Parse(FileSize.ToString()));
-                                MyFileStream.Close();
-
-                                */
                             }
                         }
                     }
