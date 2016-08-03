@@ -232,7 +232,7 @@ $(document).ready(function () {
             zoom_h_arraylist = [];
 
             // Hide comment tooltip popups during globalplay
-            $("body .qtip").css("visibility", "hidden");
+            $("g[id*='tlTape_']").qtip("disable");
 
         },
 
@@ -281,7 +281,7 @@ $(document).ready(function () {
             clearAll_darktooltip();
 
             // Show again comment tooltip popups 
-            $("body .qtip").css("visibility", "visible");
+            $("g[id*='tlTape_']").qtip("enable");
 
             // Exit Fullscreen
             if (!globalplay_active) {
@@ -1667,7 +1667,7 @@ function pre_timeframe_prepare() {
 
 // Clear comment tooltip popups already added 
 function clearAll_QTip() {
-    $("body .qtip").remove();
+    $("g[id*='tlTape_']").qtip("destroy");
 }
 
 // Clear audio tooltip popups already added 
