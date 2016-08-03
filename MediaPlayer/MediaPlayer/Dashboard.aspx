@@ -33,6 +33,7 @@
     <script src="assets/js/jquery.fancybox.js"></script>
     <script src="assets/js/timer.jquery.js"></script>
     <script src="assets/js/jquery.feedback_me.js"></script>
+    <script src="assets/js/waitMe.min.js"></script>
     <script src="assets/js/zip.js"></script>
     <script src="assets/js/Dashboard.js"></script>
     <script src="assets/js/Globalplay.js"></script>
@@ -49,6 +50,7 @@
     <link href="assets/css/jslider.css" rel="stylesheet" />
     <link href="assets/css/jquery.fancybox.css" type="text/css" rel="stylesheet" />
     <link href="assets/css/jquery.feedback_me.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/waitMe.min.css" rel="stylesheet" type="text/css" />
     <link href="assets/css/Dashboard.css" type="text/css" rel="stylesheet" />
     <link href="assets/css/globalplay.css" type="text/css" rel="stylesheet" />
 
@@ -69,14 +71,8 @@
                 __doPostBack('<%=btnSearchCandidate.UniqueID%>', "");
             }
         }
-
-        <%--    
-        function doDownloadElements() {
-            __doPostBack('<%=btnDownloadAllCandidate.UniqueID%>', "");
-        }
-        --%>
        
-        function doDownloadElements2() {
+        function doDownloadElements() {
             __doPostBack('<%=btnDownloadAllCandidate.UniqueID%>', "");
         }
 
@@ -211,12 +207,7 @@
                             <br id="br_busqueda" />
 
                             <div class="pull-right" style="margin-bottom: 5px; margin-right: 0; padding: 0; margin-top:5px;">
-                                <!-- btnDownloadAll -->
-                                <%--<button id="btnDownloadAll" runat="server" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onserverclick="DownloadHTML_Click">
-                                    <span class="fa fa-download" aria-hidden="true"></span>
-                                </button>--%>
-
-                                <button id="btnDownloadAll" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onclick="downloadAll2();">
+                                <button id="btnDownloadAll" class="btn btn-default" type="button" title="Descargar los elementos seleccionados" style="margin-right: 6px;" onclick="downloadAll();">
                                     <span class="fa fa-download" aria-hidden="true"></span>
                                 </button>
                                 <asp:Button ID="btnDownloadAllCandidate" runat="server" Style="display: none" Text="" OnClick="DownloadHTML_Click" />
@@ -758,7 +749,7 @@
                                                 <div id="sm2-progress-track" class="sm2-progress-track sm2-progress-track2">
                                                     <div id="sm2-progress-bar" class="sm2-progress-bar sm2-progress-bar2"></div>
 
-                                                    <div id="sm2-progress-ball_TIMELINE" class="sm2-progress-ball sm2-progress-ball2" style="display: none;">
+                                                    <div id="sm2-progress-ball_TIMELINE" class="sm2-progress-ball sm2-progress-ball2" style="visibility: hidden;">
                                                         <div id="icon-overlay" class="icon-overlay icon-overlay2"></div>
                                                         <img id="imgPointer" src="assets/images/pointer.png" style="width: 20px; margin-top: -45px; margin-left: -5px;" />
 
@@ -830,9 +821,12 @@
         <asp:HiddenField ID="_hdnGlobalplay_defaultDuration" runat="server" ClientIDMode="Static" />
         <asp:HiddenField ID="_hdnGlobalplay_maxCollisionElements" runat="server" ClientIDMode="Static" />
         <asp:HiddenField ID="_hdnElementsToDownload" runat="server" ClientIDMode="Static" />
-
+        <asp:HiddenField ID="_hdnDownload_folderPath_resources" runat="server" ClientIDMode="Static" />
+        <asp:HiddenField ID="_hdnDownload_WaitingSpinDuration" runat="server" ClientIDMode="Static" />
+        
         <!-- -->
         <asp:HiddenField ID="_hdnFolioID_selected" runat="server" ClientIDMode="Static" />
+        <input type="hidden" id="_hdnIsVersionPortable" name="Language" value="false"/>
 
     </form>
 </asp:Content>

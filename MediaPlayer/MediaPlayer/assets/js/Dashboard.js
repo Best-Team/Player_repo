@@ -34,6 +34,7 @@ var elementsInMemory = [];
 var globalplay_remove_elements = [];
 var globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
 var globalplay_playback_active = false;
+var isVersionPortable = false;
 
 var html5video_zoom_w = 100;
 var html5video_zoom_h = 100;
@@ -255,7 +256,6 @@ $(document).ready(function () {
                         $(".timeframe").css("margin-top", "-15px"); //-25
 
                     }, 100);
-
                 }
 
                 if (MONITOR_HEIGHT < 770) { // 1366*768
@@ -435,11 +435,11 @@ $(document).ready(function () {
 
     setTimeout(function () {
         setPosition_TimelineProgressbar();
+
+        TIMELINE_POINTER.css("visibility", "visible");
     }, 800);
 
     //#endregion Re adjust dashboard display settings regarding screen resolution - END *****************************
-
-    TIMELINE_POINTER.hide();
 
 }); // END On Ready
 
@@ -453,14 +453,16 @@ $(window).resize(function () {
 
 function setPosition_TimelineProgressbar() {
 
-    $("#divTimelineProgress").position({
-        my: "left top",
-        at: "left top",
-        of: "#timeframe"
-    });
+    //$("#divTimelineProgress").position({
+    //    my: "left top",
+    //    at: "left top",
+    //    of: "#timeframe"
+    //});
+    
+    $("#divTimelineProgress").position().top = $("#timeframe").position().top;
     divTimelineProgress_SetWidth();
 
-    //// Relocate Timeline pointer 
+     //Relocate Timeline pointer 
     TIMELINE_POINTER.position({
         my: "center bottom",
         at: "left bottom",
@@ -468,7 +470,8 @@ function setPosition_TimelineProgressbar() {
     });
 
     var offset = 5;
-    TIMELINE_POINTER.offset({ top: TIMELINE_POINTER.offset().top + offset });
+    TIMELINE_POINTER.offset({ top: TIMELINE_POINTER.offset().top - offset });
+    //TIMELINE_POINTER.offset({ top: TIMELINE_POINTER.offset().top + offset });
 
 }
 
@@ -583,6 +586,7 @@ function loadClickRemoveElementSelected_event() {
 
             $("#dialog p").text(hashMessages["ConfirmarBorrarElementos1"]);
             $("#dialog").dialog({
+                open: {},
                 resizable: false,
                 height: 140,
                 modal: true,
@@ -594,6 +598,7 @@ function loadClickRemoveElementSelected_event() {
 
                         $("#dialog p").text(hashMessages["ConfirmarBorrarElementos2"]);
                         $("#dialog").dialog({
+                            open: {},
                             resizable: false,
                             height: 140,
                             modal: true,
@@ -613,6 +618,7 @@ function loadClickRemoveElementSelected_event() {
 
                                             $("#dialog p").text(hashMessages["ElementosBorrados"]);
                                             $("#dialog").dialog({
+                                                open: {},
                                                 buttons: {
                                                     "Confirmar": function () {
                                                         $(this).dialog("close");
@@ -688,6 +694,7 @@ function loadClickRemoveElementSelected_event() {
 
             $("#dialog p").text(hashMessages["SeleccioneElemento"]);
             $("#dialog").dialog({
+                open: {},
                 buttons: {
                     "Confirmar": function () {
                         $(this).dialog("close");
@@ -817,6 +824,7 @@ function divTimelineProgress_SetWidth() {
         var x1 = parseInt(MAIN_LINE.attr("x1"), 10);
         var x2 = parseInt(MAIN_LINE.attr("x2"), 10);
 
+        // divTimelineProgress width and left
         $('#divTimelineProgress').css("width", (x2 - x1 + 4) + "px");
         $("#divTimelineProgress").offset({
             left: $("#svg_timeframe").offset().left + 42 
@@ -941,7 +949,8 @@ function LoadAlertMessagesBackup() {
     hashMessages["SeleccioneFolioID"] = "Por favor, seleccione un número de Folio.";
     hashMessages["DatosIncorrectos"] = "Datos incorrectos.";
     hashMessages["SesionFinalizada"] = "Su sesión activa ha expirado.";
-    
+    hashMessages["Download_WaitingSpinMessage"] = "Descargando, por favor espere...";
+
 }
 
 function initVariables() {
@@ -989,6 +998,11 @@ function initVariables() {
         GLOBALPLAY_MAX_COLLISION_ELEMENTS = parseInt(_hdnGlobalplay_maxCollisionElements.val(), 10);
     }
 
+    // Is Version Portable HTML ?
+    var _hdnIsVersionPortable = $("#_hdnIsVersionPortable");
+    if (_hdnIsVersionPortable != null && _hdnIsVersionPortable.val() === "true") {
+        isVersionPortable = true;
+    }
 
 }
 
@@ -1184,7 +1198,6 @@ function openFullscreen_video(isHTML5, videoID) {
         light.show("blind", 500);
 
     }
-
 }
 
 function closeFullscreen() {
@@ -1294,6 +1307,7 @@ function addCommentClick() {
     } else {
         $("#dialog p").text(hashMessages["SeleccioneFolio"]);
         $("#dialog").dialog({
+            open: {},
             buttons: {
                 "Confirmar": function () {
                     $(this).dialog("close");
@@ -1307,6 +1321,7 @@ function removeElement() {
 
     $("#dialog p").text(hashMessages["SeleccioneElemento"]);
     $("#dialog").dialog({
+        open: {},
         buttons: {
             "Confirmar": function () {
                 $(this).dialog("close");
@@ -1539,7 +1554,7 @@ function events_line_click(event) {
     if (MAIN_LINE != null && MAIN_LINE.length && TIMELINE_POINTER != null && TIMELINE_POINTER.length) {
 
         // Show timeline pointer
-        TIMELINE_POINTER.show();
+        //TIMELINE_POINTER.show();
 
         // Set current pointer date, to the add-comment & upload-file functions
         setCurrentPointerPositionDate(event);
@@ -1595,7 +1610,7 @@ function clear_timeline() {
     $("#timeframe").hide();
     $("#playerContainer").addClass("disabled");
 
-    TIMELINE_POINTER.hide();
+    //TIMELINE_POINTER.hide();
 
     // Clear previous Folios ID
     $("#divFolioSelection_fileUpload").empty();
@@ -2132,9 +2147,9 @@ function paintSelectionClick(tapeID, timestamp) {
 
     // Left panel
     $("#tblLeftGridElements button[name='btnTimelineElement']").removeClass("active");
-    $("#tblLeftGridElements tr[id*='tape_'] > td > h5").attr("style", "font-weight:normal;"); //
-    $("#tblLeftGridElements tr[id*='tape_']").attr("style", "border: regular"); //
-    $("#tblLeftGridElements tr[id*='tape_'][name='Oreka']").css("background-color", "#D1E2F3");
+    $("#tblLeftGridElements tr[id*='tape_']:visible > td > h5").attr("style", "font-weight:normal;");
+    $("#tblLeftGridElements tr[id*='tape_']:visible").attr("style", "border: regular"); 
+    $("#tblLeftGridElements tr[id*='tape_'][name='Oreka']:visible").css("background-color", "#D1E2F3");
 
     // Bottom
     var vAllBottom_texts = $("g[id*='tlTape_'] > text");
@@ -2218,7 +2233,7 @@ function timeline_pointer_setLocation(tapeID) {
         sm2_progress_bd != null && sm2_progress_bd.length && sm2_progress != null && sm2_progress.length &&
         sm2_progress_track != null && sm2_progress_track.length && timeline != null) {
 
-        TIMELINE_POINTER.show();
+        //TIMELINE_POINTER.show();
 
         // Check if if exists at least one element
         if (tapeID > 0) {
@@ -2278,7 +2293,7 @@ function timeline_pointer_setLocation_AUX() {
         sm2_progress_bd != null && sm2_progress_bd.length && sm2_progress != null && sm2_progress.length &&
         sm2_progress_track != null && sm2_progress_track.length && timeline != null) {
 
-        TIMELINE_POINTER.show();
+        //TIMELINE_POINTER.show();
 
         var first_tapeID = 0;
         if (elementsInMemory != null && elementsInMemory.length > 0) {
@@ -2340,8 +2355,10 @@ function downloadElementClick(event) {
 
 function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, segmentID, isExtra, fileName, filePath, duration_formatStr, tapeType, fileStatus) {
 
-    // First of all, check user session is active
-    checkUserSession();
+    if (!isVersionPortable) {
+        // First of all, check user session is active
+        checkUserSession();
+    }
 
     /************************ General variables START ************************/
 
@@ -2588,8 +2605,18 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
     if (duration != null) {
         oldPlayer_activeElement_duration = duration;
     }
+
+    var _hdnDownload_folderPath_resources = $("#_hdnDownload_folderPath_resources");
+
     if (file_extension != null && file_extension.length > 0) {
-        oldPlayer_activeElement_extension = file_extension[0];
+        oldPlayer_activeElement_extension = file_extension[0];        
+
+        // Is Version Portable HTML ?
+        if (isVersionPortable) {
+            if (_hdnDownload_folderPath_resources != null && _hdnDownload_folderPath_resources != undefined) {
+                file_url = "./" + _hdnDownload_folderPath_resources.val() + "/" + segmentID + "." + file_extension;
+            }
+        }
     }
 
     var lblElementName = "Video Player";
@@ -2600,7 +2627,13 @@ function loadElementPlayer(tapeID, count, duration, timestamp, type_longStr, seg
             oldPlayer_activeElement_type = tapeType == "P" ? "S" : tapeType;
 
             // Special case
-            file_url = tapeType === "S" ? WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0" : file_url;
+            file_url = tapeType === "S" ? WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0" : file_url;            
+
+            if (isVersionPortable) {
+                if (_hdnDownload_folderPath_resources != null && _hdnDownload_folderPath_resources != undefined) {
+                    file_url = "./" + _hdnDownload_folderPath_resources.val() + "/" + segmentID + "." + file_extension;
+                }
+            }
 
             loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControlsMask_VIDEO, file_extension, divControlsMask_AUDIO, aPlayPause_VIDEO, fileName, duration, fileStatus, tapeID, segmentID);
             break;
@@ -2667,7 +2700,7 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
             case "ogg": {
 
                 $("#btnFullscreen").show(); // Any other video Fullscreen
-                $("#btnFullscreen").removeClass("disabled"); 
+                $("#btnFullscreen").removeClass("disabled");
 
                 $("#aBtnFullscreen").hide(); // FBS Fullscreen
                 $("#aBtnFullscreen").addClass("disabled");
@@ -2684,7 +2717,7 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
                     cursor: 'move'
                 });
 
-                $('#html_video').mousewheel(function(event, delta) {
+                $('#html_video').mousewheel(function (event, delta) {
                     if (delta > 0) {
                         doZoom(true);
                     } else {
@@ -2730,6 +2763,7 @@ function loadElement_video_screenRecording(file_url, divPlayer_VIDEO, divControl
     if (!ok) {
         $("#dialog p").text(hashMessages["UtilizarNavegador1"]);
         $("#dialog").dialog({
+            open: {},
             buttons: {
                 "Confirmar": function () {
                     $(this).dialog("close");
@@ -2802,7 +2836,13 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
         divControlsMask_AUDIO.on("click", { _tapeID: tapeID }, playAudioElement);
     }
     // Set background image
-    loadPlayerBoxImage("url('./assets/images/audio.png')");
+
+    // Is Version Portable HTML ?
+    var dir = "url('./assets/images/audio.png')";
+    if (isVersionPortable) {
+        var dir = "url('./files/assets/images/audio.png')";
+    }
+    loadPlayerBoxImage(dir);
 
     ////////////////////////////////////
 
@@ -2843,6 +2883,7 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
 
                     if ($("#wav_object1") != null && $("#wav_object1")[0] != null && $("#wav_object1")[0].controls != null) {
 
+                        // Icons effect
                         if (divControlsMask_AUDIO.hasClass("paused")) {
                             divControlsMask_AUDIO.addClass("playing");
                             divControlsMask_AUDIO.removeClass("paused");
@@ -2862,7 +2903,6 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
 
                         // Remove previous error messages from the audio player
                         setTimeout(function () {
-
                             $(".load-error").remove();
                         }, 200);
                     }
@@ -2872,8 +2912,38 @@ function loadElement_audio(file_url, divControlsMask_AUDIO, fileName, lnkSound_A
             // Click on Progress track AUDIO
             $("#sm2-progress-track_AUDIO").on("click", { _duration: duration_int }, pre_getClickPosition_AUDIO);
 
-
         } else { // Normal HTML5 Audio tag
+
+            if (isVersionPortable) {
+
+                aPlayPause_AUDIO.bind("click", function () {
+
+                    var player = window.sm2BarPlayers[0]; // Collection priority
+                    if (divControlsMask_AUDIO != null && divControlsMask_AUDIO.length > 0 && player != null) {
+
+                        // Icons effect
+                        if (divControlsMask_AUDIO.hasClass("paused")) {
+                            divControlsMask_AUDIO.addClass("playing");
+                            divControlsMask_AUDIO.removeClass("paused");
+
+                            player.actions.play();
+
+                        } else {
+                            divControlsMask_AUDIO.addClass("paused");
+                            divControlsMask_AUDIO.removeClass("playing");
+
+                            player.actions.pause();
+                        }
+
+                        // Remove previous error messages from the audio player
+                        setTimeout(function () {
+                            $(".load-error").remove();
+                        }, 200);
+
+                    }
+                });
+
+            }
 
             // Prepare audio player
             lnkSound_AUDIO.attr("href", file_url);
@@ -3023,7 +3093,14 @@ function loadElement_comment(divControlsMask_VIDEO, timestamp, fileName) {
             "</h1></div><div class='row'><p class='pull-left' style='margin-top:15px; text-align:left; word-wrap: break-word; width: 95%;'>" +
             fileName + "</p></div></div>");
     }
-    loadPlayerBoxImage("url('./assets/images/comments.png')");
+
+    // Is Version Portable HTML ?
+    var dir = "url('./assets/images/comments.png')";
+    if (isVersionPortable) {
+        var dir = "url('./files/assets/images/comments.png')";
+    }
+    loadPlayerBoxImage(dir);
+
     $("#lnkElementDownload").addClass("disabled");
     $("#btnRemoveElement").removeClass("disabled");
 }
@@ -3080,7 +3157,14 @@ function loadElement_document(divControlsMask_VIDEO, divControlsMask_AUDIO, time
             fileName + "</p></div>" +
             "<div class='row'><p class='pull-left' style='margin-top:15px;'> Click <a href='" + filePath_str + "'>aquí</a> para descargar y visualizar el documento.</p></div></div>");
     }
-    loadPlayerBoxImage("url('./assets/images/document.png')");
+
+    // Is Version Portable HTML ?
+    var dir = "url('./assets/images/document.png')";
+    if (isVersionPortable) {
+        var dir = "url('./files/assets/images/document.png')";
+    }
+    loadPlayerBoxImage(dir);
+
     $("#lnkElementDownload").removeClass("disabled");
 }
 
@@ -3650,6 +3734,7 @@ function loadClickConfirmRemoveButton_event(tapeID, isExtra) {
 
                         $("#dialog p").text(hashMessages["ElementoBorrado"]);
                         $("#dialog").dialog({
+                            open: {},
                             buttons: {
                                 "Confirmar": function () {
                                     $(this).dialog("close");
@@ -4314,6 +4399,7 @@ function addFileClick() {
     } else {
         $("#dialog p").text(hashMessages["SeleccioneFolio"]);
         $("#dialog").dialog({
+            open: {},
             buttons: {
                 "Confirmar": function () {
                     $(this).dialog("close");
@@ -4397,6 +4483,7 @@ function downloadAll() {
             var msj = hashMessages["MaximoElementosDescarga1"] + " " + MAX_DOWNLOAD_FILES + " " + hashMessages["MaximoElementosDescarga2"];
             $("#dialog p").text(msj);
             $("#dialog").dialog({
+                open: {},
                 buttons: {
                     "Confirmar": function () {
                         $(this).dialog("close");
@@ -4408,13 +4495,13 @@ function downloadAll() {
 
             $("#dialog p").text(hashMessages["ConfirmarDesgargaElementos"]);
             $("#dialog").dialog({
+                open: {},
                 resizable: false,
                 height: 140,
                 modal: true,
                 buttons: {
                     "Confirmar": function () {
-                        multiDownload1(list_elements);
-                        $(this).dialog("close");
+                        multiDownload(list_elements);
                     },
                     Cancel: function () {
                         $(this).dialog("close");
@@ -4430,6 +4517,7 @@ function downloadAll() {
 
             $("#dialog p").text(hashMessages["SeleccioneElemento"]);
             $("#dialog").dialog({
+                open: {},
                 buttons: {
                     "Confirmar": function () {
                         $(this).dialog("close");
@@ -4441,80 +4529,12 @@ function downloadAll() {
     } else {
         $("#dialog p").text(hashMessages["SeleccioneFolio"]);
         $("#dialog").dialog({
+            open: {},
             buttons: {
                 "Confirmar": function () {
                     $(this).dialog("close");
-                }
-            }
-        });
-    }
-}
-
-
-function downloadAll2() {
-
-    // Check if folio is selected
-    var _hdnFolioID = $("input[id*='_hdnFolioID']");
-    if (_hdnFolioID != null && _hdnFolioID.val() != null && _hdnFolioID.val().length > 0) {
-
-        // Get only visible and checked checkboxes to remove
-        var list_elements = [];
-        $('tr:visible td input:checked').each(function () {
-            list_elements.push($(this).attr('value'));
-        });
-        if (list_elements.length > MAX_DOWNLOAD_FILES) {
-
-            var msj = hashMessages["MaximoElementosDescarga1"] + " " + MAX_DOWNLOAD_FILES + " " + hashMessages["MaximoElementosDescarga2"];
-            $("#dialog p").text(msj);
-            $("#dialog").dialog({
-                buttons: {
-                    "Confirmar": function () {
-                        $(this).dialog("close");
-                    }
-                }
-            });
-
-        } else if (list_elements.length > 0) {
-
-            $("#dialog p").text(hashMessages["ConfirmarDesgargaElementos"]);
-            $("#dialog").dialog({
-                resizable: false,
-                height: 140,
-                modal: true,
-                buttons: {
-                    "Confirmar": function () {
-                        multiDownload2(list_elements);
-                        $(this).dialog("close");
-                    },
-                    Cancel: function () {
-                        $(this).dialog("close");
-                    }
                 },
-                close: function (event, ui) {
-                    //$(this).dialog('destroy').remove()
-                }
-
-            });
-
-        } else if (list_elements.length == 0) {
-
-            $("#dialog p").text(hashMessages["SeleccioneElemento"]);
-            $("#dialog").dialog({
-                buttons: {
-                    "Confirmar": function () {
-                        $(this).dialog("close");
-                    }
-                }
-            });
-
-        }
-    } else {
-        $("#dialog p").text(hashMessages["SeleccioneFolio"]);
-        $("#dialog").dialog({
-            buttons: {
-                "Confirmar": function () {
-                    $(this).dialog("close");
-                }
+                open: {},
             }
         });
     }
@@ -4572,7 +4592,6 @@ function getDatetime_onPointerPosition(){
     return position_date_str;
 }
 
-
 // Get duration format in ms for timeouts
 function getDurationInMS(duration) {
     return duration * 1000;
@@ -4598,9 +4617,7 @@ function type(o) {
     return TYPES[typeof o] || TYPES[TOSTRING.call(o)] || (o ? 'object' : 'null');
 };
 
-function multiDownload1(objects) {
-    //var files = [];
-
+function multiDownload(objects) {
     var ok = false;
     var hdnElementsToDownload = $("input[id*='_hdnElementsToDownload']");
     if (hdnElementsToDownload != null) {
@@ -4615,29 +4632,24 @@ function multiDownload1(objects) {
                     var isExtra = array[1];
                     var mediaType = array[2];
                     var fileName = array[3];
-                    if (mediaType != "C") {
-                        var filePath_str = "";
+                    var filePath_str = "";
 
-                        if (isExtra != null && isExtra.length > 0) {
-                            var isExtra_str = isExtra.toString();
-                            if (isExtra_str.toLowerCase() === "true") {
+                    if (isExtra != null && isExtra.length > 0) {
+                        var isExtra_str = isExtra.toString();
+                        if (isExtra_str.toLowerCase() === "true") {
+                            filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=1";
 
-                                filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=1";
-
-                            } else {
-
-                                filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0";
-                                //filePath_str = WS_Oreka_Server + ":" + WS_Oreka_Port + WS_Oreka_URL + "?segid=" + segmentID;
-                            }
-
-                            var elements = hdnElementsToDownload.val() + "#" + filePath_str + "$" + fileName + "$" + isExtra;
-                            hdnElementsToDownload.val(elements);
-                            ok = true;
+                        } else {
+                            filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0";
                         }
+
+                        var elements = hdnElementsToDownload.val() + "#" + filePath_str + "$" + fileName + "$" + isExtra + "$" + segmentID;
+                        hdnElementsToDownload.val(elements);
+                        ok = true;
                     }
                 }
             }
-        }
+        } // for
 
         if (ok) {
             // Remove first "#"
@@ -4650,48 +4662,54 @@ function multiDownload1(objects) {
                     hdnElementsToDownload.val(aux);
                 }
             }
-            // Call server
-            doDownloadElements();
-        }
-    }
-}
+            // Spin effect
+            // Source: http://www.jqueryscript.net/demo/jQuery-Plugin-For-Creating-Loading-Overlay-with-CSS3-Animations-waitMe/
+            // http://www.jqueryscript.net/loading/jQuery-Plugin-For-Creating-Loading-Overlay-with-CSS3-Animations-waitMe.html
 
+            var msg = hashMessages["Download_WaitingSpinMessage"];
+            // Load waiting spin
+            $('#dialog').waitMe({
+                effect: 'roundBounce',
+                text: msg,
+                bg: 'rgba(255, 255, 255, 0.7)',
+                color: '#000'
+            });
 
-function multiDownload2(objects) {
-    //var files = [];
+            // Waiting sping styles
+            $("#dialog .waitMe_progress").css("width", "40px");
+            $("#dialog .waitMe_progress").css("height", "40px");
+            $("#dialog .waitMe_progress").css("margin-top", "10px");
 
-    var ok = false;
-    var hdnElementsToDownload = $("input[id*='_hdnElementsToDownload']");
-    if (hdnElementsToDownload != null) {
+            $("#dialog").dialog("close");
 
-        hdnElementsToDownload.val("");
-
-        for (obj in objects) {
-            if (objects[obj] != null && objects[obj].length) {
-                var array = objects[obj].split("#");
-                if (array != null && array.length > 3) {
-                    var segmentID = array[0];
-
-                    var elements = hdnElementsToDownload.val() + "#" + segmentID;
-                    hdnElementsToDownload.val(elements);
-                    ok = true;
-                }
+            // Get waiting spin duration
+            var Download_WaitingSpinDuration = 3000;
+            var _hdnDownload_WaitingSpinDuration = $("#_hdnDownload_WaitingSpinDuration");
+            if (_hdnDownload_WaitingSpinDuration != null && _hdnDownload_WaitingSpinDuration.val() != null && _hdnDownload_WaitingSpinDuration.val().length > 0) {
+                Download_WaitingSpinDuration = parseInt(_hdnDownload_WaitingSpinDuration.val(), 10);
             }
-        }
 
-        if (ok) {
-            // Remove first "#"
-            var elementsToDownload_str = hdnElementsToDownload.val();
-            var aux = elementsToDownload_str;
-            if (elementsToDownload_str != null && elementsToDownload_str.length > 0) {
-                if (elementsToDownload_str.charAt(0) === "#") {
-                    aux = elementsToDownload_str.substring(1);
+            // Spining dialog container
+            $("#dialog p").text("");
+            $("#dialog").dialog({
+                dialogClass: "no-close",
+                resizable: false,
+                height: 140,
+                modal: true,
+                buttons: {
+                },
+                open: function () {
+                    // Call server
+                    doDownloadElements();
 
-                    hdnElementsToDownload.val(aux);
+                    setTimeout(function () {
+                        $("#dialog").dialog("close");
+                        $("#dialog").waitMe("hide");
+
+                    }, Download_WaitingSpinDuration);
                 }
-            }
-            // Call server
-            doDownloadElements2();
+            });
+
         }
     }
 }
@@ -4902,6 +4920,7 @@ function prepareFileUpload_a(e) {
 
         $("#dialog p").text(hashMessages["SeleccioneFolioID"]);
         $("#dialog").dialog({
+            open: {},
             buttons: {
                 "Confirmar": function () {
                     $(this).dialog("close");
@@ -4918,6 +4937,7 @@ function prepareFileUpload_a(e) {
 
         $("#dialog p").text(hashMessages["SeleccioneArchivo"]);
         $("#dialog").dialog({
+            open: {},
             buttons: {
                 "Confirmar": function () {
                     $(this).dialog("close");
@@ -4941,6 +4961,7 @@ function prepareFileUpload_b(e) {
 
         $("#dialog p").text(hashMessages["IngreseNumeroCamara"]);
         $("#dialog").dialog({
+            open: {},
             buttons: {
                 "Confirmar": function () {
                     $(this).dialog("close");
@@ -5070,6 +5091,7 @@ function confirmAddComment() {
 
         $("#dialog p").text(hashMessages["ComentarioGuardado"]);
         $("#dialog").dialog({
+            open: {},
             buttons: {
                 "Confirmar": function () {
                     $(this).dialog("close");
@@ -5080,6 +5102,7 @@ function confirmAddComment() {
     else {
         $("#dialog p").text(hashMessages["SeleccioneFolioID"]);
         $("#dialog").dialog({
+            open: {},
             buttons: {
                 "Confirmar": function () {
                     $(this).dialog("close");

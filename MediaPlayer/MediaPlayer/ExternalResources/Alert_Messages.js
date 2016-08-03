@@ -23,3 +23,4 @@ hashMessages["ConfirmarBorrarUnElemento"] = "Está a punto de borrar el elemento
 hashMessages["SeleccioneFolioID"] = "Por favor, seleccione un número de Folio.";
 hashMessages["DatosIncorrectos"] = "Datos incorrectos.";
 hashMessages["SesionFinalizada"] = "Su sesión activa ha expirado.";
+hashMessages["Download_WaitingSpinMessage"] = "Descargando, por favor espere...";

@@ -1275,7 +1275,7 @@
          */
 
         this._writeDebug = function (sText, sTypeOrObject) {
-
+            /*
             // pseudo-private console.log()-style output
             // <d>
 
@@ -1284,7 +1284,6 @@
             if (!sm2.setupOptions.debugMode) {
                 return false;
             }
-
             if (hasConsole && sm2.useConsole) {
                 if (sTypeOrObject && typeof sTypeOrObject === 'object') {
                     // object passed; dump to console.
@@ -1298,7 +1297,6 @@
                     return true;
                 }
             }
-
             o = id(sDID);
 
             if (!o) {
@@ -1338,7 +1336,7 @@
             // </d>
 
             return true;
-
+            */
         };
 
         // <d>
@@ -5931,10 +5929,10 @@
             if (sm2.useHTML5Audio && sm2.hasHTML5) {
                 for (item in sm2.audioFormats) {
                     if (sm2.audioFormats.hasOwnProperty(item)) {
-                        tests.push(item + ' = ' + sm2.html5[item] + (!sm2.html5[item] && needsFlash && sm2.flash[item] ? ' (using flash)' : (sm2.preferFlash && sm2.flash[item] && needsFlash ? ' (preferring flash)' : (!sm2.html5[item] ? ' (' + (sm2.audioFormats[item].required ? 'required, ' : '') + 'and no flash support)' : ''))));
+                        //tests.push(item + ' = ' + sm2.html5[item] + (!sm2.html5[item] && needsFlash && sm2.flash[item] ? ' (using flash)' : (sm2.preferFlash && sm2.flash[item] && needsFlash ? ' (preferring flash)' : (!sm2.html5[item] ? ' (' + (sm2.audioFormats[item].required ? 'required, ' : '') + 'and no flash support)' : ''))));
                     }
                 }
-                sm2._wD('SoundManager 2 HTML5 support: ' + tests.join(', '), 1);
+                //sm2._wD('SoundManager 2 HTML5 support: ' + tests.join(', '), 1);
             }
 
             // </d>

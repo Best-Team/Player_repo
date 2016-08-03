@@ -463,6 +463,24 @@ namespace MediaPlayer {
         protected global::System.Web.UI.WebControls.HiddenField _hdnElementsToDownload;
         
         /// <summary>
+        /// _hdnDownload_folderPath_resources control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField _hdnDownload_folderPath_resources;
+        
+        /// <summary>
+        /// _hdnDownload_WaitingSpinDuration control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField _hdnDownload_WaitingSpinDuration;
+        
+        /// <summary>
         /// _hdnFolioID_selected control.
         /// </summary>
         /// <remarks>

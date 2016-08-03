@@ -201,6 +201,7 @@ function globalplay_loadElements() {
                 if (element_alreadyTaken[1] == false) {
                     globalplay_setElementAlreadyTaken(element_alreadyTaken[0].tapeID, true);
 
+                    var fileName = element_alreadyTaken[0].fileName;
                     var segmentID = element_alreadyTaken[0].segmentID;
                     var tapeType = element_alreadyTaken[0].tapeType;
                     var isVisual = (tapeType == "V" || tapeType == "S" || tapeType == "I") ? true : false;
@@ -233,6 +234,18 @@ function globalplay_loadElements() {
                     var dynamic_id = "";
                     var audio_object = null;
 
+
+                    // Get file extension
+                    var file_extension = getFileExtension(fileName);
+                    var _hdnDownload_folderPath_resources = $("#_hdnDownload_folderPath_resources");
+
+                    // Is Version Portable HTML ?
+                    if (isVersionPortable) {
+                        if (_hdnDownload_folderPath_resources != null && _hdnDownload_folderPath_resources != undefined) {
+                            file_url = "./" + _hdnDownload_folderPath_resources.val() + "/" + segmentID + "." + file_extension;
+                        }
+                    }
+
                     switch (tapeType) {
                         case "A": {
                             audio_object = globalplay_audio(file_url, element_alreadyTaken, global_numberID, flex_div, element_current_duration);
@@ -244,6 +257,12 @@ function globalplay_loadElements() {
 
                             // Special case
                             file_url = tapeType === "S" ? WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0" : file_url;
+
+                            if (isVersionPortable) {
+                                if (_hdnDownload_folderPath_resources != null && _hdnDownload_folderPath_resources != undefined) {
+                                    file_url = "./" + _hdnDownload_folderPath_resources.val() + "/" + segmentID + "." + file_extension;
+                                }
+                            }
 
                             dynamic_id = globalplay_video_screenRecording(file_url, visual_size.width, visual_size.height, flex_div, element_alreadyTaken, global_numberID, element_current_duration);
                             break;
