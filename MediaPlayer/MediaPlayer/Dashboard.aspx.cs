@@ -1497,70 +1497,70 @@ namespace MediaPlayer
                 #region Get Configuration variables 
 
                 // Get Client file name
-                string client_fileName_html = string.Empty;
+                string client_fileName_html = "MP_portable.html";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     client_fileName_html = ConfigurationManager.AppSettings["Download_ClientName"].ToString();
                 }
 
                 // Get Client file name exe
-                string client_fileName_exe = string.Empty;
+                string client_fileName_exe = "MP_portable.exe";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     client_fileName_exe = ConfigurationManager.AppSettings["Download_ClientName_exe"].ToString();
                 }
 
                 // Get Client folder name: files
-                string folder_path_files = string.Empty;
+                string folder_path_files = @"MP_client\files";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     folder_path_files = ConfigurationManager.AppSettings["Download_folderPath_files"].ToString();
                 }
 
                 // Get Client folder name: fonts
-                string folder_path_fonts = string.Empty;
+                string folder_path_fonts = @"MP_client\fonts";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     folder_path_fonts = ConfigurationManager.AppSettings["Download_folderPath_fonts"].ToString();
                 }
 
                 // Get Client folder name: image
-                string folder_path_image = string.Empty;
+                string folder_path_image = @"MP_client\image";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     folder_path_image = ConfigurationManager.AppSettings["Download_folderPath_image"].ToString();
                 }
 
                 // Get Client folder name: images
-                string folder_path_images = string.Empty;
+                string folder_path_images = @"MP_client\images";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     folder_path_images = ConfigurationManager.AppSettings["Download_folderPath_images"].ToString();
                 }
 
                 // Get Client file name: Dashboard.js
-                string filePath_DashboardJS = string.Empty;
+                string filePath_DashboardJS = @"assets\js\Dashboard.js";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     filePath_DashboardJS = ConfigurationManager.AppSettings["Download_filePath_DashboardJS"].ToString();
                 }
 
                 // Get Client file name: Globalplay.js
-                string filePath_GlobalplayJS = string.Empty;
+                string filePath_GlobalplayJS = @"assets\js\Globalplay.js";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     filePath_GlobalplayJS = ConfigurationManager.AppSettings["Download_filePath_GlobalplayJS"].ToString();
                 }
 
                 // Get Client file name: Dashboard.css
-                string filePath_DashboardCSS = string.Empty;
+                string filePath_DashboardCSS = @"assets\css\Dashboard.css";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     filePath_DashboardCSS = ConfigurationManager.AppSettings["Download_filePath_DashboardCSS"].ToString();
                 }
 
                 // Get Client folder path
-                string filePath_Resources = string.Empty;
+                string filePath_Resources = "files/Resources";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     filePath_Resources = ConfigurationManager.AppSettings["Download_folderPath_resources"].ToString();
