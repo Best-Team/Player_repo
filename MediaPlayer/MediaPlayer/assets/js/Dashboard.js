@@ -705,6 +705,7 @@ function loadClickRemoveElementSelected_event() {
     });
 }
 
+// 
 function afterDownloadFiles() {
     checkAll_checkboxes();
     pre_timeframe_prepare();
@@ -4702,6 +4703,8 @@ function multiDownload(objects) {
                     // Call server
                     doDownloadElements();
 
+                    //DownloadHTML_Click_AJAX();
+
                     setTimeout(function () {
                         $("#dialog").dialog("close");
                         $("#dialog").waitMe("hide");
@@ -4711,6 +4714,41 @@ function multiDownload(objects) {
             });
 
         }
+    }
+}
+
+function DownloadHTML_Click_AJAX() {
+    
+    //var dynamic_table = $("#tblLeftGridElements")[0];
+    var dynamic_table = $("#tblLeftGridElements").prop('outerHTML');
+    var hdnJSonList = $("input[id*='_hdnJSonList']").val();
+    var hdnElementsToDownload = $("input[id*='_hdnElementsToDownload']").val();
+    var hdnFolioID = $("input[id*='_hdnFolioID']").val();
+
+    if (hdnJSonList != null && hdnJSonList.length && hdnElementsToDownload != null && hdnElementsToDownload.length && hdnFolioID != null &&
+        hdnFolioID.length && dynamic_table != null) {
+
+        console.log("Ajax call: Dashboard.aspx/DownloadHTML_Click_2. Params:");
+        console.log("dynamic_table, type: " + type(dynamic_table)); // Issue
+        console.log("hdnJSonList, type: " + type(hdnJSonList)); // Issue
+        console.log("hdnElementsToDownload, type: " + type(hdnElementsToDownload));
+        console.log("hdnFolioID, type: " + type(hdnFolioID));
+        console.log("End Ajax call");
+
+        $.ajax({
+            type: "POST",
+            url: "Dashboard.aspx/DownloadHTML_Click_2",
+            //data: '{dynamic_table: "' + dynamic_table + '", hdnJSonList: "' + hdnJSonList + '", hdnElementsToDownload: "' + hdnElementsToDownload + '", hdnFolioID: "' + hdnFolioID + '"}',
+            data: '{dynamic_table: "' + dynamic_table + '"}',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (response) {
+                alert("HOLA !!");
+            }, // end success
+            failure: function (response) {
+                console.log("Ajax call: Dashboard.aspx/DownloadHTML_Click_2. Status: Failure");
+            }
+        });
     }
 }
 

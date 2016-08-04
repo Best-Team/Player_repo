@@ -1081,6 +1081,13 @@ namespace MediaPlayer
             // Source: http://stackoverflow.com/questions/13762338/read-files-from-a-folder-present-in-project
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
+            // Get FolioID
+            string folioID = string.Empty;
+            if (ViewState["FolioID"] != null)
+            {
+                folioID = ViewState["FolioID"].ToString();
+            }
+
             // Get static HTML client
             string staticHTML_client = string.Empty;
             if (ConfigurationManager.AppSettings != null)
@@ -1254,12 +1261,12 @@ namespace MediaPlayer
                             }
 
                             #region Send data by Hidden Fields 
-
+                            
                             // Send FolioID
                             HtmlNode hdnFolioID_node = html_doc.DocumentNode.SelectSingleNode("//input[@id='_hdnFolioID']");
                             if (hdnFolioID_node != null)
                             {
-                                hdnFolioID_node.Attributes["value"].Value = ViewState["FolioID"].ToString();
+                                hdnFolioID_node.Attributes["value"].Value = folioID;
                             }
 
                             // Send JSonList updated
@@ -1331,13 +1338,13 @@ namespace MediaPlayer
                         }
 
                         // Download ZIP file
-                        Download_ZipFiles(static_HTML, listElementsFilesPath);
+                        Download_ZipFiles(static_HTML, listElementsFilesPath, folioID);
                     }
                 }
             }
         }
 
-        protected void Download_ZipFiles(string static_HTML, List<Tuple<string, string, string, string>> listElementsFilesPath)
+        protected void Download_ZipFiles(string static_HTML, List<Tuple<string, string, string, string>> listElementsFilesPath, string folioID)
         {
             // Revisar
             // http://dotnetzip.codeplex.com/discussions/231933
@@ -1350,12 +1357,7 @@ namespace MediaPlayer
                 string className = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
                 string methodName = stackFrame.GetMethod().Name;
 
-                string folioID = string.Empty;
-                if (ViewState["FolioID"] != null)
-                {
-                    folioID = ViewState["FolioID"].ToString();
-                }
-                string zipName = String.Format("MP_portable{0}.zip", folioID);
+                string zipName = String.Format("MP_portable{0}.exe", folioID);
 
                 #region Get Configuration variables 
 
@@ -1541,7 +1543,7 @@ namespace MediaPlayer
                                     if (ok)
                                     {
                                         //zip.Save(Response.OutputStream);
-                                  
+
                                         // Repository temp path
                                         string repository_temp = string.Empty;
                                         if (ConfigurationManager.AppSettings != null)
@@ -1560,6 +1562,7 @@ namespace MediaPlayer
                                             SelfExtractorSaveOptions options = new SelfExtractorSaveOptions();
                                             options.Flavor = SelfExtractorFlavor.ConsoleApplication;
                                             options.Quiet = true;
+                                            options.Description = "inConcert MP_Portable";
                                             options.DefaultExtractDirectory = repository_temp;
                                             options.PostExtractCommandLine = repository_temp + "\\" + client_fileName_html;
                                             options.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;
@@ -1586,12 +1589,24 @@ namespace MediaPlayer
                                         string path = Server.MapPath(".\\Temp\\" + client_fileName_exe);
                                         if (File.Exists(path))
                                         {
+                                            //ScriptManager.RegisterStartupScript(this, typeof(Page), "ok_script", "alert('OK');", true);
+
                                             Response.Clear();
                                             Response.BufferOutput = false;
                                             Response.ContentType = "application/exe";
-                                            Response.AddHeader("content-disposition", "attachment; filename=" + client_fileName_exe);
+                                            Response.AddHeader("content-disposition", "attachment; filename=" + zipName);
                                             Response.TransmitFile(path);
+                                            Response.Flush();
                                             Response.End();
+
+                                            //Response.WriteFile(path);
+                                            //Response.Flush();
+                                            //HttpContext.Current.ApplicationInstance.CompleteRequest();
+                                            //Response.End();
+
+                                            // Fire the timeframe drawing
+                                            //ScriptManager.RegisterStartupScript(this, typeof(Page), "afterDownloadFiles", "afterDownloadFiles();", true);
+
                                         }
                                     }
                                 }
@@ -1606,24 +1621,557 @@ namespace MediaPlayer
                 }
             }
         }
-
-        private void Download_HTML(string _html)
+     
+        [System.Web.Services.WebMethod]
+        public static string DownloadHTML_Click_2(string dynamic_table, string hdnJSonList, string hdnElementsToDownload, string hdnFolioID)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(_html);
-            sb.Append("\r\n");
+            // #1- Logger variables
+            System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame();
+            string className = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
+            string methodName = stackFrame.GetMethod().Name;
 
-            string text = sb.ToString();
+            List<Tuple<string, string, string, string>> listElementsFilesPath = new List<Tuple<string, string, string, string>>();
 
-            Response.Clear();
-            Response.ClearHeaders();
+            // Source: http://stackoverflow.com/questions/13762338/read-files-from-a-folder-present-in-project
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
-            Response.AddHeader("Content-Length", text.Length.ToString());
-            Response.ContentType = "text/plain";
-            Response.AppendHeader("content-disposition", "attachment;filename=\"MP_client.html\"");
+            // Get static HTML client
+            string staticHTML_client = string.Empty;
+            if (ConfigurationManager.AppSettings != null)
+            {
+                staticHTML_client = ConfigurationManager.AppSettings["staticHTML_client_path"].ToString();
+            }
+            string path = Path.Combine(Directory.GetCurrentDirectory(), staticHTML_client);
+            if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            {
+                string static_HTML = File.ReadAllText(path);
+                string div_container_ID = "divElementos";
 
-            Response.Write(text);
-            Response.End();
+                // Get dynamic table with elements
+                //string dynamic_table = litTable.Text;
+
+                /* ************** */
+                // HTML Agility Pack: http://htmlagilitypack.codeplex.com/wikipage?title=Examples
+                // http://www.codeproject.com/Tips/804660/How-to-Parse-HTML-using-Csharp
+
+                if (!string.IsNullOrWhiteSpace(static_HTML) && !string.IsNullOrWhiteSpace(div_container_ID) && !string.IsNullOrWhiteSpace(dynamic_table))
+                {
+                    // Create document
+                    HtmlDocument html_doc_Table = new HtmlDocument();
+                    html_doc_Table.LoadHtml(dynamic_table);
+
+                    // Create collection of tr nodes
+                    HtmlNodeCollection tr_nodes_toDownload = new HtmlNodeCollection(html_doc_Table.DocumentNode);
+
+                    // Get all folio elements
+                    RootObject json_elementList = JsonConvert.DeserializeObject<RootObject>(hdnJSonList);
+                    List<Span> spans_aux = new List<Span>();
+
+                    // Folio start date and end date
+                    DateTime folio_start = DateTime.MaxValue;
+                    DateTime folio_end = DateTime.MinValue;
+
+                    string hdnElementsAttributes_str = string.Empty;
+
+                    try
+                    {
+                        string[] elements_array;
+                        if (hdnElementsToDownload.Length > 0)
+                        {
+                            // Recorro los elementos seleccionados
+                            elements_array = hdnElementsToDownload.Split('#');
+                            if (elements_array != null && elements_array.Length > 0)
+                            {
+                                int index = 1;
+
+                                string[] fileData_array;
+                                foreach (string element in elements_array)
+                                {
+                                    if (!string.IsNullOrWhiteSpace(element))
+                                    {
+                                        fileData_array = element.Split('$');
+                                        if (fileData_array != null && fileData_array.Length > 3)
+                                        {
+                                            string file_path = fileData_array[0];
+                                            string file_name = fileData_array[1];
+                                            string file_isExtra = fileData_array[2];
+                                            string segmentID = fileData_array[3];
+
+                                            if (!string.IsNullOrWhiteSpace(file_path) && !string.IsNullOrWhiteSpace(file_name) && !string.IsNullOrWhiteSpace(file_isExtra))
+                                            {
+                                                HtmlNode tr_node = html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segmentID + "']");
+
+                                                // Update index number
+                                                html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segmentID + "'] //h5").InnerHtml = index.ToString();
+                                                tr_nodes_toDownload.Add(tr_node);
+
+                                                string userName_str = string.Empty;
+                                                if (html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segmentID + "'] ").ChildNodes[1].ChildNodes[3].ChildNodes[3].ChildNodes[1].InnerHtml != null)
+                                                {
+                                                    userName_str = html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segmentID + "'] ").ChildNodes[1].ChildNodes[3].ChildNodes[3].ChildNodes[1].InnerHtml;
+                                                }
+
+                                                // Recorro todos los elementos del folio
+                                                foreach (var span in json_elementList.spans)
+                                                {
+                                                    if (span.id == segmentID)
+                                                    {
+                                                        spans_aux.Add(span);
+
+                                                        // JSon Element data
+                                                        string groupName = span.name; // missing data !!
+                                                        string mediaType = span.type;
+                                                        string duration = span.duration;
+                                                        string timestamp = span.start;
+                                                        string fileName = file_name; // missing data !!
+                                                        string end_date = span.end;
+                                                        string filePath = file_path; // missing data !!
+                                                        string duration_formatStr = span.duration;
+                                                        string fileStatus = "OK";
+                                                        string userName = string.Empty;
+
+                                                        if (!string.IsNullOrWhiteSpace(userName_str))
+                                                        {
+                                                            userName = userName_str;
+                                                        }
+
+                                                        // Get filtered elements MIN date
+                                                        DateTime timestamp_date = DateTime.Now;
+                                                        if (!DateTime.TryParseExact(timestamp, "dd-MM-yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out timestamp_date))
+                                                        {
+                                                            timestamp_date = DateTime.Now;
+                                                        }
+
+                                                        // Get filtered elements MAX date
+                                                        DateTime end_date_date = DateTime.Now;
+                                                        if (!DateTime.TryParseExact(end_date, "dd-MM-yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out end_date_date))
+                                                        {
+                                                            end_date_date = DateTime.Now;
+                                                        }
+
+                                                        var diffInSeconds = (end_date_date - timestamp_date).TotalSeconds;
+
+                                                        // Get MX and MIN value of filtered folio
+                                                        folio_start = folio_start > timestamp_date ? timestamp_date : folio_start;
+                                                        folio_end = folio_end < end_date_date ? end_date_date : folio_end;
+
+                                                        duration = diffInSeconds.ToString();
+                                                        duration_formatStr = string.Format("{0:00}:{1:00}:{2:00}", diffInSeconds / 3600, (diffInSeconds / 60) % 60, diffInSeconds % 60);
+
+                                                        // Recupero la lista de elementos
+                                                        hdnElementsAttributes_str += segmentID + "#" + groupName + "#" + mediaType + "#" + duration + "#" + timestamp + "#" + segmentID
+                                                            + "#" + index + "#" + fileName + "#" + end_date + "#" + filePath + "#" + duration_formatStr + "#" + fileStatus + "#" + userName + "$";
+                                                    }
+                                                } // foreach
+
+                                                listElementsFilesPath.Add(new Tuple<string, string, string, string>(segmentID, file_path, file_isExtra, file_name));
+                                            }
+                                        }
+                                    }
+
+                                    index++;
+                                } // foreach
+                            }
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // #2- Logger exception
+                        Logger.LogError("(%s) (%s) -- Excepcion. Recorriendo elementos seleccionados. ERROR: %s", className, methodName, ex.Message);
+                    }
+
+                    if (tr_nodes_toDownload != null && tr_nodes_toDownload.Count > 0)
+                    {
+                        try
+                        {
+                            // Filtrar elementos seleccionados
+                            HtmlNode tr_node_parent = html_doc_Table.DocumentNode.SelectSingleNode("//tbody");
+                            if (tr_node_parent != null)
+                            {
+                                tr_node_parent.RemoveAllChildren();
+                                tr_node_parent.AppendChildren(tr_nodes_toDownload);
+                            }
+
+                            // Create document
+                            HtmlDocument html_doc = new HtmlDocument();
+                            html_doc.LoadHtml(static_HTML);
+
+                            // Create table node
+                            HtmlNode table_node = HtmlNode.CreateNode(html_doc_Table.DocumentNode.OuterHtml);
+
+                            // Get container div
+                            HtmlNode divElementos_node = html_doc.DocumentNode.SelectSingleNode("//div[@id='" + div_container_ID + "']");
+                            if (divElementos_node != null)
+                            {
+                                divElementos_node.AppendChild(table_node);
+                            }
+
+                            #region Send data by Hidden Fields 
+
+                            // Send FolioID
+                            HtmlNode hdnFolioID_node = html_doc.DocumentNode.SelectSingleNode("//input[@id='_hdnFolioID']");
+                            if (hdnFolioID_node != null)
+                            {
+                                hdnFolioID_node.Attributes["value"].Value = hdnFolioID;
+                            }
+
+                            // Send JSonList updated
+                            json_elementList.spans = spans_aux;
+                            HtmlNode hdnJSonList_node = html_doc.DocumentNode.SelectSingleNode("//input[@id='_hdnJSonList']");
+                            if (hdnJSonList_node != null)
+                            {
+                                string value = JsonConvert.SerializeObject(json_elementList).Replace(@"""", "&quot;"); ;
+                                hdnJSonList_node.Attributes["value"].Value = value;
+                            }
+
+                            // Send JSonList updated
+                            HtmlNode hdnJSonStart_node = html_doc.DocumentNode.SelectSingleNode("//input[@id='_hdnJSonStart']");
+                            if (hdnJSonStart_node != null)
+                            {
+                                string folio_start_final = folio_start.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
+                                hdnJSonStart_node.Attributes["value"].Value = folio_start_final;
+                            }
+
+                            // Send JSonList updated
+                            HtmlNode hdnJSonEnd_node = html_doc.DocumentNode.SelectSingleNode("//input[@id='_hdnJSonEnd']");
+                            if (hdnJSonEnd_node != null)
+                            {
+                                string folio_end_final = folio_end.ToString("dd'-'MM'-'yyyy HH':'mm':'ss");
+                                hdnJSonEnd_node.Attributes["value"].Value = folio_end_final;
+                            }
+
+                            // Send Element attributes updated
+                            if (hdnElementsAttributes_str.Length > 0)
+                            {
+                                hdnElementsAttributes_str = hdnElementsAttributes_str.Remove(hdnElementsAttributes_str.Length - 1);
+                            }
+
+                            HtmlNode hdnElementsAttributes = html_doc.DocumentNode.SelectSingleNode("//input[@id='_hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName']");
+                            if (hdnElementsAttributes != null)
+                            {
+                                hdnElementsAttributes.Attributes["value"].Value = hdnElementsAttributes_str;
+                            }
+
+                            // Send Build datetime                        
+                            HtmlNode divBuild_node = html_doc.DocumentNode.SelectSingleNode("//div[@id='mainFooterCopyright']/label");
+                            if (divBuild_node != null)
+                            {
+                                divBuild_node.InnerHtml = "Generado: " + DateTime.Now;
+                            }
+
+                            // Send Folder Path resources
+                            string Download_folderPath_resources = @"files\Resources";
+                            if (ConfigurationManager.AppSettings != null)
+                            {
+                                Download_folderPath_resources = ConfigurationManager.AppSettings["Download_folderPath_resources"].ToString();
+                            }
+
+                            HtmlNode hdnDownload_folderPath_resources = html_doc.DocumentNode.SelectSingleNode("//input[@id='_hdnDownload_folderPath_resources']");
+                            if (hdnDownload_folderPath_resources != null)
+                            {
+                                hdnDownload_folderPath_resources.Attributes["value"].Value = Download_folderPath_resources;
+                            }
+
+                            #endregion
+
+                            // Convert to string
+                            static_HTML = html_doc.DocumentNode.OuterHtml;
+                        }
+                        catch (Exception ex)
+                        {
+                            // #2- Logger exception
+                            Logger.LogError("(%s) (%s) -- Excepcion. Manipulando HTML DOM con HTML Agility Pack. ERROR: %s", className, methodName, ex.Message);
+                        }
+
+                        // Download ZIP file
+                        Download_ZipFiles_2(static_HTML, listElementsFilesPath, hdnFolioID);
+                    }
+                }
+            }
+            return "";
+        }
+
+
+        [System.Web.Services.WebMethod]
+        public static void Download_ZipFiles_2(string static_HTML, List<Tuple<string, string, string, string>> listElementsFilesPath, string FolioID_str)
+        {
+            // Revisar
+            // http://dotnetzip.codeplex.com/discussions/231933
+            // http://dotnetzip.codeplex.com/discussions/234342
+
+            if (!string.IsNullOrWhiteSpace(static_HTML))
+            {
+                // #1- Logger variables
+                System.Diagnostics.StackFrame stackFrame = new System.Diagnostics.StackFrame();
+                string className = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
+                string methodName = stackFrame.GetMethod().Name;
+               
+                string zipName = String.Format("MP_portable{0}.exe", FolioID_str);
+
+                #region Get Configuration variables 
+
+                // Get Client file name
+                string client_fileName_html = "MP_portable.html";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    client_fileName_html = ConfigurationManager.AppSettings["Download_ClientName"].ToString();
+                }
+
+                // Get Client file name exe
+                string client_fileName_exe = "MP_portable.exe";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    client_fileName_exe = ConfigurationManager.AppSettings["Download_ClientName_exe"].ToString();
+                }
+
+                // Get Client folder name: files
+                string folder_path_files = @"MP_client\files";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    folder_path_files = ConfigurationManager.AppSettings["Download_folderPath_files"].ToString();
+                }
+
+                // Get Client folder name: fonts
+                string folder_path_fonts = @"MP_client\fonts";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    folder_path_fonts = ConfigurationManager.AppSettings["Download_folderPath_fonts"].ToString();
+                }
+
+                // Get Client folder name: image
+                string folder_path_image = @"MP_client\image";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    folder_path_image = ConfigurationManager.AppSettings["Download_folderPath_image"].ToString();
+                }
+
+                // Get Client folder name: images
+                string folder_path_images = @"MP_client\images";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    folder_path_images = ConfigurationManager.AppSettings["Download_folderPath_images"].ToString();
+                }
+
+                // Get Client file name: Dashboard.js
+                string filePath_DashboardJS = @"assets\js\Dashboard.js";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    filePath_DashboardJS = ConfigurationManager.AppSettings["Download_filePath_DashboardJS"].ToString();
+                }
+
+                // Get Client file name: Globalplay.js
+                string filePath_GlobalplayJS = @"assets\js\Globalplay.js";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    filePath_GlobalplayJS = ConfigurationManager.AppSettings["Download_filePath_GlobalplayJS"].ToString();
+                }
+
+                // Get Client file name: Dashboard.css
+                string filePath_DashboardCSS = @"assets\css\Dashboard.css";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    filePath_DashboardCSS = ConfigurationManager.AppSettings["Download_filePath_DashboardCSS"].ToString();
+                }
+
+                // Get Client folder path
+                string filePath_Resources = "files/Resources";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    filePath_Resources = ConfigurationManager.AppSettings["Download_folderPath_resources"].ToString();
+                }
+
+                #endregion
+
+                if (!string.IsNullOrWhiteSpace(client_fileName_html) && !string.IsNullOrWhiteSpace(client_fileName_exe) &&
+                !string.IsNullOrWhiteSpace(filePath_Resources) && !string.IsNullOrWhiteSpace(folder_path_files) &&
+                !string.IsNullOrWhiteSpace(folder_path_fonts) && !string.IsNullOrWhiteSpace(filePath_DashboardJS) &&
+                !string.IsNullOrWhiteSpace(filePath_GlobalplayJS) && !string.IsNullOrWhiteSpace(filePath_DashboardCSS))
+                {
+                    // Zip Source: http://www.aspsnippets.com/Articles/Download-multiple-files-as-Zip-Archive-File-in-ASPNet-using-C-and-VBNet.aspx
+                    using (ZipFile zip = new ZipFile())
+                    {
+                        zip.AlternateEncodingUsage = ZipOption.AsNecessary;
+
+                        /* ******************** Elements files ******************** */
+                        if (listElementsFilesPath != null && listElementsFilesPath.Count > 0)
+                        {
+                            WebClient webClient = new WebClient();
+                            foreach (Tuple<string, string, string, string> element in listElementsFilesPath)
+                            {
+                                try
+                                {
+                                    string segmentID = element.Item1;
+                                    string path = element.Item2;
+                                    string isExtra = element.Item3;
+                                    string fileName = element.Item4;
+
+                                    if (!string.IsNullOrWhiteSpace(segmentID) && !string.IsNullOrWhiteSpace(path) &&
+                                        !string.IsNullOrWhiteSpace(isExtra) && !string.IsNullOrWhiteSpace(fileName))
+                                    {
+                                        string fileExtension = Path.GetExtension(fileName);
+                                        if (!string.IsNullOrWhiteSpace(fileExtension))
+                                        {
+                                            byte[] fileInMemory = webClient.DownloadData(path);
+                                            if (fileInMemory != null && fileInMemory.Length > 0)
+                                            {
+                                                zip.AddEntry(filePath_Resources + @"\" + segmentID + fileExtension, fileInMemory);
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    // #2- Logger exception
+                                    Logger.LogError("(%s) (%s) -- Excepcion. Copiando archivos de elementos al ZIP. ERROR: %s", className, methodName, ex.Message);
+                                }
+                            } // foreach
+                        }
+
+                        /* ******************** Directories Files ******************** */
+
+                        // Check if exists all folders
+                        Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+                        string folder_path_1 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_files);
+                        string folder_path_2 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_fonts);
+                        string folder_path_3 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_image);
+                        string folder_path_4 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_images);
+
+                        if (!string.IsNullOrWhiteSpace(folder_path_1) && !string.IsNullOrWhiteSpace(folder_path_2) &&
+                            !string.IsNullOrWhiteSpace(folder_path_3) && !string.IsNullOrWhiteSpace(folder_path_4))
+                        {
+                            bool ok = Directory.Exists(folder_path_1) && Directory.Exists(folder_path_2) && Directory.Exists(folder_path_3) &&
+                            Directory.Exists(folder_path_4) ? true : false;
+                            if (ok)
+                            {
+                                try
+                                {
+                                    // Add folders directories
+                                    zip.AddDirectory(folder_path_1, Path.GetFileName(folder_path_1));
+                                    zip.AddDirectory(folder_path_2, Path.GetFileName(folder_path_2));
+                                    zip.AddDirectory(folder_path_3, Path.GetFileName(folder_path_3));
+                                    zip.AddDirectory(folder_path_4, Path.GetFileName(folder_path_4));
+
+                                    // Add HTML File in root directory of zip
+                                    zip.AddEntry("MP_portable.html", static_HTML, Encoding.UTF8);
+
+                                    #region Copiado de archivos dinámicos
+
+                                    // Únicos archivos copiados dinámicamente desde la solución para mejorar el mantenimiento del código de la aplicación: Dashboard.js, Globalplay.js y Dashboard.css
+                                    string DashboardJS_path = Path.Combine(Directory.GetCurrentDirectory(), filePath_DashboardJS);
+                                    if (File.Exists(DashboardJS_path))
+                                    {
+                                        zip.AddFile(DashboardJS_path, @"files\assets\js\");
+                                    }
+                                    else
+                                    {
+                                        ok = false;
+                                    }
+
+                                    string GlobalplayJS_path = Path.Combine(Directory.GetCurrentDirectory(), filePath_GlobalplayJS);
+                                    if (File.Exists(GlobalplayJS_path))
+                                    {
+                                        zip.AddFile(GlobalplayJS_path, @"files\assets\js\");
+                                    }
+                                    else
+                                    {
+                                        ok = false;
+                                    }
+
+                                    string DashboardCSS_path = Path.Combine(Directory.GetCurrentDirectory(), filePath_DashboardCSS);
+                                    if (File.Exists(DashboardCSS_path))
+                                    {
+                                        zip.AddFile(DashboardCSS_path, @"files\assets\css\");
+                                    }
+                                    else
+                                    {
+                                        ok = false;
+                                    }
+
+                                    #endregion
+
+                                    if (ok)
+                                    {
+                                        //zip.Save(Response.OutputStream);
+
+                                        // Repository temp path
+                                        string repository_temp = string.Empty;
+                                        if (ConfigurationManager.AppSettings != null)
+                                        {
+                                            repository_temp = ConfigurationManager.AppSettings["LocalTempPath"].ToString();
+                                        }
+
+                                        try
+                                        {
+                                            // Check if directory exists, if not creates it
+                                            if (!Directory.Exists(Path.GetDirectoryName(repository_temp)))
+                                            {
+                                                Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
+                                            }
+
+                                            SelfExtractorSaveOptions options = new SelfExtractorSaveOptions();
+                                            options.Flavor = SelfExtractorFlavor.ConsoleApplication;
+                                            options.Quiet = true;
+                                            options.Description = "inConcert MP_Portable";
+                                            options.DefaultExtractDirectory = repository_temp;
+                                            options.PostExtractCommandLine = repository_temp + "\\" + client_fileName_html;
+                                            options.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;
+                                            options.RemoveUnpackedFilesAfterExecute = true;
+                                            zip.SaveSelfExtractor(".\\Temp\\" + client_fileName_exe, options);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            // #2- Logger exception
+                                            Logger.LogError("(%s) (%s) -- Excepcion. Creando archivo ZIP. ERROR: %s", className, methodName, ex.Message);
+
+                                            ok = false;
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        // #2- Logger exception
+                                        Logger.LogError("(%s) (%s) -- ERROR. Creando archivo ZIP, archivos no encontrados. ERROR", className, methodName, "");
+                                    }
+
+                                    if (ok)
+                                    {
+                                        /*
+                                        string path = Server.MapPath(".\\Temp\\" + client_fileName_exe);
+                                        if (File.Exists(path))
+                                        {
+                                            //ScriptManager.RegisterStartupScript(this, typeof(Page), "ok_script", "alert('OK');", true);
+
+                                            Response.Clear();
+                                            Response.BufferOutput = false;
+                                            Response.ContentType = "application/exe";
+                                            Response.AddHeader("content-disposition", "attachment; filename=" + zipName);
+                                            Response.TransmitFile(path);
+                                            Response.Flush();
+                                            Response.End();
+
+                                            //Response.WriteFile(path);
+                                            //Response.Flush();
+                                            //HttpContext.Current.ApplicationInstance.CompleteRequest();
+                                            //Response.End();
+
+                                            // Fire the timeframe drawing
+                                            //ScriptManager.RegisterStartupScript(this, typeof(Page), "afterDownloadFiles", "afterDownloadFiles();", true);
+
+                                        }
+                                        */
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    // #2- Logger exception
+                                    Logger.LogError("(%s) (%s) -- Excepcion. Creando archivo ZIP. ERROR: %s", className, methodName, ex.Message);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public static DateTime GetLinkerTime(Assembly assembly, TimeZoneInfo target = null)
