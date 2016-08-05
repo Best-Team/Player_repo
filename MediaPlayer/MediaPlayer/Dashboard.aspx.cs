@@ -1427,10 +1427,17 @@ namespace MediaPlayer
                 }
 
                 // Get Client folder path
-                string filePath_Resources = "files/Resources";
+                string filePath_Resources = @"files\Resources";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     filePath_Resources = ConfigurationManager.AppSettings["Download_folderPath_resources"].ToString();
+                }
+
+                // Get exe icon path
+                string iconFile_path = @"assets\images\logo_portable.ico";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    iconFile_path = ConfigurationManager.AppSettings["Download_IconFile"].ToString();
                 }
 
                 #endregion
@@ -1438,7 +1445,7 @@ namespace MediaPlayer
                 if (!string.IsNullOrWhiteSpace(client_fileName_html) && !string.IsNullOrWhiteSpace(client_fileName_exe) &&
                 !string.IsNullOrWhiteSpace(filePath_Resources) && !string.IsNullOrWhiteSpace(folder_path_files) &&
                 !string.IsNullOrWhiteSpace(folder_path_fonts) && !string.IsNullOrWhiteSpace(filePath_DashboardJS) &&
-                !string.IsNullOrWhiteSpace(filePath_GlobalplayJS) && !string.IsNullOrWhiteSpace(filePath_DashboardCSS))
+                !string.IsNullOrWhiteSpace(filePath_GlobalplayJS) && !string.IsNullOrWhiteSpace(filePath_DashboardCSS) && !string.IsNullOrWhiteSpace(iconFile_path))
                 {
                     // Zip Source: http://www.aspsnippets.com/Articles/Download-multiple-files-as-Zip-Archive-File-in-ASPNet-using-C-and-VBNet.aspx
                     using (ZipFile zip = new ZipFile())
@@ -1570,9 +1577,15 @@ namespace MediaPlayer
                                             options.Quiet = true;
                                             options.Description = "inConcert MP_Portable";
                                             options.DefaultExtractDirectory = @"%TEMP%";
-                                            options.PostExtractCommandLine = @"%TEMP%\" + client_fileName_html; //
-
+                                            options.PostExtractCommandLine = @"%TEMP%\" + client_fileName_html;
                                             options.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;
+
+                                            // Get icon path
+                                            string icon_path = Path.Combine(Directory.GetCurrentDirectory(), iconFile_path);
+                                            if (File.Exists(icon_path))
+                                            {
+                                                options.IconFile = icon_path;
+                                            }
 
                                             zip.TempFileFolder = path_temp;
                                             zip.SaveSelfExtractor(".\\Temp\\" + client_fileName_exe, options);
@@ -1979,10 +1992,17 @@ namespace MediaPlayer
                 }
 
                 // Get Client folder path
-                string filePath_Resources = "files/Resources";
+                string filePath_Resources = @"files\Resources";
                 if (ConfigurationManager.AppSettings != null)
                 {
                     filePath_Resources = ConfigurationManager.AppSettings["Download_folderPath_resources"].ToString();
+                }
+
+                // Get exe icon path
+                string iconFile_path = @"assets\files\images\logo_portable.ico";
+                if (ConfigurationManager.AppSettings != null)
+                {
+                    iconFile_path = ConfigurationManager.AppSettings["Download_IconFile"].ToString();
                 }
 
                 #endregion
@@ -1990,7 +2010,7 @@ namespace MediaPlayer
                 if (!string.IsNullOrWhiteSpace(client_fileName_html) && !string.IsNullOrWhiteSpace(client_fileName_exe) &&
                 !string.IsNullOrWhiteSpace(filePath_Resources) && !string.IsNullOrWhiteSpace(folder_path_files) &&
                 !string.IsNullOrWhiteSpace(folder_path_fonts) && !string.IsNullOrWhiteSpace(filePath_DashboardJS) &&
-                !string.IsNullOrWhiteSpace(filePath_GlobalplayJS) && !string.IsNullOrWhiteSpace(filePath_DashboardCSS))
+                !string.IsNullOrWhiteSpace(filePath_GlobalplayJS) && !string.IsNullOrWhiteSpace(filePath_DashboardCSS) && !string.IsNullOrWhiteSpace(filePath_DashboardCSS))
                 {
                     // Zip Source: http://www.aspsnippets.com/Articles/Download-multiple-files-as-Zip-Archive-File-in-ASPNet-using-C-and-VBNet.aspx
                     using (ZipFile zip = new ZipFile())

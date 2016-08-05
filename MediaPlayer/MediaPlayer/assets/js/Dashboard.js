@@ -4709,7 +4709,6 @@ function multiDownload(objects) {
                     //checkAll_checkboxes();
                     //$('#chbSelectAll').click();
 
-
                     // Call server
                     doDownloadElements();
 
@@ -4718,6 +4717,7 @@ function multiDownload(objects) {
                     setTimeout(function () {
                         $("#dialog").dialog("close");
                         $("#dialog").waitMe("hide");
+                        location.reload();
 
 
                     }, Download_WaitingSpinDuration);
