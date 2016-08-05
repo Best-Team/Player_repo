@@ -1359,6 +1359,8 @@ namespace MediaPlayer
 
                 string zipName = String.Format("MP_portable{0}.exe", folioID);
 
+                Logger.LogDebug("(%s) (%s) -- Inicia método de descarga de zip de elementos del folio.", className, methodName);
+
                 #region Get Configuration variables 
 
                 // Get Client file name
@@ -1542,6 +1544,7 @@ namespace MediaPlayer
 
                                     if (ok)
                                     {
+                                        Logger.LogDebug("(%s) (%s) -- Iniciando creación del zip a descargar con librería ZipDotNet.", className, methodName);
                                         //zip.Save(Response.OutputStream);
 
                                         // Repository temp path
@@ -1551,6 +1554,7 @@ namespace MediaPlayer
                                             repository_temp = ConfigurationManager.AppSettings["LocalTempPath"].ToString();
                                         }
 
+                                        string path_temp = string.Empty;
                                         try
                                         {
                                             // Check if directory exists, if not creates it
@@ -1558,21 +1562,26 @@ namespace MediaPlayer
                                             {
                                                 Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
                                             }
+                                            path_temp = Path.GetTempPath();
+                                            Logger.LogDebug("(%s) (%s) -- Intentando descargar archivos del zip a carpeta temporal: " + path_temp, className, methodName);
 
                                             SelfExtractorSaveOptions options = new SelfExtractorSaveOptions();
                                             options.Flavor = SelfExtractorFlavor.ConsoleApplication;
                                             options.Quiet = true;
                                             options.Description = "inConcert MP_Portable";
-                                            options.DefaultExtractDirectory = repository_temp;
-                                            options.PostExtractCommandLine = repository_temp + "\\" + client_fileName_html;
+                                            options.DefaultExtractDirectory = @"%TEMP%";
+                                            options.PostExtractCommandLine = @"%TEMP%\" + client_fileName_html; //
+
                                             options.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;
-                                            options.RemoveUnpackedFilesAfterExecute = true;
+
+                                            zip.TempFileFolder = path_temp;
                                             zip.SaveSelfExtractor(".\\Temp\\" + client_fileName_exe, options);
+                                            Logger.LogDebug("(%s) (%s) -- Terminó OK de descargar archivos del zip a carpeta temporal: " + path_temp, className, methodName);
                                         }
                                         catch (Exception ex)
                                         {
                                             // #2- Logger exception
-                                            Logger.LogError("(%s) (%s) -- Excepcion. Creando archivo ZIP. ERROR: %s", className, methodName, ex.Message);
+                                            Logger.LogError("(%s) (%s) -- Excepcion. Creando archivo ZIP temporal en %s. ERROR: %s", className, methodName, path_temp, ex.Message);
 
                                             ok = false;
                                         }
@@ -1598,11 +1607,6 @@ namespace MediaPlayer
                                             Response.TransmitFile(path);
                                             Response.Flush();
                                             Response.End();
-
-                                            //Response.WriteFile(path);
-                                            //Response.Flush();
-                                            //HttpContext.Current.ApplicationInstance.CompleteRequest();
-                                            //Response.End();
 
                                             // Fire the timeframe drawing
                                             //ScriptManager.RegisterStartupScript(this, typeof(Page), "afterDownloadFiles", "afterDownloadFiles();", true);

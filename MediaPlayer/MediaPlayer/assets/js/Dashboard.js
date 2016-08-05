@@ -712,12 +712,16 @@ function afterDownloadFiles() {
 }
 
 function checkAll_checkboxes() {
-    $('tr:visible td input:checkbox', table).prop('checked', true);
+    $('tr:visible td input:checkbox', $("#tblLeftGridElements")).prop('checked', true);
 }
 
 /**** Event: OnClick check all elements at left grid ****/
 function loadGridCheckboxAll_event() {
     $('#chbSelectAll').click(function (e) {
+
+        // Clean div content
+        $("#timeframe").empty();
+        $("#timeframe").hide();
 
         // Clear div player
         removeDivPlayerContentExcept();
@@ -4700,6 +4704,12 @@ function multiDownload(objects) {
                 buttons: {
                 },
                 open: function () {
+
+                    //$("#chbSelectAll").prop('checked', true);
+                    //checkAll_checkboxes();
+                    //$('#chbSelectAll').click();
+
+
                     // Call server
                     doDownloadElements();
 
@@ -4708,6 +4718,7 @@ function multiDownload(objects) {
                     setTimeout(function () {
                         $("#dialog").dialog("close");
                         $("#dialog").waitMe("hide");
+
 
                     }, Download_WaitingSpinDuration);
                 }
