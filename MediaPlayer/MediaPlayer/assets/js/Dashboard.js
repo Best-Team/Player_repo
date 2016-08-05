@@ -4717,8 +4717,13 @@ function multiDownload(objects) {
                     setTimeout(function () {
                         $("#dialog").dialog("close");
                         $("#dialog").waitMe("hide");
-                        location.reload();
 
+                        setTimeout(function () {
+                            //location.reload();
+                            if (!$("#chbSelectAll").is(':checked')) {
+                                $('#chbSelectAll').click();
+                            }
+                        }, 1000);
 
                     }, Download_WaitingSpinDuration);
                 }
