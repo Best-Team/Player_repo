@@ -436,7 +436,11 @@ $(document).ready(function () {
     setTimeout(function () {
         setPosition_TimelineProgressbar();
 
-        TIMELINE_POINTER.css("visibility", "visible");
+        if (elementsInMemory != null && elementsInMemory.length > 0) {
+            TIMELINE_POINTER.css("visibility", "visible");
+        } else {
+            TIMELINE_POINTER.css("visibility", "hidden");
+        }
     }, 800);
 
     //#endregion Re adjust dashboard display settings regarding screen resolution - END *****************************
@@ -469,10 +473,12 @@ function setPosition_TimelineProgressbar() {
         of: "#divTimelineProgress"
     });
 
-    var offset = 5;
-    TIMELINE_POINTER.offset({ top: TIMELINE_POINTER.offset().top - offset });
-    //TIMELINE_POINTER.offset({ top: TIMELINE_POINTER.offset().top + offset });
+    if (TIMELINE_POINTER.offset() != null && TIMELINE_POINTER.offset() != undefined) {
+        var offset = 5;
+        TIMELINE_POINTER.offset({ top: TIMELINE_POINTER.offset().top - offset });
 
+        TIMELINE_POINTER.css("visibility", "visible"); // new
+    }
 }
 
 function doneResizing() {
@@ -1876,7 +1882,7 @@ function timeframe_draw(timeline_data, start, end) {
                                 line_opacity = 1;
                                 break;
                             }
-                    }
+                    } // switch
 
                     if (ELEMENT != null && ELEMENT.length) {
 
@@ -1978,6 +1984,13 @@ function timeframe_draw(timeline_data, start, end) {
                                 var x2 = parseInt(MAIN_LINE.attr("x2"), 10);
                                 ELEMENT_rect.attr("width", x2 - x1);
                             }
+                        }
+
+                        // BUG-FIX
+                        // If Element rect is double, remove the second
+                        var ELEMENT_rect_BUG = $("#tlTape_" + tapeID + " > rect")[1];
+                        if (ELEMENT_rect_BUG != null && ELEMENT_rect_BUG != undefined) {
+                            ELEMENT_rect_BUG.remove();
                         }
                     }
                 }
@@ -4811,10 +4824,12 @@ function getTime(msec, useString) {
 
 // Load elements from folio selected - Get data from server
 function getElementsInMemory() {
+    var ok = false;
     var hdnElements = $("input[id*='_hdnTapeID_RoleGroupName_TypeTapeType_duration_timestamp_segmentID_count_fileName_endDate_filePath_duration_formatStr_fileStatus_userName']").val();
     if (hdnElements != null && hdnElements.length) {
         var tapes_array = hdnElements.split("$"); // Elements
         if (tapes_array.length > 0) {
+            ok = true;
 
             elementsInMemory = [];
             globalplay_stack_elements = [[], []]; // [object, already_taken: bool]
@@ -4861,8 +4876,13 @@ function getElementsInMemory() {
                         globalplay_stack_elements.push(element_alreadyTaken);
                     }
                 }
-            }
+            } // for
         }
+    }
+    if (!ok) {
+        // No elements on Ready
+
+        TIMELINE_POINTER.css("visibility", "hidden");
     }
 }
 

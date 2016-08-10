@@ -1052,6 +1052,7 @@ namespace MediaPlayer
 
             // Change Roles and Types filter checkboxes to checked status
             ScriptManager.RegisterStartupScript(this, typeof(Page), "checkRolesAndTypesFilters", "checkRolesAndTypesFilters();", true);
+            ScriptManager.RegisterStartupScript(this, typeof(Page), "setPosition_TimelineProgressbar", "setPosition_TimelineProgressbar();", true);
         }
 
         private string FolioElements_GetOnClickEvent(Folio folio, int index, bool isExtra, string duration_formatStr, string media_str = "")

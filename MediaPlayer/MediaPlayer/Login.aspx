@@ -43,18 +43,35 @@
             var username = $("input[id*='txbUser']").val();
             var password = $("input[id*='txbPassword']").val();
 
-            if (username == "" || password == "")
-            {
+            if (username == "" || password == "") {
                 $('#lblMessages').text("Los campos son requeridos.");
                 $('#divMessages').show();
             }
-            else
-            {
+            else {
+                // Loading spinner effect
+                $("#btnIcon").removeClass("fa-check");
+                $("#btnIcon").addClass("fa-spinner");
+
+                $("#btnIcon").css("-webkit-animation", "fa-spin 2s infinite linear");
+                $("#btnIcon").css("animation", "fa-spin 2s infinite linear");
+
+                setTimeout(function () {
+                    __doPostBack('<%=btnLoginCandidate.UniqueID%>', "");
+
+                    ok = true;
+                }, 2400);
                 $('#divMessages').hide();
-                __doPostBack('<%=btnLoginCandidate.UniqueID%>', "");
-                ok = true;
             }
             return ok;
+        }
+
+        function sleep(milliseconds) {
+            var start = new Date().getTime();
+            for (var i = 0; i < 1e7; i++) {
+                if ((new Date().getTime() - start) > milliseconds) {
+                    break;
+                }
+            }
         }
 
    </script>
@@ -89,7 +106,7 @@
 			</div>
 			<div class="loginFormButtonContainer" style="width: 100%;">
 				<button id="submitButton" class="btn btn-default" type="button" runat="server" onclick="return checkEmptyValues();" onserverclick="submitButton_ServerClick" style="text-transform: none; letter-spacing: inherit;">
-                     <span class="fa fa-check" aria-hidden="true"></span>
+                     <span id="btnIcon" class="fa fa-check" aria-hidden="true"></span>
                     Iniciar sesión</button>
                 <asp:Button ID="btnLoginCandidate" runat="server" style="display:none" Text="" OnClientClick="return checkEmptyValues();" OnClick="btnLoginCandidate_Click"/>
 			</div>
