@@ -628,6 +628,7 @@ function loadClickRemoveElementSelected_event() {
                                                 buttons: {
                                                     "Confirmar": function () {
                                                         $(this).dialog("close");
+                                                        $(this).dialog("destroy");
                                                     }
                                                 }
                                             });
@@ -3684,6 +3685,8 @@ function loadClickConfirmRemoveButton_event(tapeID, isExtra) {
     var divPanel_PlayerControl = $("#divPanel_PlayerControl");
     var divRemoveElementMessage = $("#divRemoveElementMessage");
 
+    btnConfirmRemoveElement.off("click"); // BUG-FIX
+    btnConfirmRemoveElement.unbind("click"); 
     btnConfirmRemoveElement.bind("click", function () {
 
         var userID = globalUserID;
@@ -3756,6 +3759,7 @@ function loadClickConfirmRemoveButton_event(tapeID, isExtra) {
                             buttons: {
                                 "Confirmar": function () {
                                     $(this).dialog("close");
+                                    $(this).dialog("destroy");
                                 }
                             }
                         });
@@ -4717,10 +4721,6 @@ function multiDownload(objects) {
                 buttons: {
                 },
                 open: function () {
-
-                    //$("#chbSelectAll").prop('checked', true);
-                    //checkAll_checkboxes();
-                    //$('#chbSelectAll').click();
 
                     // Call server
                     doDownloadElements();
