@@ -198,11 +198,19 @@ namespace MediaPlayer
 
                 if (!DateTime.TryParseExact(input.Value, "dd-MM-yyyy HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out datetime))
                 {
-                    datetime = DateTime.Now;
-
                     // #2- Logger exception
-                    Logger.LogError("(%s) (%s) -- Excepcion. Convirtiendo a datetime.", className, methodName);
+                    Logger.LogError("(%s) (%s) -- Excepcion 1. Probando convertir a datetime con formato 'dd-MM-yyyy HH:mm:ss'. Si falla prueba sin segundos.", className, methodName);
                     Logger.LogError("(%s) (%s) -- Dato: " + input.Value, className, methodName);
+
+                    // BUG-FIX: Some servers does not bring seconds on datetime format
+                    if (!DateTime.TryParseExact(input.Value, "dd-MM-yyyy HH:mm", null, System.Globalization.DateTimeStyles.None, out datetime))
+                    {
+                        datetime = DateTime.Now;
+
+                        // #2- Logger exception
+                        Logger.LogError("(%s) (%s) -- Excepcion 2. Probando convertir a datetime con formato 'dd-MM-yyyy HH:mm'.", className, methodName);
+                        Logger.LogError("(%s) (%s) -- Dato: " + input.Value, className, methodName);
+                    }
                 }
             }
 
@@ -508,6 +516,7 @@ namespace MediaPlayer
                 case "png":
                 case "jpg":
                 case "jepg":
+                case "jpeg":
                 case "bmp":
                 case "tiff":
                 case "gif":
@@ -1364,282 +1373,290 @@ namespace MediaPlayer
 
                 #region Get Configuration variables 
 
-                // Get Client file name
-                string client_fileName_html = "MP_portable.html";
-                if (ConfigurationManager.AppSettings != null)
+                try
                 {
-                    client_fileName_html = ConfigurationManager.AppSettings["Download_ClientName"].ToString();
-                }
-
-                // Get Client file name exe
-                string client_fileName_exe = "MP_portable.exe";
-                if (ConfigurationManager.AppSettings != null)
-                {
-                    client_fileName_exe = ConfigurationManager.AppSettings["Download_ClientName_exe"].ToString();
-                }
-
-                // Get Client folder name: files
-                string folder_path_files = @"MP_client\files";
-                if (ConfigurationManager.AppSettings != null)
-                {
-                    folder_path_files = ConfigurationManager.AppSettings["Download_folderPath_files"].ToString();
-                }
-
-                // Get Client folder name: fonts
-                string folder_path_fonts = @"MP_client\fonts";
-                if (ConfigurationManager.AppSettings != null)
-                {
-                    folder_path_fonts = ConfigurationManager.AppSettings["Download_folderPath_fonts"].ToString();
-                }
-
-                // Get Client folder name: image
-                string folder_path_image = @"MP_client\image";
-                if (ConfigurationManager.AppSettings != null)
-                {
-                    folder_path_image = ConfigurationManager.AppSettings["Download_folderPath_image"].ToString();
-                }
-
-                // Get Client folder name: images
-                string folder_path_images = @"MP_client\images";
-                if (ConfigurationManager.AppSettings != null)
-                {
-                    folder_path_images = ConfigurationManager.AppSettings["Download_folderPath_images"].ToString();
-                }
-
-                // Get Client file name: Dashboard.js
-                string filePath_DashboardJS = @"assets\js\Dashboard.js";
-                if (ConfigurationManager.AppSettings != null)
-                {
-                    filePath_DashboardJS = ConfigurationManager.AppSettings["Download_filePath_DashboardJS"].ToString();
-                }
-
-                // Get Client file name: Globalplay.js
-                string filePath_GlobalplayJS = @"assets\js\Globalplay.js";
-                if (ConfigurationManager.AppSettings != null)
-                {
-                    filePath_GlobalplayJS = ConfigurationManager.AppSettings["Download_filePath_GlobalplayJS"].ToString();
-                }
-
-                // Get Client file name: Dashboard.css
-                string filePath_DashboardCSS = @"assets\css\Dashboard.css";
-                if (ConfigurationManager.AppSettings != null)
-                {
-                    filePath_DashboardCSS = ConfigurationManager.AppSettings["Download_filePath_DashboardCSS"].ToString();
-                }
-
-                // Get Client folder path
-                string filePath_Resources = @"files\Resources";
-                if (ConfigurationManager.AppSettings != null)
-                {
-                    filePath_Resources = ConfigurationManager.AppSettings["Download_folderPath_resources"].ToString();
-                }
-
-                // Get exe icon path
-                string iconFile_path = @"assets\images\logo_portable.ico";
-                if (ConfigurationManager.AppSettings != null)
-                {
-                    iconFile_path = ConfigurationManager.AppSettings["Download_IconFile"].ToString();
-                }
-
-                #endregion
-
-                if (!string.IsNullOrWhiteSpace(client_fileName_html) && !string.IsNullOrWhiteSpace(client_fileName_exe) &&
-                !string.IsNullOrWhiteSpace(filePath_Resources) && !string.IsNullOrWhiteSpace(folder_path_files) &&
-                !string.IsNullOrWhiteSpace(folder_path_fonts) && !string.IsNullOrWhiteSpace(filePath_DashboardJS) &&
-                !string.IsNullOrWhiteSpace(filePath_GlobalplayJS) && !string.IsNullOrWhiteSpace(filePath_DashboardCSS) && !string.IsNullOrWhiteSpace(iconFile_path))
-                {
-                    // Zip Source: http://www.aspsnippets.com/Articles/Download-multiple-files-as-Zip-Archive-File-in-ASPNet-using-C-and-VBNet.aspx
-                    using (ZipFile zip = new ZipFile())
+                    // Get Client file name
+                    string client_fileName_html = "MP_portable.html";
+                    if (ConfigurationManager.AppSettings != null)
                     {
-                        zip.AlternateEncodingUsage = ZipOption.AsNecessary;
+                        client_fileName_html = ConfigurationManager.AppSettings["Download_ClientName"].ToString();
+                    }
 
-                        /* ******************** Elements files ******************** */
-                        if (listElementsFilesPath != null && listElementsFilesPath.Count > 0)
+                    // Get Client file name exe
+                    string client_fileName_exe = "MP_portable.exe";
+                    if (ConfigurationManager.AppSettings != null)
+                    {
+                        client_fileName_exe = ConfigurationManager.AppSettings["Download_ClientName_exe"].ToString();
+                    }
+
+                    // Get Client folder name: files
+                    string folder_path_files = @"MP_client\files";
+                    if (ConfigurationManager.AppSettings != null)
+                    {
+                        folder_path_files = ConfigurationManager.AppSettings["Download_folderPath_files"].ToString();
+                    }
+
+                    // Get Client folder name: fonts
+                    string folder_path_fonts = @"MP_client\fonts";
+                    if (ConfigurationManager.AppSettings != null)
+                    {
+                        folder_path_fonts = ConfigurationManager.AppSettings["Download_folderPath_fonts"].ToString();
+                    }
+
+                    // Get Client folder name: image
+                    string folder_path_image = @"MP_client\image";
+                    if (ConfigurationManager.AppSettings != null)
+                    {
+                        folder_path_image = ConfigurationManager.AppSettings["Download_folderPath_image"].ToString();
+                    }
+
+                    // Get Client folder name: images
+                    string folder_path_images = @"MP_client\images";
+                    if (ConfigurationManager.AppSettings != null)
+                    {
+                        folder_path_images = ConfigurationManager.AppSettings["Download_folderPath_images"].ToString();
+                    }
+
+                    // Get Client file name: Dashboard.js
+                    string filePath_DashboardJS = @"assets\js\Dashboard.js";
+                    if (ConfigurationManager.AppSettings != null)
+                    {
+                        filePath_DashboardJS = ConfigurationManager.AppSettings["Download_filePath_DashboardJS"].ToString();
+                    }
+
+                    // Get Client file name: Globalplay.js
+                    string filePath_GlobalplayJS = @"assets\js\Globalplay.js";
+                    if (ConfigurationManager.AppSettings != null)
+                    {
+                        filePath_GlobalplayJS = ConfigurationManager.AppSettings["Download_filePath_GlobalplayJS"].ToString();
+                    }
+
+                    // Get Client file name: Dashboard.css
+                    string filePath_DashboardCSS = @"assets\css\Dashboard.css";
+                    if (ConfigurationManager.AppSettings != null)
+                    {
+                        filePath_DashboardCSS = ConfigurationManager.AppSettings["Download_filePath_DashboardCSS"].ToString();
+                    }
+
+                    // Get Client folder path
+                    string filePath_Resources = @"files\Resources";
+                    if (ConfigurationManager.AppSettings != null)
+                    {
+                        filePath_Resources = ConfigurationManager.AppSettings["Download_folderPath_resources"].ToString();
+                    }
+
+                    // Get exe icon path
+                    string iconFile_path = @"assets\images\logo_portable.ico";
+                    if (ConfigurationManager.AppSettings != null)
+                    {
+                        iconFile_path = ConfigurationManager.AppSettings["Download_IconFile"].ToString();
+                    }
+
+                    #endregion
+
+                    if (!string.IsNullOrWhiteSpace(client_fileName_html) && !string.IsNullOrWhiteSpace(client_fileName_exe) &&
+                    !string.IsNullOrWhiteSpace(filePath_Resources) && !string.IsNullOrWhiteSpace(folder_path_files) &&
+                    !string.IsNullOrWhiteSpace(folder_path_fonts) && !string.IsNullOrWhiteSpace(filePath_DashboardJS) &&
+                    !string.IsNullOrWhiteSpace(filePath_GlobalplayJS) && !string.IsNullOrWhiteSpace(filePath_DashboardCSS) && !string.IsNullOrWhiteSpace(iconFile_path))
+                    {
+                        // Zip Source: http://www.aspsnippets.com/Articles/Download-multiple-files-as-Zip-Archive-File-in-ASPNet-using-C-and-VBNet.aspx
+                        using (ZipFile zip = new ZipFile())
                         {
-                            WebClient webClient = new WebClient();
-                            foreach (Tuple<string, string, string, string> element in listElementsFilesPath)
+                            zip.AlternateEncodingUsage = ZipOption.AsNecessary;
+
+                            /* ******************** Elements files ******************** */
+                            if (listElementsFilesPath != null && listElementsFilesPath.Count > 0)
                             {
-                                try
+                                WebClient webClient = new WebClient();
+                                foreach (Tuple<string, string, string, string> element in listElementsFilesPath)
                                 {
-                                    string segmentID = element.Item1;
-                                    string path = element.Item2;
-                                    string isExtra = element.Item3;
-                                    string fileName = element.Item4;
-
-                                    if (!string.IsNullOrWhiteSpace(segmentID) && !string.IsNullOrWhiteSpace(path) &&
-                                        !string.IsNullOrWhiteSpace(isExtra) && !string.IsNullOrWhiteSpace(fileName))
+                                    try
                                     {
-                                        string fileExtension = Path.GetExtension(fileName);
-                                        if (!string.IsNullOrWhiteSpace(fileExtension))
+                                        string segmentID = element.Item1;
+                                        string path = element.Item2;
+                                        string isExtra = element.Item3;
+                                        string fileName = element.Item4;
+
+                                        if (!string.IsNullOrWhiteSpace(segmentID) && !string.IsNullOrWhiteSpace(path) &&
+                                            !string.IsNullOrWhiteSpace(isExtra) && !string.IsNullOrWhiteSpace(fileName))
                                         {
-                                            byte[] fileInMemory = webClient.DownloadData(path);
-                                            if (fileInMemory != null && fileInMemory.Length > 0)
+                                            string fileExtension = Path.GetExtension(fileName);
+                                            if (!string.IsNullOrWhiteSpace(fileExtension))
                                             {
-                                                zip.AddEntry(filePath_Resources + @"\" + segmentID + fileExtension, fileInMemory);
+                                                byte[] fileInMemory = webClient.DownloadData(path);
+                                                if (fileInMemory != null && fileInMemory.Length > 0)
+                                                {
+                                                    zip.AddEntry(filePath_Resources + @"\" + segmentID + fileExtension, fileInMemory);
+                                                }
                                             }
                                         }
+
                                     }
-                                }
-                                catch (Exception ex)
-                                {
-                                    // #2- Logger exception
-                                    Logger.LogError("(%s) (%s) -- Excepcion. Copiando archivos de elementos al ZIP. ERROR: %s", className, methodName, ex.Message);
-                                }
-                            } // foreach
-                        }
+                                    catch (Exception ex)
+                                    {
+                                        // #2- Logger exception
+                                        Logger.LogError("(%s) (%s) -- Excepcion. Copiando archivos de elementos al ZIP. ERROR: %s", className, methodName, ex.Message);
+                                    }
+                                } // foreach
+                            }
 
-                        /* ******************** Directories Files ******************** */
+                            /* ******************** Directories Files ******************** */
 
-                        // Check if exists all folders
-                        Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-                        string folder_path_1 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_files);
-                        string folder_path_2 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_fonts);
-                        string folder_path_3 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_image);
-                        string folder_path_4 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_images);
+                            // Check if exists all folders
+                            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+                            string folder_path_1 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_files);
+                            string folder_path_2 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_fonts);
+                            string folder_path_3 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_image);
+                            string folder_path_4 = Path.Combine(Directory.GetCurrentDirectory(), folder_path_images);
 
-                        if (!string.IsNullOrWhiteSpace(folder_path_1) && !string.IsNullOrWhiteSpace(folder_path_2) &&
-                            !string.IsNullOrWhiteSpace(folder_path_3) && !string.IsNullOrWhiteSpace(folder_path_4))
-                        {
-                            bool ok = Directory.Exists(folder_path_1) && Directory.Exists(folder_path_2) && Directory.Exists(folder_path_3) &&
-                            Directory.Exists(folder_path_4) ? true : false;
-                            if (ok)
+                            if (!string.IsNullOrWhiteSpace(folder_path_1) && !string.IsNullOrWhiteSpace(folder_path_2) &&
+                                !string.IsNullOrWhiteSpace(folder_path_3) && !string.IsNullOrWhiteSpace(folder_path_4))
                             {
-                                try
+                                bool ok = Directory.Exists(folder_path_1) && Directory.Exists(folder_path_2) && Directory.Exists(folder_path_3) &&
+                                Directory.Exists(folder_path_4) ? true : false;
+                                if (ok)
                                 {
-                                    // Add folders directories
-                                    zip.AddDirectory(folder_path_1, Path.GetFileName(folder_path_1));
-                                    zip.AddDirectory(folder_path_2, Path.GetFileName(folder_path_2));
-                                    zip.AddDirectory(folder_path_3, Path.GetFileName(folder_path_3));
-                                    zip.AddDirectory(folder_path_4, Path.GetFileName(folder_path_4));
-
-                                    // Add HTML File in root directory of zip
-                                    zip.AddEntry("MP_portable.html", static_HTML, Encoding.UTF8);
-
-                                    #region Copiado de archivos dinámicos
-
-                                    // Únicos archivos copiados dinámicamente desde la solución para mejorar el mantenimiento del código de la aplicación: Dashboard.js, Globalplay.js y Dashboard.css
-                                    string DashboardJS_path = Path.Combine(Directory.GetCurrentDirectory(), filePath_DashboardJS);
-                                    if (File.Exists(DashboardJS_path))
+                                    try
                                     {
-                                        zip.AddFile(DashboardJS_path, @"files\assets\js\");
-                                    }
-                                    else
-                                    {
-                                        ok = false;
-                                    }
+                                        // Add folders directories
+                                        zip.AddDirectory(folder_path_1, Path.GetFileName(folder_path_1));
+                                        zip.AddDirectory(folder_path_2, Path.GetFileName(folder_path_2));
+                                        zip.AddDirectory(folder_path_3, Path.GetFileName(folder_path_3));
+                                        zip.AddDirectory(folder_path_4, Path.GetFileName(folder_path_4));
 
-                                    string GlobalplayJS_path = Path.Combine(Directory.GetCurrentDirectory(), filePath_GlobalplayJS);
-                                    if (File.Exists(GlobalplayJS_path))
-                                    {
-                                        zip.AddFile(GlobalplayJS_path, @"files\assets\js\");
-                                    }
-                                    else
-                                    {
-                                        ok = false;
-                                    }
+                                        // Add HTML File in root directory of zip
+                                        zip.AddEntry("MP_portable.html", static_HTML, Encoding.UTF8);
 
-                                    string DashboardCSS_path = Path.Combine(Directory.GetCurrentDirectory(), filePath_DashboardCSS);
-                                    if (File.Exists(DashboardCSS_path))
-                                    {
-                                        zip.AddFile(DashboardCSS_path, @"files\assets\css\");
-                                    }
-                                    else
-                                    {
-                                        ok = false;
-                                    }
+                                        #region Copiado de archivos dinámicos
 
-                                    #endregion
-
-                                    if (ok)
-                                    {
-                                        Logger.LogDebug("(%s) (%s) -- Iniciando creación del zip a descargar con librería ZipDotNet.", className, methodName);
-                                        //zip.Save(Response.OutputStream);
-
-                                        // Repository temp path
-                                        string repository_temp = string.Empty;
-                                        if (ConfigurationManager.AppSettings != null)
+                                        // Únicos archivos copiados dinámicamente desde la solución para mejorar el mantenimiento del código de la aplicación: Dashboard.js, Globalplay.js y Dashboard.css
+                                        string DashboardJS_path = Path.Combine(Directory.GetCurrentDirectory(), filePath_DashboardJS);
+                                        if (File.Exists(DashboardJS_path))
                                         {
-                                            repository_temp = ConfigurationManager.AppSettings["LocalTempPath"].ToString();
+                                            zip.AddFile(DashboardJS_path, @"files\assets\js\");
                                         }
-
-                                        string path_temp = string.Empty;
-                                        try
+                                        else
                                         {
-                                            // Check if directory exists, if not creates it
-                                            if (!Directory.Exists(Path.GetDirectoryName(repository_temp)))
-                                            {
-                                                Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
-                                            }
-                                            path_temp = Path.GetTempPath();
-                                            Logger.LogDebug("(%s) (%s) -- Intentando descargar archivos del zip a carpeta temporal: " + path_temp, className, methodName);
-
-                                            SelfExtractorSaveOptions options = new SelfExtractorSaveOptions();
-                                            options.Flavor = SelfExtractorFlavor.ConsoleApplication;
-                                            options.Quiet = true;
-                                            options.Description = "inConcert MP_Portable";
-                                            options.DefaultExtractDirectory = @"%TEMP%";
-                                            options.PostExtractCommandLine = @"%TEMP%\" + client_fileName_html;
-                                            options.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;
-
-                                            // Get icon path
-                                            string icon_path = Path.Combine(Directory.GetCurrentDirectory(), iconFile_path);
-                                            if (File.Exists(icon_path))
-                                            {
-                                                options.IconFile = icon_path;
-                                            }
-
-                                            zip.TempFileFolder = path_temp;
-                                            zip.SaveSelfExtractor(".\\Temp\\" + client_fileName_exe, options);
-                                            Logger.LogDebug("(%s) (%s) -- Terminó OK de descargar archivos del zip a carpeta temporal: " + path_temp, className, methodName);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            // #2- Logger exception
-                                            Logger.LogError("(%s) (%s) -- Excepcion. Creando archivo ZIP temporal en %s. ERROR: %s", className, methodName, path_temp, ex.Message);
-
                                             ok = false;
                                         }
 
-                                    }
-                                    else
-                                    {
-                                        // #2- Logger exception
-                                        Logger.LogError("(%s) (%s) -- ERROR. Creando archivo ZIP, archivos no encontrados. ERROR", className, methodName, "");
-                                    }
-
-                                    if (ok)
-                                    {
-                                        string path = Server.MapPath(".\\Temp\\" + client_fileName_exe);
-                                        if (File.Exists(path))
+                                        string GlobalplayJS_path = Path.Combine(Directory.GetCurrentDirectory(), filePath_GlobalplayJS);
+                                        if (File.Exists(GlobalplayJS_path))
                                         {
-                                            //ScriptManager.RegisterStartupScript(this, typeof(Page), "ok_script", "alert('OK');", true);
+                                            zip.AddFile(GlobalplayJS_path, @"files\assets\js\");
+                                        }
+                                        else
+                                        {
+                                            ok = false;
+                                        }
 
-                                            Response.Clear();
-                                            Response.BufferOutput = false;
-                                            Response.ContentType = "application/exe";
-                                            Response.AddHeader("content-disposition", "attachment; filename=" + zipName);
-                                            Response.TransmitFile(path);
-                                            Response.Flush();
-                                            Response.End();
+                                        string DashboardCSS_path = Path.Combine(Directory.GetCurrentDirectory(), filePath_DashboardCSS);
+                                        if (File.Exists(DashboardCSS_path))
+                                        {
+                                            zip.AddFile(DashboardCSS_path, @"files\assets\css\");
+                                        }
+                                        else
+                                        {
+                                            ok = false;
+                                        }
 
-                                            // Fire the timeframe drawing
-                                            //ScriptManager.RegisterStartupScript(this, typeof(Page), "afterDownloadFiles", "afterDownloadFiles();", true);
+                                        #endregion
+
+                                        if (ok)
+                                        {
+                                            Logger.LogDebug("(%s) (%s) -- Iniciando creación del zip a descargar con librería ZipDotNet.", className, methodName);
+                                            //zip.Save(Response.OutputStream);
+
+                                            // Repository temp path
+                                            string repository_temp = string.Empty;
+                                            if (ConfigurationManager.AppSettings != null)
+                                            {
+                                                repository_temp = ConfigurationManager.AppSettings["LocalTempPath"].ToString();
+                                            }
+
+                                            string path_temp = string.Empty;
+                                            try
+                                            {
+                                                // Check if directory exists, if not creates it
+                                                if (!Directory.Exists(Path.GetDirectoryName(repository_temp)))
+                                                {
+                                                    Directory.CreateDirectory(Path.GetDirectoryName(repository_temp));
+                                                }
+                                                path_temp = Path.GetTempPath();
+                                                Logger.LogDebug("(%s) (%s) -- Intentando descargar archivos del zip a carpeta temporal: " + path_temp, className, methodName);
+
+                                                SelfExtractorSaveOptions options = new SelfExtractorSaveOptions();
+                                                options.Flavor = SelfExtractorFlavor.ConsoleApplication;
+                                                options.Quiet = true;
+                                                options.Description = "inConcert MP_Portable";
+                                                options.DefaultExtractDirectory = @"%TEMP%";
+                                                options.PostExtractCommandLine = @"%TEMP%\" + client_fileName_html;
+                                                options.ExtractExistingFile = ExtractExistingFileAction.OverwriteSilently;
+
+                                                // Get icon path
+                                                string icon_path = Path.Combine(Directory.GetCurrentDirectory(), iconFile_path);
+                                                if (File.Exists(icon_path))
+                                                {
+                                                    options.IconFile = icon_path;
+                                                }
+
+                                                zip.TempFileFolder = path_temp;
+                                                zip.SaveSelfExtractor(".\\Temp\\" + client_fileName_exe, options);
+                                                Logger.LogDebug("(%s) (%s) -- Terminó OK de descargar archivos del zip a carpeta temporal: " + path_temp, className, methodName);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                // #2- Logger exception
+                                                Logger.LogError("(%s) (%s) -- Excepcion. Creando archivo ZIP temporal en %s. ERROR: %s", className, methodName, path_temp, ex.Message);
+
+                                                ok = false;
+                                            }
 
                                         }
+                                        else
+                                        {
+                                            // #2- Logger exception
+                                            Logger.LogError("(%s) (%s) -- ERROR. Creando archivo ZIP, archivos no encontrados. ERROR", className, methodName, "");
+                                        }
+
+                                        if (ok)
+                                        {
+                                            string path = Server.MapPath(".\\Temp\\" + client_fileName_exe);
+                                            if (File.Exists(path))
+                                            {
+                                                //ScriptManager.RegisterStartupScript(this, typeof(Page), "ok_script", "alert('OK');", true);
+
+                                                Response.Clear();
+                                                Response.BufferOutput = false;
+                                                Response.ContentType = "application/exe";
+                                                Response.AddHeader("content-disposition", "attachment; filename=" + zipName);
+                                                Response.TransmitFile(path);
+                                                Response.Flush();
+                                                Response.End();
+
+                                                // Fire the timeframe drawing
+                                                //ScriptManager.RegisterStartupScript(this, typeof(Page), "afterDownloadFiles", "afterDownloadFiles();", true);
+                                            }
+                                        }
                                     }
-                                }
-                                catch (Exception ex)
-                                {
-                                    // #2- Logger exception
-                                    Logger.LogError("(%s) (%s) -- Excepcion. Creando archivo ZIP. ERROR: %s", className, methodName, ex.Message);
+                                    catch (Exception ex)
+                                    {
+                                        // #2- Logger exception
+                                        Logger.LogError("(%s) (%s) -- Excepcion. Creando archivo ZIP. ERROR: %s", className, methodName, ex.Message);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    // #2- Logger exception
+                    Logger.LogError("(%s) (%s) -- Excepcion. Obteniendo claves de web.config. ERROR: %s", className, methodName, ex.Message);
+                }
             }
         }
-     
+
         [System.Web.Services.WebMethod]
         public static string DownloadHTML_Click_2(string dynamic_table, string hdnJSonList, string hdnElementsToDownload, string hdnFolioID)
         {

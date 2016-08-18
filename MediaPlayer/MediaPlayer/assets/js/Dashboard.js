@@ -1347,6 +1347,7 @@ function closeModal() {
     return false;
 }
 //#endregion 
+
 //#region JS Methods 2: prepareFilterTimelineElements | extend | changeTab1 | changeTab2
 /* ************* Method: Click on filters Roles or Types ************* */
 
