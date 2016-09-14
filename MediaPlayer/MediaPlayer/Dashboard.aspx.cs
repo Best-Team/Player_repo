@@ -989,7 +989,7 @@ namespace MediaPlayer
                             htmlTable.AppendLine("<tr id='tape_" + folio.tapeID + "' style='background-color: " + tr_color + ";' name='" + tr_name + "'>");
                             htmlTable.AppendLine("<td>");
 
-                            htmlTable.AppendLine("<input type='checkbox' name='timeline_elements' class='button' value='" + folio.tapeID + "#" + isExtra.ToString().ToLowerInvariant() + "#" + folio.mediaType + "#" + folio.fileName + "' onclick='manageElement(this, " + folio.tapeID + ", " + (index - 1).ToString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>");
+                            htmlTable.AppendLine("<input type='checkbox' name='timeline_elements' class='button' value='" + folio.tapeID + "#" + isExtra.ToString().ToLowerInvariant() + "#" + folio.mediaType + "#" + folio.fileName + "#" + folio.segmentID + "' onclick='manageElement(this, " + folio.tapeID + ", " + (index - 1).ToString() + ", " + JsonConvert.SerializeObject(json_element) + ")' checked>");
                             htmlTable.AppendLine("<td>");
                             htmlTable.AppendLine("<h5>" + index + "</h5>");
                             htmlTable.AppendLine("<td>");
@@ -1086,7 +1086,7 @@ namespace MediaPlayer
             string className = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
             string methodName = stackFrame.GetMethod().Name;
 
-            List<Tuple<string, string, string, string>> listElementsFilesPath = new List<Tuple<string, string, string, string>>();
+            List<Tuple<string, string, string, string, string>> listElementsFilesPath = new List<Tuple<string, string, string, string, string>>();
 
             // Source: http://stackoverflow.com/questions/13762338/read-files-from-a-folder-present-in-project
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
@@ -1153,31 +1153,32 @@ namespace MediaPlayer
                                     if (!string.IsNullOrWhiteSpace(element))
                                     {
                                         fileData_array = element.Split('$');
-                                        if (fileData_array != null && fileData_array.Length > 3)
+                                        if (fileData_array != null && fileData_array.Length > 4)
                                         {
                                             string file_path = fileData_array[0];
                                             string file_name = fileData_array[1];
                                             string file_isExtra = fileData_array[2];
-                                            string segmentID = fileData_array[3];
+                                            string tapeID = fileData_array[3];
+                                            string segmentID = fileData_array[4];
 
                                             if (!string.IsNullOrWhiteSpace(file_path) && !string.IsNullOrWhiteSpace(file_name) && !string.IsNullOrWhiteSpace(file_isExtra))
                                             {
-                                                HtmlNode tr_node = html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segmentID + "']");
+                                                HtmlNode tr_node = html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + tapeID + "']");
 
                                                 // Update index number
-                                                html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segmentID + "'] //h5").InnerHtml = index.ToString();
+                                                html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + tapeID + "'] //h5").InnerHtml = index.ToString();
                                                 tr_nodes_toDownload.Add(tr_node);
 
                                                 string userName_str = string.Empty;
-                                                if(html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segmentID + "'] ").ChildNodes[1].ChildNodes[3].ChildNodes[3].ChildNodes[1].InnerHtml != null)
+                                                if(html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + tapeID + "'] ").ChildNodes[1].ChildNodes[3].ChildNodes[3].ChildNodes[1].InnerHtml != null)
                                                 {
-                                                    userName_str = html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + segmentID + "'] ").ChildNodes[1].ChildNodes[3].ChildNodes[3].ChildNodes[1].InnerHtml;
+                                                    userName_str = html_doc_Table.DocumentNode.SelectSingleNode("//tr[@id='tape_" + tapeID + "'] ").ChildNodes[1].ChildNodes[3].ChildNodes[3].ChildNodes[1].InnerHtml;
                                                 }
 
                                                 // Recorro todos los elementos del folio
                                                 foreach (var span in json_elementList.spans)
                                                 {
-                                                    if (span.id == segmentID)
+                                                    if (span.id == tapeID)
                                                     {
                                                         spans_aux.Add(span);
 
@@ -1222,12 +1223,12 @@ namespace MediaPlayer
                                                         duration_formatStr = string.Format("{0:00}:{1:00}:{2:00}", diffInSeconds / 3600, (diffInSeconds / 60) % 60, diffInSeconds % 60);
 
                                                         // Recupero la lista de elementos
-                                                        hdnElementsAttributes_str += segmentID + "#" + groupName + "#" + mediaType + "#" + duration + "#" + timestamp + "#" + segmentID
+                                                        hdnElementsAttributes_str += tapeID + "#" + groupName + "#" + mediaType + "#" + duration + "#" + timestamp + "#" + segmentID
                                                             + "#" + index + "#" + fileName + "#" + end_date + "#" + filePath + "#" + duration_formatStr + "#" + fileStatus + "#" + userName + "$";
                                                     }
                                                 } // foreach
 
-                                                listElementsFilesPath.Add(new Tuple<string, string, string, string>(segmentID, file_path, file_isExtra, file_name));
+                                                listElementsFilesPath.Add(new Tuple<string, string, string, string, string>(tapeID, file_path, file_isExtra, file_name, segmentID));
                                             }
                                         }
                                     }
@@ -1354,7 +1355,7 @@ namespace MediaPlayer
             }
         }
 
-        protected void Download_ZipFiles(string static_HTML, List<Tuple<string, string, string, string>> listElementsFilesPath, string folioID)
+        protected void Download_ZipFiles(string static_HTML, List<Tuple<string, string, string, string, string>> listElementsFilesPath, string folioID)
         {
             // Revisar
             // http://dotnetzip.codeplex.com/discussions/231933
@@ -1468,14 +1469,15 @@ namespace MediaPlayer
                             if (listElementsFilesPath != null && listElementsFilesPath.Count > 0)
                             {
                                 WebClient webClient = new WebClient();
-                                foreach (Tuple<string, string, string, string> element in listElementsFilesPath)
+                                foreach (Tuple<string, string, string, string, string> element in listElementsFilesPath)
                                 {
                                     try
                                     {
-                                        string segmentID = element.Item1;
+                                        //string tapeID = element.Item1;
                                         string path = element.Item2;
                                         string isExtra = element.Item3;
                                         string fileName = element.Item4;
+                                        string segmentID = element.Item5;
 
                                         if (!string.IsNullOrWhiteSpace(segmentID) && !string.IsNullOrWhiteSpace(path) &&
                                             !string.IsNullOrWhiteSpace(isExtra) && !string.IsNullOrWhiteSpace(fileName))
@@ -1657,6 +1659,7 @@ namespace MediaPlayer
             }
         }
 
+        /*
         [System.Web.Services.WebMethod]
         public static string DownloadHTML_Click_2(string dynamic_table, string hdnJSonList, string hdnElementsToDownload, string hdnFolioID)
         {
@@ -1685,7 +1688,6 @@ namespace MediaPlayer
                 // Get dynamic table with elements
                 //string dynamic_table = litTable.Text;
 
-                /* ************** */
                 // HTML Agility Pack: http://htmlagilitypack.codeplex.com/wikipage?title=Examples
                 // http://www.codeproject.com/Tips/804660/How-to-Parse-HTML-using-Csharp
 
@@ -2035,7 +2037,7 @@ namespace MediaPlayer
                     {
                         zip.AlternateEncodingUsage = ZipOption.AsNecessary;
 
-                        /* ******************** Elements files ******************** */
+                        // /* ******************** Elements files ******************** 
                         if (listElementsFilesPath != null && listElementsFilesPath.Count > 0)
                         {
                             WebClient webClient = new WebClient();
@@ -2070,7 +2072,7 @@ namespace MediaPlayer
                             } // foreach
                         }
 
-                        /* ******************** Directories Files ******************** */
+                        // /* ******************** Directories Files ******************** 
 
                         // Check if exists all folders
                         Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
@@ -2201,7 +2203,7 @@ namespace MediaPlayer
                                             //ScriptManager.RegisterStartupScript(this, typeof(Page), "afterDownloadFiles", "afterDownloadFiles();", true);
 
                                         }
-                                        */
+                                        
                                     }
                                 }
                                 catch (Exception ex)
@@ -2215,6 +2217,7 @@ namespace MediaPlayer
                 }
             }
         }
+        */
 
         public static DateTime GetLinkerTime(Assembly assembly, TimeZoneInfo target = null)
         {

@@ -4650,11 +4650,12 @@ function multiDownload(objects) {
         for (obj in objects) {
             if (objects[obj] != null && objects[obj].length) {
                 var array = objects[obj].split("#");
-                if (array != null && array.length > 3) {
-                    var segmentID = array[0];
+                if (array != null && array.length > 4) {
+                    var tapeID = array[0];
                     var isExtra = array[1];
                     var mediaType = array[2];
                     var fileName = array[3];
+                    var segmentID = array[4];
                     var filePath_str = "";
 
                     if (isExtra != null && isExtra.length > 0) {
@@ -4666,7 +4667,7 @@ function multiDownload(objects) {
                             filePath_str = WS_InConcert_Server + ":" + WS_InConcert_Port + WS_InConcert_URL_download + "?id=" + segmentID + "&isExtra=0";
                         }
 
-                        var elements = hdnElementsToDownload.val() + "#" + filePath_str + "$" + fileName + "$" + isExtra + "$" + segmentID;
+                        var elements = hdnElementsToDownload.val() + "#" + filePath_str + "$" + fileName + "$" + isExtra + "$" + tapeID + "$" + segmentID;
                         hdnElementsToDownload.val(elements);
                         ok = true;
                     }
@@ -4747,6 +4748,7 @@ function multiDownload(objects) {
     }
 }
 
+/*
 function DownloadHTML_Click_AJAX() {
     
     //var dynamic_table = $("#tblLeftGridElements")[0];
@@ -4781,6 +4783,7 @@ function DownloadHTML_Click_AJAX() {
         });
     }
 }
+*/
 
 function sleep(milliseconds) {
     var start = new Date().getTime();
